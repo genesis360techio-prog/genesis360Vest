@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Set Transaction PIN — Genesis360</title>
+<script src="/tailwind.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/supabase-config.js"></script>
+<script>
+tailwind.config = { theme:{ extend:{ colors:{ brand:{'700':'#1E4535','600':'#2d6a4f'}, lime:{'400':'#9DC43A'} } } } }
+</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif}
+.pin-box{width:58px;height:68px;text-align:center;font-size:26px;font-weight:700;border:2px solid #e2e8f0;border-radius:14px;outline:none;transition:all 0.15s;background:#fff;color:#1e293b;-webkit-text-security:disc;-moz-appearance:textfield;appearance:none}
+.pin-box:focus{border-color:#1E4535;box-shadow:0 0 0 3px rgba(30,69,53,.12)}
+.pin-box.filled{border-color:#9DC43A;background:#f0fdf4}
+.spinner{display:inline-block;width:20px;height:20px;border:2px solid rgba(157,196,58,.3);border-top-color:#9DC43A;border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+.btn-primary{width:100%;padding:13px;background:#1E4535;color:#fff;font-weight:600;border-radius:12px;border:none;cursor:pointer;font-size:15px;transition:background .15s}
+.btn-primary:hover{background:#2d6a4f}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-ghost{width:100%;padding:10px;background:none;border:none;color:#64748b;font-size:14px;cursor:pointer;margin-top:6px}
+.btn-ghost:hover{color:#1e293b}
+</style>
+</head>
+<body style="min-height:100vh;background:#0f172a;display:flex;align-items:center;justify-content:center;padding:1rem">
+
+<!-- Loading -->
+<div id="loading" style="text-align:center">
+  <div class="spinner" style="width:36px;height:36px;border-width:3px;margin:0 auto 16px"></div>
+  <p style="color:#94a3b8;font-size:14px">Verifying your session…</p>
+</div>
+
+<!-- PIN Setup -->
+<div id="pin-form" style="display:none;width:100%;max-width:380px">
+  <div style="text-align:center;margin-bottom:28px">
+    <a href="/"><img src="logo.png" onerror="this.style.display='none'" alt="Genesis360" style="height:36px;margin:0 auto 20px;display:block;filter:brightness(0) invert(1)"/></a>
+    <div style="width:56px;height:56px;background:rgba(157,196,58,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+      <svg width="28" height="28" fill="none" stroke="#9DC43A" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+    </div>
+    <h1 style="font-size:22px;font-weight:800;color:#fff;margin-bottom:6px">Set Your Transaction PIN</h1>
+    <p style="color:#94a3b8;font-size:14px;line-height:1.5">Your 4-digit PIN protects every withdrawal<br>and cycle investment</p>
+  </div>
+
+  <div style="background:#fff;border-radius:20px;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.4)">
+
+    <!-- Step 1: Choose PIN -->
+    <div id="pin-step-1">
+      <p style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.07em;text-align:center;margin-bottom:16px">Choose a 4-digit PIN</p>
+      <div style="display:flex;justify-content:center;gap:12px;margin-bottom:24px">
+        <input type="tel" class="pin-box" maxlength="1" data-idx="0" data-group="1" inputmode="numeric">
+        <input type="tel" class="pin-box" maxlength="1" data-idx="1" data-group="1" inputmode="numeric">
+        <input type="tel" class="pin-box" maxlength="1" data-idx="2" data-group="1" inputmode="numeric">
+        <input type="tel" class="pin-box" maxlength="1" data-idx="3" data-group="1" inputmode="numeric">
+      </div>
+      <button id="btn-next" class="btn-primary" onclick="goToConfirm()" disabled>Continue →</button>
+    </div>
+
+    <!-- Step 2: Confirm PIN -->
+    <div id="pin-step-2" style="display:none">
+      <p style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.07em;text-align:center;margin-bottom:16px">Confirm your PIN</p>
+      <div style="display:flex;justify-content:center;gap:12px;margin-bottom:12px">
+        <input type="tel" class="pin-box" maxlength="1" data-idx="0" data-group="2" inputmode="numeric">
+        <input type="tel" class="pin-box" maxlength="1" data-idx="1" data-group="2" inputmode="numeric">
+        <input type="tel" class="pin-box" maxlength="1" data-idx="2" data-group="2" inputmode="numeric">
+        <input type="tel" class="pin-box" maxlength="1" data-idx="3" data-group="2" inputmode="numeric">
+      </div>
+      <div id="pin-err" style="display:none;color:#dc2626;font-size:13px;text-align:center;margin-bottom:12px"></div>
+      <button id="btn-save" class="btn-primary" onclick="savePin()" disabled>Set PIN &amp; Go to Dashboard →</button>
+      <button class="btn-ghost" onclick="backToPin()">← Change PIN</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Error / expired -->
+<div id="error-state" style="display:none;text-align:center">
+  <div style="width:56px;height:56px;background:rgba(239,68,68,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+    <svg width="28" height="28" fill="none" stroke="#ef4444" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+  </div>
+  <p style="color:#94a3b8;margin-bottom:20px;font-size:15px">Session not found or expired.</p>
+  <a href="/login" style="display:inline-block;padding:12px 28px;background:#1E4535;color:#fff;border-radius:12px;font-weight:600;text-decoration:none">Sign In</a>
+</div>
+
+<script>
+let _session = null
+let _pin1    = ''
+
+// ── Hash PIN (SHA-256 + salt) ─────────────────────────────────
+async function hashPin(pin) {
+  const data = new TextEncoder().encode(pin + '_g360_txpin_v1')
+  const buf  = await crypto.subtle.digest('SHA-256', data)
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('')
+}
+
+// ── Supabase client ───────────────────────────────────────────
+function sb() { return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON) }
+
+// ── PIN box behaviour ─────────────────────────────────────────
+function initPinBoxes() {
+  document.querySelectorAll('.pin-box').forEach(input => {
+    input.addEventListener('input', e => {
+      const v = e.target.value.replace(/\D/g,'')
+      e.target.value = v ? v[0] : ''
+      e.target.classList.toggle('filled', !!v)
+      const group = e.target.dataset.group, idx = parseInt(e.target.dataset.idx)
+      if (v) {
+        const next = document.querySelector(`.pin-box[data-group="${group}"][data-idx="${idx+1}"]`)
+        if (next) next.focus()
+      }
+      checkGroup(group)
+    })
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !e.target.value) {
+        const group = e.target.dataset.group, idx = parseInt(e.target.dataset.idx)
+        const prev  = document.querySelector(`.pin-box[data-group="${group}"][data-idx="${idx-1}"]`)
+        if (prev) { prev.value = ''; prev.classList.remove('filled'); prev.focus() }
+      }
+    })
+  })
+}
+
+function checkGroup(group) {
+  const done = [...document.querySelectorAll(`.pin-box[data-group="${group}"]`)].every(b => /^\d$/.test(b.value))
+  if (group === '1') document.getElementById('btn-next').disabled = !done
+  if (group === '2') document.getElementById('btn-save').disabled = !done
+}
+
+function getGroup(group) {
+  return [...document.querySelectorAll(`.pin-box[data-group="${group}"]`)].map(b => b.value).join('')
+}
+
+function clearGroup(group) {
+  document.querySelectorAll(`.pin-box[data-group="${group}"]`).forEach(b => { b.value=''; b.classList.remove('filled') })
+  if (group==='1') document.getElementById('btn-next').disabled = true
+  if (group==='2') document.getElementById('btn-save').disabled = true
+}
+
+function goToConfirm() {
+  _pin1 = getGroup('1')
+  document.getElementById('pin-step-1').style.display = 'none'
+  document.getElementById('pin-step-2').style.display = 'block'
+  document.getElementById('pin-err').style.display    = 'none'
+  clearGroup('2')
+  document.querySelector('.pin-box[data-group="2"][data-idx="0"]').focus()
+}
+
+function backToPin() {
+  document.getElementById('pin-step-2').style.display = 'none'
+  document.getElementById('pin-step-1').style.display = 'block'
+  document.querySelector('.pin-box[data-group="1"][data-idx="0"]').focus()
+}
+
+async function savePin() {
+  const pin2  = getGroup('2')
+  const errEl = document.getElementById('pin-err')
+  if (pin2 !== _pin1) {
+    errEl.textContent = 'PINs do not match. Try again.'
+    errEl.style.display = 'block'
+    clearGroup('2')
+    document.querySelector('.pin-box[data-group="2"][data-idx="0"]').focus()
+    return
+  }
+  const btn = document.getElementById('btn-save')
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>'
+  try {
+    const hash = await hashPin(_pin1)
+    const { error } = await sb().from('profiles').update({ transaction_pin: hash }).eq('id', _session.user.id)
+    if (error) throw error
+    window.location.href = '/dashboard'
+  } catch(e) {
+    btn.disabled = false; btn.textContent = 'Set PIN & Go to Dashboard →'
+    errEl.textContent = 'Failed to save PIN: ' + e.message
+    errEl.style.display = 'block'
+  }
+}
+
+// ── Init ──────────────────────────────────────────────────────
+async function init() {
+  try {
+    const { data: { session } } = await sb().auth.getSession()
+    if (session) {
+      _session = session
+      showForm()
+    } else {
+      // Wait for Supabase to process URL hash tokens (email confirm redirect)
+      setTimeout(async () => {
+        const { data: { session: s2 } } = await sb().auth.getSession()
+        if (s2) { _session = s2; showForm() }
+        else     { show('error-state') }
+      }, 1800)
+    }
+  } catch(e) { show('error-state') }
+}
+
+function show(id) {
+  document.getElementById('loading').style.display   = 'none'
+  document.getElementById('pin-form').style.display  = 'none'
+  document.getElementById('error-state').style.display = 'none'
+  document.getElementById(id).style.display = id === 'pin-form' ? 'block' : (id === 'loading' ? 'block' : 'block')
+}
+
+function showForm() {
+  document.getElementById('loading').style.display    = 'none'
+  document.getElementById('error-state').style.display = 'none'
+  document.getElementById('pin-form').style.display   = 'block'
+  initPinBoxes()
+  document.querySelector('.pin-box[data-group="1"][data-idx="0"]').focus()
+}
+
+init()
+</script>
+</body>
+</html>

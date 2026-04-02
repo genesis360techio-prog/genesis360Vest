@@ -1,0 +1,4 @@
+// Genesis360 — Supabase Configuration
+const SUPABASE_URL         = 'https://tsnkgwmzokymokurkxjh.supabase.co'
+const SUPABASE_ANON        = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzbmtnd216b2t5bW9rdXJreGpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxMjc5NDQsImV4cCI6MjA5MDcwMzk0NH0.HG1WSBwcslAX4lstaZowMGIGTrvQjiR3fxp56_qR6fc'
+const SUPABASE_SERVICE_ROLE = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzbmtnd216b2t5bW9rdXJreGpoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTEyNzk0NCwiZXhwIjoyMDkwNzAzOTQ0fQ.ACo8ILY9hM04R0Uutqxv4kgXHx-CSvoKPUKtge7zGz8'

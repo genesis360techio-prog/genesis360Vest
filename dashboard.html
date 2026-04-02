@@ -1,0 +1,1777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Genesis360 — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/supabase-config.js"></script>
+<script src="/paystack.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#F0F4F8;color:#1e293b;min-height:100vh}
+#loading-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:16px;background:#0f172a}
+.spinner{width:40px;height:40px;border:3px solid rgba(157,196,58,0.3);border-top:3px solid #9DC43A;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pm-box:focus{border-color:#1E4535!important;box-shadow:0 0 0 3px rgba(30,69,53,.12)}
+.pm-filled{border-color:#9DC43A!important;background:#f0fdf4}
+#app{display:none;min-height:100vh;flex-direction:row}
+
+/* SIDEBAR */
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:256px;background:#0f172a;display:flex;flex-direction:column;z-index:100;overflow-y:auto}
+.sidebar-logo{padding:24px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.sidebar-logo span{font-size:20px;font-weight:800;color:#fff;letter-spacing:-0.5px}
+.sidebar-logo em{color:#9DC43A;font-style:normal}
+.sidebar-nav{flex:1;padding:12px 0}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 20px;color:rgba(255,255,255,0.55);font-size:14px;font-weight:500;cursor:pointer;border-left:3px solid transparent;transition:all 0.18s;background:none;border-right:none;border-top:none;border-bottom:none;width:100%;text-align:left}
+.nav-item:hover{color:#fff;background:rgba(255,255,255,0.06)}
+.nav-item.active{color:#fff;background:rgba(157,196,58,0.12);border-left-color:#9DC43A}
+.sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,0.08)}
+.user-chip{display:flex;align-items:center;gap:10px}
+.user-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1E4535,#9DC43A);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:13px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.signout-btn{background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:12px;padding:4px 0;margin-top:8px;display:block;width:100%;text-align:left}
+.signout-btn:hover{color:#ef4444}
+
+/* MAIN */
+.main{margin-left:256px;flex:1;min-height:100vh}
+.page{display:none;padding:28px}
+.page.active{display:block}
+.page-title{font-size:22px;font-weight:800;color:#0f172a;margin-bottom:4px}
+.page-sub{font-size:14px;color:#64748b;margin-bottom:24px}
+
+/* BALANCE HERO */
+.balance-hero{background:linear-gradient(135deg,#0f2417 0%,#1E4535 60%,#2d6a4f 100%);border-radius:20px;padding:28px;color:#fff;position:relative;overflow:hidden;margin-bottom:16px}
+.balance-hero::before{content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;background:rgba(157,196,58,0.08);border-radius:50%}
+.balance-hero::after{content:'';position:absolute;bottom:-60px;right:30px;width:130px;height:130px;background:rgba(157,196,58,0.05);border-radius:50%}
+.bal-label{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:8px}
+.bal-amount{font-size:42px;font-weight:800;letter-spacing:-1.5px;line-height:1;position:relative;z-index:1}
+.bal-stats{display:flex;margin-top:20px;border-top:1px solid rgba(255,255,255,0.1);padding-top:16px;position:relative;z-index:1}
+.bal-stat{flex:1;text-align:center;padding:0 6px}
+.bal-stat:not(:last-child){border-right:1px solid rgba(255,255,255,0.1)}
+.bal-stat-val{font-size:15px;font-weight:700}
+.bal-stat-lbl{font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px}
+.hero-btns{display:flex;gap:10px;margin-top:20px;position:relative;z-index:1}
+.btn-lime{background:#9DC43A;color:#0f2417;border:none;border-radius:10px;padding:12px 20px;font-size:14px;font-weight:700;cursor:pointer;flex:1;transition:all 0.18s}
+.btn-lime:hover{background:#8ab52e}
+.btn-outline-w{background:rgba(255,255,255,0.12);color:#fff;border:1.5px solid rgba(255,255,255,0.25);border-radius:10px;padding:12px 20px;font-size:14px;font-weight:600;cursor:pointer;flex:1;transition:all 0.18s}
+.btn-outline-w:hover{background:rgba(255,255,255,0.2)}
+
+/* STAT GRID */
+.stat-grid{display:grid;gap:12px}
+.stat-grid-3{grid-template-columns:repeat(3,1fr)}
+.stat-grid-2{grid-template-columns:repeat(2,1fr)}
+.stat-card{background:#fff;border-radius:14px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:center;gap:12px}
+.stat-card-v{flex-direction:column;text-align:center;align-items:center;gap:4px}
+.stat-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.stat-val{font-size:20px;font-weight:800;color:#0f172a}
+.stat-lbl{font-size:11px;color:#64748b;margin-top:2px}
+
+/* LEVEL CARD */
+.level-card{border-radius:16px;padding:20px;color:#fff;display:flex;align-items:center;gap:16px;margin-bottom:14px}
+.level-icon{font-size:36px;flex-shrink:0}
+.level-bar-wrap{background:rgba(255,255,255,0.2);border-radius:99px;height:6px;margin-top:10px;overflow:hidden}
+.level-bar-fill{height:100%;border-radius:99px;background:#fff;transition:width 0.8s ease}
+
+/* COUNTDOWN */
+.countdown-card{background:#fff;border-radius:16px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06);text-align:center;margin-bottom:16px}
+.cd-label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:14px}
+.cd-boxes{display:flex;gap:8px;justify-content:center}
+.cd-box{background:#F0F4F8;border-radius:10px;padding:12px 16px;min-width:66px}
+.cd-num{font-size:26px;font-weight:800;color:#1E4535}
+.cd-unit{font-size:10px;color:#94a3b8;margin-top:2px;text-transform:uppercase}
+
+/* CHIPS */
+.chip{display:inline-flex;align-items:center;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+.chip-green{background:#dcfce7;color:#15803d}
+.chip-lime{background:#f0fdf4;color:#1E4535;border:1px solid #9DC43A}
+.chip-yellow{background:#fef9c3;color:#854d0e}
+.chip-blue{background:#dbeafe;color:#1d4ed8}
+.chip-red{background:#fee2e2;color:#dc2626}
+.chip-gray{background:#f1f5f9;color:#475569}
+
+/* CYCLE CARD */
+.cycle-card{background:#fff;border-radius:16px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06);margin-bottom:12px}
+.cycle-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.cycle-name{font-size:16px;font-weight:700;color:#0f172a}
+.cycle-meta{font-size:12px;color:#64748b;margin-top:4px}
+.fill-bar-wrap{background:#F0F4F8;border-radius:99px;height:8px;overflow:hidden;margin:10px 0 6px}
+.fill-bar{height:100%;border-radius:99px;background:linear-gradient(90deg,#1E4535,#9DC43A);transition:width 0.6s ease}
+.fill-label{font-size:12px;color:#64748b;display:flex;justify-content:space-between}
+.cycle-footer{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:center}
+.btn-primary{background:#1E4535;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.18s}
+.btn-primary:hover{background:#2d6a4f}
+.btn-secondary{background:#F0F4F8;color:#1e293b;border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.18s}
+.btn-secondary:hover{background:#e2e8f0}
+.btn-lime-sm{background:#9DC43A;color:#0f2417;border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer}
+
+/* CARD */
+.card{background:#fff;border-radius:16px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+
+/* SEC HEADER */
+.sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sec-title{font-size:15px;font-weight:700;color:#0f172a}
+.sec-link{font-size:13px;color:#1E4535;font-weight:600;cursor:pointer;border:none;background:none;padding:0}
+
+/* TX ROWS */
+.tx-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f1f5f9}
+.tx-row:last-child{border-bottom:none}
+.tx-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.tx-name{font-size:13px;font-weight:600;color:#1e293b}
+.tx-date{font-size:11px;color:#94a3b8;margin-top:2px}
+.tx-amt{font-size:14px;font-weight:700;margin-left:auto;white-space:nowrap}
+
+/* NOTIF */
+.notif-row{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid #f1f5f9;cursor:pointer}
+.notif-row:last-child{border-bottom:none}
+.notif-dot{width:8px;height:8px;border-radius:50%;background:#9DC43A;margin-top:6px;flex-shrink:0}
+.notif-dot.read{background:#e2e8f0}
+.notif-title{font-size:13px;font-weight:600;color:#0f172a}
+.notif-msg{font-size:12px;color:#64748b;margin-top:3px;line-height:1.5}
+.notif-time{font-size:11px;color:#94a3b8;margin-top:4px}
+
+/* PANELS */
+.panel{display:none;background:#F0F4F8;border-radius:12px;padding:18px;margin-top:14px}
+.preset-btns{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.preset-btn{background:#fff;border:1.5px solid #e2e8f0;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;color:#334155;cursor:pointer;transition:all 0.15s}
+.preset-btn:hover,.preset-btn.sel{background:#1E4535;color:#fff;border-color:#1E4535}
+.input-field{width:100%;border:1.5px solid #e2e8f0;border-radius:10px;padding:11px 14px;font-size:14px;font-family:'Inter',sans-serif;outline:none;background:#fff;transition:border-color 0.15s}
+.input-field:focus{border-color:#9DC43A}
+.fee-row{display:flex;justify-content:space-between;padding:5px 0;font-size:13px;color:#64748b}
+.fee-row.total{font-weight:700;color:#0f172a;border-top:1px solid #e2e8f0;margin-top:6px;padding-top:10px}
+
+/* TIMELINE */
+.timeline{position:relative;padding-left:28px}
+.timeline::before{content:'';position:absolute;left:9px;top:12px;bottom:12px;width:2px;background:#e2e8f0}
+.tl-item{position:relative;margin-bottom:22px}
+.tl-dot{position:absolute;left:-28px;top:4px;width:16px;height:16px;border-radius:50%;border:2px solid #e2e8f0;background:#fff}
+.tl-dot.paid{background:#9DC43A;border-color:#9DC43A}
+.tl-dot.next{background:#1E4535;border-color:#1E4535;box-shadow:0 0 0 4px rgba(30,69,53,0.15)}
+.tl-dot.mora{background:#94a3b8;border-color:#94a3b8}
+.tl-label{font-size:13px;font-weight:600;color:#0f172a}
+.tl-sub{font-size:12px;color:#64748b;margin-top:2px}
+.tl-amt{font-size:13px;font-weight:700;color:#1E4535;margin-top:4px}
+
+/* EARN ROW */
+.earn-row{display:flex;align-items:center;gap:12px;padding:12px;background:#F0F4F8;border-radius:10px;margin-bottom:8px}
+.achieve-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f1f5f9}
+.achieve-row:last-child{border-bottom:none}
+.achieve-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+
+/* REFERRAL */
+.ref-code-box{background:#F0F4F8;border-radius:12px;padding:18px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.ref-code{font-size:20px;font-weight:800;letter-spacing:2px;color:#1E4535}
+.copy-btn{background:#1E4535;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+
+/* LEADERBOARD */
+.lb-tabs{display:flex;gap:0;background:#F0F4F8;border-radius:10px;padding:3px;margin-bottom:16px}
+.lb-tab{flex:1;padding:9px;text-align:center;font-size:13px;font-weight:600;color:#64748b;cursor:pointer;border-radius:8px;border:none;background:none;transition:all 0.15s}
+.lb-tab.active{background:#fff;color:#1E4535;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+.lb-row{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;margin-bottom:6px;background:#fff}
+.lb-row.me{background:linear-gradient(135deg,rgba(30,69,53,0.06),rgba(157,196,58,0.06));border:1px solid rgba(157,196,58,0.3)}
+.lb-rank{font-size:14px;font-weight:800;color:#64748b;width:28px;text-align:center;flex-shrink:0}
+.lb-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1E4535,#9DC43A);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
+.lb-pts{font-size:13px;font-weight:700;color:#1E4535;margin-left:auto}
+
+/* RANK BANNER */
+.rank-banner{background:linear-gradient(135deg,#1E4535,#2d6a4f);color:#fff;border-radius:14px;padding:16px 20px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+
+/* PROGRESS BAR */
+.prog-wrap{background:#f1f5f9;border-radius:99px;height:8px;overflow:hidden;margin-top:8px}
+.prog-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#1E4535,#9DC43A);transition:width 0.8s ease}
+
+/* MSG CARD */
+.msg-card{border-radius:14px;padding:14px 16px;margin-bottom:16px;display:flex;gap:12px;align-items:flex-start;font-size:14px}
+.msg-icon{font-size:20px;flex-shrink:0;margin-top:2px}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:1000;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-box{background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:720px;max-height:92vh;overflow-y:auto;padding:24px;animation:slideUp 0.3s ease;position:relative}
+@keyframes slideUp{from{transform:translateY(60px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-handle{width:40px;height:4px;background:#e2e8f0;border-radius:99px;margin:0 auto 20px}
+.modal-close{position:absolute;top:20px;right:20px;background:#F0F4F8;border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:16px}
+
+/* Q CARDS */
+.mora-notice{background:#fef9c3;border:1px solid #fde047;border-radius:10px;padding:12px 14px;font-size:12px;color:#854d0e;margin-bottom:12px;line-height:1.5}
+.q-card{background:#F0F4F8;border-radius:12px;padding:14px;margin-bottom:8px}
+.q-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.q-badge{background:#1E4535;color:#fff;border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700}
+.q-rows{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.q-cell{text-align:center;padding:8px;background:#fff;border-radius:8px}
+.q-cell-val{font-size:14px;font-weight:700;color:#0f172a}
+.q-cell-val.green{color:#15803d}
+.q-cell-val.big{font-size:16px;color:#1E4535}
+.q-cell-lbl{font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.3px;margin-top:2px}
+.totals-card{background:linear-gradient(135deg,rgba(30,69,53,0.06),rgba(157,196,58,0.08));border:1px solid rgba(157,196,58,0.3);border-radius:12px;padding:16px;margin-top:4px;display:flex;justify-content:space-between;align-items:center}
+.gain-badge{background:#dcfce7;color:#15803d;padding:4px 10px;border-radius:99px;font-size:12px;font-weight:700}
+
+/* EMPTY */
+.empty{text-align:center;padding:48px 24px;color:#94a3b8}
+.empty-icon{font-size:48px;margin-bottom:12px}
+.empty-text{font-size:14px;line-height:1.6}
+
+/* MOBILE NAV */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#0f172a;z-index:200;border-top:1px solid rgba(255,255,255,0.07)}
+.mobile-nav-inner{display:flex;justify-content:space-around;padding:8px 0 calc(8px + env(safe-area-inset-bottom))}
+.mnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 12px;color:rgba(255,255,255,0.45);cursor:pointer;font-size:10px;font-weight:500;border:none;background:none;min-width:52px}
+.mnav-item.active{color:#9DC43A}
+.mnav-item svg{width:22px;height:22px}
+
+/* MORE SHEET */
+.more-sheet{position:fixed;inset:0;z-index:300;display:none}
+.more-sheet.open{display:block}
+.more-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.5)}
+.more-content{position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:20px 20px 0 0;padding:20px;padding-bottom:calc(24px + env(safe-area-inset-bottom));animation:slideUp 0.25s ease}
+.more-handle{width:36px;height:4px;background:#e2e8f0;border-radius:99px;margin:0 auto 16px}
+.more-item{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid #f1f5f9;cursor:pointer;font-size:15px;font-weight:500;color:#1e293b;background:none;border-left:none;border-right:none;border-top:none;width:100%;text-align:left}
+.more-item:last-child{border-bottom:none}
+.more-item-icon{width:38px;height:38px;border-radius:10px;background:#F0F4F8;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+
+/* TOAST */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+
+/* TWO COL */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+@media(max-width:900px){
+  .sidebar{display:none}
+  .mobile-nav{display:block}
+  .main{margin-left:0;padding-bottom:80px}
+  .page{padding:16px}
+  .stat-grid-3{grid-template-columns:1fr 1fr}
+  .two-col{grid-template-columns:1fr}
+  .bal-amount{font-size:34px}
+  .cd-box{min-width:56px;padding:10px 12px}
+  .cd-num{font-size:22px}
+  .q-rows{grid-template-columns:1fr 1fr 1fr}
+}
+@media(max-width:400px){
+  .stat-grid-3{grid-template-columns:1fr 1fr}
+  .bal-stat-val{font-size:13px}
+  .bal-stat-lbl{font-size:9px}
+}
+</style>
+</head>
+<body>
+
+<div id="loading-screen">
+  <div class="spinner"></div>
+  <div style="color:rgba(255,255,255,0.45);font-size:14px;font-family:'Inter',sans-serif;margin-top:4px">Loading your dashboard…</div>
+</div>
+
+<div id="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo"><span>Genesis<em>360</em></span></div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" onclick="showPage('home')" id="nav-home">
+        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        Overview
+      </button>
+      <button class="nav-item" onclick="showPage('wallet')" id="nav-wallet">
+        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+        Wallet
+      </button>
+      <button class="nav-item" onclick="showPage('cycles')" id="nav-cycles">
+        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        Funding Cycles
+      </button>
+      <button class="nav-item" onclick="showPage('tracking')" id="nav-tracking">
+        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        My Tracking
+      </button>
+      <button class="nav-item" onclick="showPage('rewards')" id="nav-rewards">
+        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+        Rewards
+      </button>
+      <button class="nav-item" onclick="showPage('referrals')" id="nav-referrals">
+        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Referrals
+      </button>
+      <button class="nav-item" onclick="showPage('leaderboard')" id="nav-leaderboard">
+        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+        Leaderboard
+      </button>
+      <button class="nav-item" onclick="showPage('notifs')" id="nav-notifs">
+        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        Notifications
+        <span id="notif-count" style="display:none;background:#ef4444;color:#fff;border-radius:99px;padding:1px 7px;font-size:10px;margin-left:auto"></span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-chip">
+        <div class="user-avatar" id="sb-avatar">G</div>
+        <div class="user-info">
+          <div class="user-name" id="sb-name">Loading…</div>
+          <div id="sb-kyc" style="font-size:11px;margin-top:2px"></div>
+        </div>
+      </div>
+      <button class="signout-btn" onclick="resetPin()" style="margin-bottom:4px;color:#9DC43A;border-color:rgba(157,196,58,.3)">🔒 Reset PIN</button>
+      <button class="signout-btn" onclick="signOut()">→ Sign out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- ═══════════════ HOME PAGE ═══════════════ -->
+    <div class="page active" id="page-home">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <div>
+          <div class="page-title" id="home-greeting">Overview</div>
+          <div style="font-size:13px;color:#64748b" id="home-date"></div>
+        </div>
+        <button onclick="showPage('notifs')" style="position:relative;background:#fff;border:none;border-radius:10px;padding:9px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.08)">
+          <svg width="20" height="20" fill="none" stroke="#1e293b" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          <span id="notif-dot" style="display:none;position:absolute;top:7px;right:7px;width:8px;height:8px;background:#ef4444;border-radius:50%"></span>
+        </button>
+      </div>
+
+      <!-- LEVEL CARD -->
+      <div class="level-card" id="level-card" style="background:linear-gradient(135deg,#334155,#64748b)">
+        <div style="font-size:38px" id="lv-icon">🌱</div>
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <div style="font-size:20px;font-weight:800" id="lv-name">Explorer</div>
+            <span style="font-size:11px;background:rgba(255,255,255,0.2);padding:2px 9px;border-radius:99px;font-weight:600" id="lv-pts">0 pts</span>
+          </div>
+          <div class="level-bar-wrap"><div class="level-bar-fill" id="lv-bar" style="width:0%"></div></div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:6px" id="lv-next">100 pts to Builder</div>
+        </div>
+      </div>
+
+      <!-- PERSONALIZED MESSAGE -->
+      <div class="msg-card" id="home-msg" style="background:#f0fdf4;border:1px solid #bbf7d0">
+        <div class="msg-icon">💡</div>
+        <div id="home-msg-text" style="line-height:1.5">Fund your wallet and join your first cycle.</div>
+      </div>
+
+      <!-- BALANCE HERO -->
+      <div class="balance-hero">
+        <div class="bal-label">Available Balance</div>
+        <div class="bal-amount">$<span id="h-bal">0.00</span></div>
+        <div class="bal-stats">
+          <div class="bal-stat"><div class="bal-stat-val" id="h-cycle">$0</div><div class="bal-stat-lbl">In Cycle</div></div>
+          <div class="bal-stat"><div class="bal-stat-val" id="h-dep">$0</div><div class="bal-stat-lbl">Deposited</div></div>
+          <div class="bal-stat"><div class="bal-stat-val" id="h-rcv">$0</div><div class="bal-stat-lbl">Received</div></div>
+        </div>
+        <div class="hero-btns">
+          <button class="btn-lime" onclick="showPage('wallet');setTimeout(()=>togglePanel('add-panel'),150)">+ Add Funds</button>
+          <button class="btn-outline-w" onclick="showPage('wallet');setTimeout(()=>togglePanel('withdraw-panel'),150)">Withdraw</button>
+        </div>
+      </div>
+
+      <!-- COUNTDOWN -->
+      <div id="cd-wrap" style="display:none">
+        <div class="countdown-card">
+          <div class="cd-label">⏱ Next Payout In</div>
+          <div class="cd-boxes">
+            <div class="cd-box"><div class="cd-num" id="cd-d">00</div><div class="cd-unit">Days</div></div>
+            <div class="cd-box"><div class="cd-num" id="cd-h">00</div><div class="cd-unit">Hrs</div></div>
+            <div class="cd-box"><div class="cd-num" id="cd-m">00</div><div class="cd-unit">Min</div></div>
+            <div class="cd-box"><div class="cd-num" id="cd-s">00</div><div class="cd-unit">Sec</div></div>
+          </div>
+          <div style="font-size:12px;color:#64748b;margin-top:10px" id="cd-name">Active Cycle</div>
+        </div>
+      </div>
+
+      <!-- OPEN CYCLES -->
+      <div class="sec-header"><div class="sec-title">Open Cycles</div><button class="sec-link" onclick="showPage('cycles')">View all →</button></div>
+      <div id="home-cycles"></div>
+
+      <!-- RECENT ACTIVITY -->
+      <div class="sec-header" style="margin-top:20px"><div class="sec-title">Recent Activity</div><button class="sec-link" onclick="showPage('wallet')">View all →</button></div>
+      <div class="card" style="padding:4px 16px"><div id="home-txns"></div></div>
+    </div>
+
+    <!-- ═══════════════ WALLET PAGE ═══════════════ -->
+    <div class="page" id="page-wallet">
+      <div class="page-title">Wallet</div>
+      <div class="page-sub">Manage your funds</div>
+
+      <div class="balance-hero">
+        <div class="bal-label">Available Balance</div>
+        <div class="bal-amount">$<span id="w-bal">0.00</span></div>
+        <div class="bal-stats">
+          <div class="bal-stat"><div class="bal-stat-val" id="w-cycle">$0</div><div class="bal-stat-lbl">In Cycle</div></div>
+          <div class="bal-stat"><div class="bal-stat-val" id="w-dep">$0</div><div class="bal-stat-lbl">Total In</div></div>
+          <div class="bal-stat"><div class="bal-stat-val" id="w-rcv">$0</div><div class="bal-stat-lbl">Received</div></div>
+        </div>
+        <div class="hero-btns">
+          <button class="btn-lime" onclick="togglePanel('add-panel')">+ Add Funds</button>
+          <button class="btn-outline-w" onclick="togglePanel('withdraw-panel')">Withdraw</button>
+        </div>
+      </div>
+
+      <div class="stat-grid stat-grid-3">
+        <div class="stat-card"><div class="stat-icon" style="background:#f0fdf4">💰</div><div><div class="stat-val" id="w-dep-ct">0</div><div class="stat-lbl">Deposits</div></div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:#eff6ff">🔄</div><div><div class="stat-val" id="w-cyc-ct">0</div><div class="stat-lbl">Cycles Joined</div></div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:#fefce8">📤</div><div><div class="stat-val" id="w-pay-ct">0</div><div class="stat-lbl">Payouts</div></div></div>
+      </div>
+
+      <div class="card" style="margin-top:12px;display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:40px;height:40px;background:#fff0f0;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">💸</div>
+          <div><div style="font-size:13px;font-weight:600">Total Withdrawn</div><div style="font-size:11px;color:#94a3b8;margin-top:2px">All time</div></div>
+        </div>
+        <div style="font-size:18px;font-weight:800;color:#dc2626">-$<span id="w-wd">0.00</span></div>
+      </div>
+
+      <!-- ADD FUNDS PANEL -->
+      <div class="panel" id="add-panel">
+        <div style="font-size:15px;font-weight:700;margin-bottom:14px">💳 Add Funds</div>
+
+        <!-- Payment method tabs -->
+        <div style="display:flex;gap:0;background:#e2e8f0;border-radius:10px;padding:3px;margin-bottom:16px">
+          <button id="tab-paystack" onclick="switchPayTab('paystack')" style="flex:1;padding:10px 8px;font-size:13px;font-weight:600;border-radius:8px;border:none;background:#1E4535;color:#fff;cursor:pointer;transition:all 0.15s">🇳🇬 NGN</button>
+          <button id="tab-intl" onclick="switchPayTab('intl')" style="flex:1;padding:10px 8px;font-size:13px;font-weight:600;border-radius:8px;border:none;background:none;color:#64748b;cursor:pointer;transition:all 0.15s">🌍 USD/GBP/EUR</button>
+        </div>
+
+        <!-- PAYSTACK (NGN) -->
+        <div id="pay-paystack">
+          <div style="font-size:12px;color:#64748b;margin-bottom:8px">Enter amount in Naira (₦)</div>
+          <div class="preset-btns">
+            <button class="preset-btn" onclick="selectAmt('ps',5000)">₦5K</button>
+            <button class="preset-btn" onclick="selectAmt('ps',10000)">₦10K</button>
+            <button class="preset-btn" onclick="selectAmt('ps',25000)">₦25K</button>
+            <button class="preset-btn" onclick="selectAmt('ps',50000)">₦50K</button>
+            <button class="preset-btn" onclick="selectAmt('ps',100000)">₦100K</button>
+            <button class="preset-btn" onclick="selectAmt('ps',200000)">₦200K</button>
+          </div>
+          <input type="number" class="input-field" id="deposit-amt-ps" placeholder="Or enter custom amount (₦)" oninput="updatePreview('ps')"/>
+          <div id="preview-ps" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px;margin-top:10px;font-size:13px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#64748b">You pay (incl. 1.5% fee)</span><span id="ps-ngn" style="font-weight:700">₦0</span></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#dc2626">Paystack fee</span><span id="ps-fee" style="color:#dc2626">₦0</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:#64748b">Wallet credited (approx.)</span><span id="ps-usd" style="font-weight:700;color:#1E4535">$0.00 USD</span></div>
+            <div style="font-size:11px;color:#94a3b8;margin-top:6px">Rate: ₦1,600 / $1 · Paystack fee passed to you</div>
+          </div>
+          <button class="btn-lime" style="width:100%;margin-top:12px;padding:13px;font-size:15px;font-weight:700" onclick="proceedToPaystack()">Pay with Paystack →</button>
+        </div>
+
+        <!-- INTERNATIONAL via PAYSTACK (USD/GBP/EUR/CAD) -->
+        <div id="pay-intl" style="display:none">
+          <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:#1d4ed8">
+            🌍 Diaspora payments — USD, GBP, EUR, CAD via Paystack
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:10px">
+            <select id="intl-currency" onchange="updatePreview('intl')" style="background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:10px 12px;font-size:14px;font-family:'Inter',sans-serif;outline:none;flex:1">
+              <option value="USD">🇺🇸 USD — US Dollar</option>
+              <option value="GBP">🇬🇧 GBP — British Pound</option>
+              <option value="EUR">🇪🇺 EUR — Euro</option>
+              <option value="CAD">🇨🇦 CAD — Canadian Dollar</option>
+            </select>
+          </div>
+          <div class="preset-btns">
+            <button class="preset-btn" onclick="selectAmt('intl',50)">50</button>
+            <button class="preset-btn" onclick="selectAmt('intl',100)">100</button>
+            <button class="preset-btn" onclick="selectAmt('intl',250)">250</button>
+            <button class="preset-btn" onclick="selectAmt('intl',500)">500</button>
+            <button class="preset-btn" onclick="selectAmt('intl',1000)">1,000</button>
+          </div>
+          <input type="number" class="input-field" id="deposit-amt-intl" placeholder="Enter amount" oninput="updatePreview('intl')"/>
+          <div id="preview-intl" style="display:none;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px;margin-top:10px;font-size:13px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#64748b">Deposit amount</span><span id="intl-deposit" style="font-weight:700">$0</span></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#dc2626">Paystack intl fee (3.9%)</span><span id="intl-fee" style="color:#dc2626">$0.00</span></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;border-top:1px solid #bfdbfe;padding-top:6px"><span style="font-weight:600">You are charged</span><span id="intl-charged" style="font-weight:700">$0.00</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:#64748b">Wallet credited</span><span id="intl-usd" style="font-weight:700;color:#1E4535">$0.00 USD</span></div>
+            <div style="font-size:11px;color:#94a3b8;margin-top:6px">International card fee of 3.9% is added to your charge</div>
+          </div>
+          <button class="btn-lime" style="width:100%;margin-top:12px;padding:13px;font-size:15px;font-weight:700" onclick="proceedToIntlPaystack()">Pay with Paystack →</button>
+        </div>
+      </div>
+
+      <!-- WITHDRAW PANEL — multi-step -->
+      <div class="panel" id="withdraw-panel">
+        <div style="font-size:15px;font-weight:700;margin-bottom:4px">📤 Withdraw Funds</div>
+
+        <!-- Step indicators -->
+        <div style="display:flex;gap:6px;margin-bottom:14px">
+          <div id="wd-step-dot-1" style="flex:1;height:3px;border-radius:99px;background:#1E4535"></div>
+          <div id="wd-step-dot-2" style="flex:1;height:3px;border-radius:99px;background:#e2e8f0"></div>
+          <div id="wd-step-dot-3" style="flex:1;height:3px;border-radius:99px;background:#e2e8f0"></div>
+        </div>
+
+        <!-- Step 1: Amount -->
+        <div id="wd-step-1">
+          <div style="font-size:12px;color:#64748b;margin-bottom:8px">How much do you want to withdraw?</div>
+          <div class="preset-btns">
+            <button class="preset-btn" onclick="setWd(50)">$50</button>
+            <button class="preset-btn" onclick="setWd(100)">$100</button>
+            <button class="preset-btn" onclick="setWd(250)">$250</button>
+            <button class="preset-btn" onclick="setWd(500)">$500</button>
+          </div>
+          <input type="number" class="input-field" id="wd-amt" placeholder="Enter amount ($)" oninput="calcWd()"/>
+          <div style="background:#f8fafc;border-radius:10px;padding:14px;margin-top:10px">
+            <div class="fee-row"><span>Amount</span><span id="wd-gross">$0.00</span></div>
+            <div class="fee-row"><span style="color:#dc2626">Platform Fee (2.5%)</span><span id="wd-fee" style="color:#dc2626">-$0.00</span></div>
+            <div class="fee-row total"><span>You Receive</span><span id="wd-net" style="color:#1E4535">$0.00</span></div>
+          </div>
+          <button class="btn-primary" style="width:100%;margin-top:12px;padding:13px" onclick="wdGoStep2()">Continue →</button>
+        </div>
+
+        <!-- Step 2: Bank details -->
+        <div id="wd-step-2" style="display:none">
+          <div style="font-size:12px;color:#64748b;margin-bottom:10px">Enter your Nigerian bank account details</div>
+          <div style="margin-bottom:10px">
+            <label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">Select Bank</label>
+            <select id="wd-bank" class="input-field" onchange="wdBankChanged()" style="padding:11px 12px">
+              <option value="">Loading banks…</option>
+            </select>
+          </div>
+          <div style="margin-bottom:10px">
+            <label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">Account Number</label>
+            <input id="wd-acct-num" type="text" maxlength="10" class="input-field" placeholder="10-digit account number" oninput="wdAcctChanged()" style="letter-spacing:.08em"/>
+          </div>
+          <!-- Account verification result -->
+          <div id="wd-verify-box" style="display:none;border-radius:10px;padding:12px;margin-bottom:10px;font-size:13px"></div>
+          <div style="display:flex;gap:8px;margin-top:4px">
+            <button class="btn-outline" style="flex:1;padding:11px" onclick="wdGoStep1()">← Back</button>
+            <button id="wd-confirm-btn" class="btn-primary" style="flex:2;padding:11px" onclick="wdConfirmBtnClick()" disabled>Verify Account</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Confirm -->
+        <div id="wd-step-3" style="display:none">
+          <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px;margin-bottom:14px">
+            <div style="font-size:11px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Withdrawal Summary</div>
+            <div class="fee-row"><span>You Receive</span><span id="wd-confirm-net" style="font-weight:700;color:#1E4535;font-size:16px">$0.00</span></div>
+            <div class="fee-row"><span>Bank</span><span id="wd-confirm-bank" style="font-weight:600">—</span></div>
+            <div class="fee-row"><span>Account</span><span id="wd-confirm-acct" style="font-weight:600;letter-spacing:.08em">—</span></div>
+            <div class="fee-row" style="border-top:1px solid #bbf7d0;padding-top:8px;margin-top:6px"><span>Account Name</span><span id="wd-confirm-name" style="font-weight:700;color:#1E4535">—</span></div>
+          </div>
+          <div id="wd-step3-err" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:10px 12px;font-size:13px;color:#dc2626;margin-bottom:10px"></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn-outline" style="flex:1;padding:11px" onclick="wdGoStep2()">← Back</button>
+            <button class="btn-primary" style="flex:2;padding:11px" onclick="doWithdraw()">Confirm & Withdraw</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TX HISTORY -->
+      <div class="sec-header" style="margin-top:20px"><div class="sec-title">Transaction History</div></div>
+      <div class="card" style="padding:4px 16px"><div id="wallet-txns"></div></div>
+    </div>
+
+    <!-- ═══════════════ CYCLES PAGE ═══════════════ -->
+    <div class="page" id="page-cycles">
+      <div class="page-title">Funding Cycles</div>
+      <div class="page-sub">View and join available cycles</div>
+      <div id="cycles-list"></div>
+    </div>
+
+    <!-- ═══════════════ TRACKING PAGE ═══════════════ -->
+    <div class="page" id="page-tracking">
+      <div class="page-title">My Tracking</div>
+      <div class="page-sub">Monitor your active participations and payout timelines</div>
+      <div id="tracking-list"></div>
+
+      <!-- Investor Intelligence -->
+      <div style="margin-top:32px;">
+        <div style="font-size:1.1rem;font-weight:700;color:#A6D64A;margin-bottom:6px;">Loan Ecosystem Intelligence</div>
+        <div style="font-size:0.85rem;color:#aaa;margin-bottom:16px;">Live metrics from the Genesis360Finance loan portfolio powering your returns</div>
+        <div style="background:#111;border:1px solid rgba(166,214,74,0.15);border-radius:12px;overflow:hidden;">
+          <iframe id="tracking_intel_iframe" style="width:100%;height:700px;border:none;display:block;" loading="lazy"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ REWARDS PAGE ═══════════════ -->
+    <div class="page" id="page-rewards">
+      <div class="page-title">Rewards</div>
+      <div class="page-sub">Earn points, unlock levels and exclusive access</div>
+
+      <div class="level-card" id="rew-lv-card" style="background:linear-gradient(135deg,#334155,#64748b);margin-bottom:20px">
+        <div style="font-size:52px" id="rew-icon">🌱</div>
+        <div style="flex:1">
+          <div style="font-size:11px;opacity:0.65;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Your Level</div>
+          <div style="font-size:26px;font-weight:800" id="rew-lv-name">Explorer</div>
+          <div style="font-size:13px;opacity:0.7;margin-top:2px" id="rew-pts-text">0 points earned</div>
+          <div class="level-bar-wrap"><div class="level-bar-fill" id="rew-bar" style="width:0%"></div></div>
+          <div style="font-size:11px;opacity:0.6;margin-top:6px" id="rew-next-text">100 pts to Builder</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:14px">
+        <div class="sec-title" style="margin-bottom:12px">How to Earn Points</div>
+        <div class="earn-row"><div style="font-size:20px">🔄</div><div><div style="font-size:13px;font-weight:600">Join a Funding Cycle</div><div style="font-size:12px;color:#1E4535;font-weight:700;margin-top:2px">+100 pts per cycle</div></div></div>
+        <div class="earn-row"><div style="font-size:20px">✅</div><div><div style="font-size:13px;font-weight:600">Complete a Full Cycle</div><div style="font-size:12px;color:#1E4535;font-weight:700;margin-top:2px">+250 pts</div></div></div>
+        <div class="earn-row"><div style="font-size:20px">💰</div><div><div style="font-size:13px;font-weight:600">Deposit $500 or more</div><div style="font-size:12px;color:#1E4535;font-weight:700;margin-top:2px">+50 pts per qualifying deposit</div></div></div>
+        <div class="earn-row" style="margin-bottom:0"><div style="font-size:20px">🤝</div><div><div style="font-size:13px;font-weight:600">Refer a Friend</div><div style="font-size:12px;color:#1E4535;font-weight:700;margin-top:2px">+150 pts per successful referral</div></div></div>
+      </div>
+
+      <div class="card">
+        <div class="sec-title" style="margin-bottom:12px">Achievements</div>
+        <div class="achieve-row">
+          <div class="achieve-icon" style="background:#fef9c3">💰</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">First Deposit</div><div style="font-size:11px;color:#64748b;margin-top:2px">Make your first wallet deposit</div></div>
+          <div id="ach-dep"></div>
+        </div>
+        <div class="achieve-row">
+          <div class="achieve-icon" style="background:#f0fdf4">🔄</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">First Cycle</div><div style="font-size:11px;color:#64748b;margin-top:2px">Join your first funding cycle</div></div>
+          <div id="ach-cyc"></div>
+        </div>
+        <div class="achieve-row">
+          <div class="achieve-icon" style="background:#eff6ff">🏅</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">Cycle Completer</div><div style="font-size:11px;color:#64748b;margin-top:2px">Complete a full 13-month cycle</div></div>
+          <div id="ach-done"></div>
+        </div>
+        <div class="achieve-row" style="border-bottom:none">
+          <div class="achieve-icon" style="background:#fdf4ff">🤝</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">Ambassador</div><div style="font-size:11px;color:#64748b;margin-top:2px">Refer a friend successfully</div></div>
+          <div id="ach-ref"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ REFERRALS PAGE ═══════════════ -->
+    <div class="page" id="page-referrals">
+      <div class="page-title">Referrals</div>
+      <div class="page-sub">Invite friends, earn 150 pts per successful referral</div>
+
+      <div class="card" style="margin-bottom:14px">
+        <div style="font-size:12px;color:#64748b;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px">Your Referral Code</div>
+        <div class="ref-code-box">
+          <div class="ref-code" id="ref-code">GEN-XXXX</div>
+          <button class="copy-btn" onclick="copyRefLink()">Copy Link</button>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:14px">
+          <button onclick="shareWA()" style="flex:1;background:#25D366;color:#fff;border:none;border-radius:10px;padding:12px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Share on WhatsApp
+          </button>
+          <button onclick="copyRefLink()" style="flex:1;background:#F0F4F8;border:none;border-radius:10px;padding:12px;font-size:13px;font-weight:600;cursor:pointer">🔗 Copy Link</button>
+        </div>
+      </div>
+
+      <div class="stat-grid stat-grid-3" style="margin-bottom:14px">
+        <div class="stat-card stat-card-v"><div class="stat-val" id="ref-total">0</div><div class="stat-lbl">Referrals</div></div>
+        <div class="stat-card stat-card-v"><div class="stat-val" id="ref-conv">0</div><div class="stat-lbl">Converted</div></div>
+        <div class="stat-card stat-card-v"><div class="stat-val" id="ref-pts">0</div><div class="stat-lbl">Pts Earned</div></div>
+      </div>
+
+      <div class="card" style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="font-size:13px;font-weight:600">🔓 Unlock Early Access</div>
+          <div style="font-size:12px;color:#64748b"><span id="ref-prog-n">0</span>/3 referrals</div>
+        </div>
+        <div class="prog-wrap"><div class="prog-fill" id="ref-prog-bar" style="width:0%"></div></div>
+        <div style="font-size:12px;color:#64748b;margin-top:8px">Refer 3 friends to unlock priority cycle access</div>
+      </div>
+
+      <div class="card">
+        <div class="sec-title" style="margin-bottom:14px">How It Works</div>
+        <div style="display:flex;gap:12px;margin-bottom:14px"><div style="width:28px;height:28px;border-radius:50%;background:#1E4535;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">1</div><div style="font-size:13px;color:#334155"><strong>Share your link</strong><br>Send your unique referral link to friends and family</div></div>
+        <div style="display:flex;gap:12px;margin-bottom:14px"><div style="width:28px;height:28px;border-radius:50%;background:#1E4535;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">2</div><div style="font-size:13px;color:#334155"><strong>They register</strong><br>Your friend signs up using your referral link</div></div>
+        <div style="display:flex;gap:12px"><div style="width:28px;height:28px;border-radius:50%;background:#9DC43A;color:#0f2417;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">3</div><div style="font-size:13px;color:#334155"><strong>You earn 150 pts</strong><br>Points credited once they fund their wallet and join a cycle</div></div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ LEADERBOARD PAGE ═══════════════ -->
+    <div class="page" id="page-leaderboard">
+      <div class="page-title">Leaderboard</div>
+      <div class="page-sub">Top participants this cycle</div>
+      <div class="rank-banner">
+        <div><div style="font-size:11px;opacity:0.7;text-transform:uppercase;letter-spacing:0.5px">Your Rank</div><div style="font-size:30px;font-weight:800">#<span id="my-rank">—</span></div></div>
+        <div style="text-align:right"><div style="font-size:11px;opacity:0.7;text-transform:uppercase;letter-spacing:0.5px">Total Participation</div><div style="font-size:30px;font-weight:800">$<span id="my-total">0</span></div></div>
+      </div>
+      <div class="lb-tabs">
+        <button class="lb-tab active" onclick="switchLbTab('participation')" id="lbt-p">Participation</button>
+        <button class="lb-tab" onclick="switchLbTab('referrals')" id="lbt-r">Referrals</button>
+      </div>
+      <div id="lb-list"></div>
+    </div>
+
+    <!-- ═══════════════ NOTIFICATIONS PAGE ═══════════════ -->
+    <div class="page" id="page-notifs">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <div class="page-title">Notifications</div>
+        <button onclick="markAllRead()" style="background:#F0F4F8;border:none;border-radius:8px;padding:9px 16px;font-size:12px;font-weight:600;cursor:pointer;color:#1E4535">Mark all read</button>
+      </div>
+      <div class="card" style="padding:0 16px"><div id="notifs-list"></div></div>
+    </div>
+
+  </main>
+
+  <!-- ═══ MOBILE BOTTOM NAV ═══ -->
+  <nav class="mobile-nav">
+    <div class="mobile-nav-inner">
+      <button class="mnav-item active" onclick="showPage('home')" id="mnav-home">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        Home
+      </button>
+      <button class="mnav-item" onclick="showPage('wallet')" id="mnav-wallet">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+        Wallet
+      </button>
+      <button class="mnav-item" onclick="showPage('cycles')" id="mnav-cycles">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        Cycles
+      </button>
+      <button class="mnav-item" onclick="showPage('rewards')" id="mnav-rewards">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+        Rewards
+      </button>
+      <button class="mnav-item" onclick="showMoreSheet()" id="mnav-more">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        More
+      </button>
+    </div>
+  </nav>
+
+  <!-- ═══ MORE SHEET ═══ -->
+  <div class="more-sheet" id="more-sheet">
+    <div class="more-overlay" onclick="hideMoreSheet()"></div>
+    <div class="more-content">
+      <div class="more-handle"></div>
+      <button class="more-item" onclick="hideMoreSheet();showPage('tracking')"><div class="more-item-icon">📊</div>My Tracking</button>
+      <button class="more-item" onclick="hideMoreSheet();showPage('leaderboard')"><div class="more-item-icon">🏆</div>Leaderboard</button>
+      <button class="more-item" onclick="hideMoreSheet();showPage('referrals')"><div class="more-item-icon">🤝</div>Referrals</button>
+      <button class="more-item" onclick="hideMoreSheet();showPage('notifs')"><div class="more-item-icon">🔔</div>Notifications</button>
+      <button class="more-item" onclick="hideMoreSheet();resetPin()"><div class="more-item-icon" style="background:#f0fdf4">🔒</div>Reset PIN</button>
+      <button class="more-item" onclick="signOut()" style="color:#ef4444"><div class="more-item-icon" style="background:#fff0f0">🚪</div>Sign Out</button>
+    </div>
+  </div>
+
+  <!-- ═══ JOIN / PAYOUT MODAL ═══ -->
+  <div class="modal-overlay" id="join-modal">
+    <div class="modal-box">
+      <div class="modal-handle"></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div style="font-size:18px;font-weight:800;color:#0f172a;margin-bottom:4px" id="modal-title">Funding Cycle</div>
+      <div style="font-size:13px;color:#64748b;margin-bottom:18px" id="modal-sub">Enter an amount to preview your payout schedule</div>
+
+      <div style="margin-bottom:16px">
+        <div class="preset-btns" id="modal-presets"></div>
+        <input type="number" class="input-field" id="modal-amt" placeholder="Or enter amount ($)" oninput="calcBreakdown()"/>
+      </div>
+
+      <div id="modal-body" style="display:none">
+        <div class="mora-notice">⏸ <strong>Month 1 — Moratorium:</strong> No distribution. Your contribution accrues interest at 2.5%/month before quarterly payouts begin at Month 4.</div>
+        <div id="q-cards"></div>
+        <div class="totals-card">
+          <div>
+            <div style="font-size:12px;color:#64748b;margin-bottom:4px">Total Distributions (4 payouts over 13 months)</div>
+            <div style="font-size:24px;font-weight:800;color:#0f172a">$<span id="modal-total">0.00</span></div>
+          </div>
+          <div style="text-align:right">
+            <div class="gain-badge" id="modal-gain">+0%</div>
+            <div style="font-size:11px;color:#64748b;margin-top:6px">total gain</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:#94a3b8;line-height:1.6;margin-top:10px;margin-bottom:16px">* 13-month cycle · 1-month moratorium · Payouts at months 4, 7, 10 &amp; 13 · Rate: 2.5%/month amortised · Dates are estimates, confirmed when cycle activates.</div>
+        <button class="btn-lime" style="width:100%;padding:14px;font-size:15px;display:none" id="modal-join-btn" onclick="confirmJoin()">Confirm &amp; Join Cycle →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+// ────────────────────────────────────────────────────────
+// STATE
+// ────────────────────────────────────────────────────────
+let _sb = null;
+function sb() {
+  if (!_sb) _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+  return _sb;
+}
+
+let currentUser=null, profile=null, wallet=null;
+let cycles=[], parts=[], txns=[], payouts=[], notifs=[];
+let modalCycleId=null, modalJoin=false, cdTick=null, lbTab='participation', lbData=[];
+
+// ────────────────────────────────────────────────────────
+// HELPERS
+// ────────────────────────────────────────────────────────
+function fmt(n){return(+(n||0)).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function fmtK(n){n=+(n||0);return n>=1000?'$'+(n/1000).toFixed(1)+'k':'$'+fmt(n);}
+function fmtDate(d){return d?new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';}
+function fmtShort(d){return d?new Date(d).toLocaleDateString('en-US',{month:'short',year:'numeric'}):'—';}
+function pad(n){return String(n).padStart(2,'0');}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+function set(id,val){const e=document.getElementById(id);if(e)e.textContent=val;}
+function setH(id,val){const e=document.getElementById(id);if(e)e.innerHTML=val;}
+
+// ────────────────────────────────────────────────────────
+// LEVELS
+// ────────────────────────────────────────────────────────
+function getPoints(){
+  let p=parts.length*100;
+  txns.filter(t=>t.type==='deposit'&&t.amount>=500).forEach(()=>p+=50);
+  return p;
+}
+function getLevel(pts){
+  if(pts>=600)return{name:'Elite',icon:'🏆',grad:'linear-gradient(135deg,#78350f,#f59e0b)',progress:100,next:'Maximum level reached'};
+  if(pts>=300)return{name:'Insider',icon:'⭐',grad:'linear-gradient(135deg,#064e3b,#059669)',progress:((pts-300)/300)*100,next:`${600-pts} pts to Elite`};
+  if(pts>=100)return{name:'Builder',icon:'🔷',grad:'linear-gradient(135deg,#1e3a8a,#3b82f6)',progress:((pts-100)/200)*100,next:`${300-pts} pts to Insider`};
+  return{name:'Explorer',icon:'🌱',grad:'linear-gradient(135deg,#334155,#64748b)',progress:(pts/100)*100,next:`${100-pts} pts to Builder`};
+}
+
+// ────────────────────────────────────────────────────────
+// AMORTIZATION  (2.5%/month, 1-month moratorium, 4 quarterly payouts)
+// ────────────────────────────────────────────────────────
+function calcAmort(principal, startDate){
+  const r=0.025, mora=1;
+  const B=principal*Math.pow(1+r,mora);
+  const qRate=Math.pow(1+r,3)-1; // ~7.689%
+  const nQ=4;
+  const qPMT=B*qRate*Math.pow(1+qRate,nQ)/(Math.pow(1+qRate,nQ)-1);
+  let balance=B, rows=[];
+  const start=startDate?new Date(startDate):new Date();
+  for(let q=1;q<=4;q++){
+    const mth=mora+q*3; // months 4,7,10,13
+    const d=new Date(start); d.setMonth(d.getMonth()+mth);
+    const interest=balance*qRate;
+    const prin=qPMT-interest;
+    balance-=prin;
+    rows.push({q,mth,date:d,principal:Math.max(0,prin),distribution:interest,total:qPMT});
+  }
+  return rows;
+}
+
+// ────────────────────────────────────────────────────────
+// INIT + LOAD
+// ────────────────────────────────────────────────────────
+async function init(){
+  try{
+    const {data:{session}}=await sb().auth.getSession();
+    if(!session){window.location.href='/login';return;}
+    currentUser=session.user;
+    await Promise.all([loadProfile(),loadWallet(),loadCycles(),loadParts(),loadTxns(),loadPayouts(),loadNotifs()]);
+    renderAll();
+    document.getElementById('loading-screen').style.display='none';
+    document.getElementById('app').style.display='flex';
+    renderLeaderboard();
+  }catch(e){
+    console.error(e);
+    document.getElementById('loading-screen').innerHTML=`<div style="text-align:center;padding:40px"><div style="font-size:14px;color:rgba(255,255,255,0.5);margin-bottom:16px">Could not load dashboard</div><a href="/login" style="color:#9DC43A;font-weight:600;font-size:15px">Sign in again →</a></div>`;
+  }
+}
+
+async function loadProfile(){const{data}=await sb().from('profiles').select('*').eq('id',currentUser.id).single();profile=data||{full_name:currentUser.email,kyc_status:'pending'};}
+async function loadWallet(){const{data}=await sb().from('wallets').select('*').eq('user_id',currentUser.id).single();wallet=data||{balance_usd:0,locked_amount:0,total_deposited:0,total_withdrawn:0};}
+async function loadCycles(){const{data}=await sb().from('funding_cycles').select('*').order('created_at',{ascending:false});cycles=data||[];}
+async function loadParts(){const{data}=await sb().from('cycle_participations').select('*,funding_cycles(*)').eq('user_id',currentUser.id);parts=data||[];}
+async function loadTxns(){const{data}=await sb().from('transactions').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});txns=data||[];}
+async function loadPayouts(){const{data}=await sb().from('payouts').select('*,funding_cycles(cycle_name)').eq('user_id',currentUser.id).order('scheduled_date',{ascending:true});payouts=data||[];}
+async function loadNotifs(){const{data}=await sb().from('notifications').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});notifs=data||[];}
+
+// ────────────────────────────────────────────────────────
+// RENDER ALL
+// ────────────────────────────────────────────────────────
+function renderAll(){
+  renderSidebar(); renderHome(); renderWallet();
+  renderCycles(); renderTracking(); renderRewards();
+  renderReferrals(); renderNotifPage();
+}
+
+// ── SIDEBAR ──
+function renderSidebar(){
+  const name=profile?.full_name||currentUser.email;
+  const ini=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'?';
+  set('sb-avatar',ini); set('sb-name',name);
+  const kyc=profile?.kyc_status||'pending';
+  setH('sb-kyc',kyc==='approved'?'<span style="color:#9DC43A;font-size:11px">✓ KYC Verified</span>':kyc==='rejected'?'<span style="color:#ef4444;font-size:11px">✗ KYC Rejected</span>':'<span style="color:#f59e0b;font-size:11px">⏳ KYC Pending</span>');
+  const unread=notifs.filter(n=>!n.read).length;
+  const nc=document.getElementById('notif-count'),nd=document.getElementById('notif-dot');
+  if(unread>0){if(nc){nc.textContent=unread;nc.style.display='';}if(nd)nd.style.display='';}
+  else{if(nc)nc.style.display='none';if(nd)nd.style.display='none';}
+}
+
+// ── HOME ──
+function renderHome(){
+  const hr=new Date().getHours();
+  const g=hr<12?'Good morning':hr<18?'Good afternoon':'Good evening';
+  const fn=(profile?.full_name||'').split(' ')[0]||'there';
+  set('home-greeting',`${g}, ${fn}`);
+  set('home-date',new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}));
+
+  const bal=wallet?.balance_usd||0, locked=wallet?.locked_amount||0, dep=wallet?.total_deposited||0;
+  const rcv=payouts.filter(p=>p.status==='paid').reduce((s,p)=>s+p.amount,0);
+  set('h-bal',fmt(bal)); set('h-cycle',fmtK(locked)); set('h-dep',fmtK(dep)); set('h-rcv',fmtK(rcv));
+
+  // Level
+  const pts=getPoints(), lv=getLevel(pts);
+  document.getElementById('level-card').style.background=lv.grad;
+  set('lv-icon',lv.icon); set('lv-name',lv.name); set('lv-pts',`${pts} pts`);
+  document.getElementById('lv-bar').style.width=lv.progress+'%';
+  set('lv-next',lv.next);
+
+  // Personalized message
+  const msg=document.getElementById('home-msg'), txt=document.getElementById('home-msg-text');
+  const kyc=profile?.kyc_status;
+  if(kyc==='pending'){msg.style.background='#fffbeb';msg.style.borderColor='#fde68a';txt.innerHTML='<strong style="display:block;margin-bottom:2px">Identity Under Review</strong>Your KYC is pending. You can fund your wallet and join cycles — but withdrawals are locked until your identity is verified.';}
+  else if(kyc==='rejected'){msg.style.background='#fef2f2';msg.style.borderColor='#fecaca';txt.innerHTML='<strong style="display:block;margin-bottom:2px">KYC Rejected</strong>Please re-submit your identity documents to continue.';}
+  else if(parts.length===0){msg.style.background='#f0fdf4';msg.style.borderColor='#bbf7d0';txt.innerHTML='<strong style="display:block;margin-bottom:2px">You\'re all set!</strong>Fund your wallet and join your first cycle to start your participation journey.';}
+  else if(bal<100){msg.style.background='#eff6ff';msg.style.borderColor='#bfdbfe';txt.innerHTML='<strong style="display:block;margin-bottom:2px">Top up your wallet</strong>Add funds to position yourself for the next cycle opening.';}
+  else{msg.style.background='#f0fdf4';msg.style.borderColor='#bbf7d0';txt.innerHTML='<strong style="display:block;margin-bottom:2px">You\'re participating!</strong>You\'re in an active cycle. Your next distribution is on its way.';}
+
+  // Countdown
+  const np=payouts.find(p=>p.status==='pending'&&p.scheduled_date);
+  if(np){document.getElementById('cd-wrap').style.display='block';set('cd-name',np.funding_cycles?.cycle_name||'Active Cycle');startCountdown(np.scheduled_date);}
+
+  // Open cycles (max 2)
+  const open=cycles.filter(c=>c.status==='open').slice(0,2);
+  setH('home-cycles',open.length===0
+    ?'<div class="empty" style="padding:28px"><div class="empty-icon" style="font-size:36px">🔄</div><div class="empty-text">No open cycles right now.</div></div>'
+    :open.map(c=>miniCard(c)).join(''));
+
+  // Recent txns
+  setH('home-txns',txns.length===0
+    ?'<div style="text-align:center;padding:24px;color:#94a3b8;font-size:13px">No transactions yet</div>'
+    :txns.slice(0,5).map(txRow).join(''));
+}
+
+function miniCard(c){
+  const fill=c.total_slots>0?Math.round((c.filled_slots/c.total_slots)*100):0;
+  const left=(c.total_slots||0)-(c.filled_slots||0);
+  return `<div class="cycle-card">
+    <div class="cycle-header">
+      <div><div class="cycle-name">${c.cycle_name||'Funding Cycle'}</div><div class="cycle-meta">Min: $${fmt(c.contribution_amount||c.min_amount||100)} · 13 months · 2.5%/month</div></div>
+      <span class="chip chip-${c.status==='open'?'lime':c.status==='active'?'green':'gray'}">${c.status}</span>
+    </div>
+    <div class="fill-bar-wrap"><div class="fill-bar" style="width:${fill}%"></div></div>
+    <div class="fill-label"><span>${fill}% filled</span><span style="color:${left<=3?'#ef4444':'#64748b'}">${left} slot${left!==1?'s':''} left</span></div>
+    <div class="cycle-footer">
+      <button class="btn-secondary" onclick="showModal('${c.id}',false)">View Schedule</button>
+      ${c.status==='open'&&profile?.kyc_status!=='rejected'?`<button class="btn-lime-sm" onclick="showModal('${c.id}',true)">Join →</button>`:''}
+    </div>
+  </div>`;
+}
+
+function txRow(tx){
+  const icons={deposit:'💰',withdrawal:'💸',payout:'📤',participation:'🔄'};
+  const bgs={deposit:'#f0fdf4',withdrawal:'#fff0f0',payout:'#f0fdf4',participation:'#eff6ff'};
+  const pos=tx.type==='deposit'||tx.type==='payout';
+  return `<div class="tx-row">
+    <div class="tx-icon" style="background:${bgs[tx.type]||'#f1f5f9'}">${icons[tx.type]||'💳'}</div>
+    <div><div class="tx-name">${tx.type.charAt(0).toUpperCase()+tx.type.slice(1)}</div><div class="tx-date">${fmtDate(tx.created_at)}</div></div>
+    <div class="tx-amt" style="color:${pos?'#15803d':'#dc2626'}">${pos?'+':'-'}$${fmt(tx.amount)}</div>
+  </div>`;
+}
+
+// ── WALLET ──
+function renderWallet(){
+  const bal=wallet?.balance_usd||0, locked=wallet?.locked_amount||0, dep=wallet?.total_deposited||0, wd=wallet?.total_withdrawn||0;
+  const rcv=payouts.filter(p=>p.status==='paid').reduce((s,p)=>s+p.amount,0);
+  set('w-bal',fmt(bal)); set('w-cycle',fmtK(locked)); set('w-dep',fmtK(dep)); set('w-rcv',fmtK(rcv)); set('w-wd',fmt(wd));
+  set('w-dep-ct',txns.filter(t=>t.type==='deposit').length);
+  set('w-cyc-ct',parts.length);
+  set('w-pay-ct',payouts.filter(p=>p.status==='paid').length);
+  setH('wallet-txns',txns.length===0
+    ?'<div style="text-align:center;padding:32px;color:#94a3b8;font-size:13px">No transactions yet</div>'
+    :txns.map(txRow).join(''));
+}
+
+// ── CYCLES ──
+function renderCycles(){
+  if(cycles.length===0){setH('cycles-list','<div class="empty"><div class="empty-icon">🔄</div><div class="empty-text">No cycles available right now</div></div>');return;}
+  setH('cycles-list',cycles.map(c=>{
+    const fill=c.total_slots>0?Math.round((c.filled_slots/c.total_slots)*100):0;
+    const left=(c.total_slots||0)-(c.filled_slots||0);
+    const joined=parts.some(p=>p.cycle_id===c.id);
+    const sc={open:'lime',active:'green',upcoming:'blue',full:'yellow',completed:'gray'};
+    return `<div class="cycle-card">
+      <div class="cycle-header">
+        <div><div class="cycle-name">${c.cycle_name||'Funding Cycle'}</div><div class="cycle-meta">Min: $${fmt(c.contribution_amount||c.min_amount||100)} · 13 months · 2.5%/month amortised</div></div>
+        <span class="chip chip-${sc[c.status]||'gray'}">${c.status}</span>
+      </div>
+      <div class="fill-bar-wrap"><div class="fill-bar" style="width:${fill}%"></div></div>
+      <div class="fill-label"><span>${c.filled_slots||0}/${c.total_slots||0} slots (${fill}%)</span><span style="color:${left<=3?'#ef4444':'#64748b'}">${left} left</span></div>
+      ${c.start_date?`<div style="font-size:12px;color:#64748b;margin-top:6px">🗓 Start: ${fmtDate(c.start_date)}</div>`:''}
+      <div class="cycle-footer">
+        <button class="btn-secondary" onclick="showModal('${c.id}',false)">View Payout Schedule</button>
+        ${joined?'<span class="chip chip-green">✓ Joined</span>':c.status==='open'&&profile?.kyc_status!=='rejected'?`<button class="btn-lime-sm" onclick="showModal('${c.id}',true)">Join Cycle →</button>`:c.status==='open'&&profile?.kyc_status==='rejected'?'<span class="chip chip-yellow">KYC Rejected</span>':''}
+      </div>
+    </div>`;
+  }).join(''));
+}
+
+// ── TRACKING ──
+function renderTracking(){
+  if(parts.length===0){setH('tracking-list','<div class="empty"><div class="empty-icon">📊</div><div class="empty-text">You haven\'t joined any cycles yet.<br><button onclick="showPage(\'cycles\')" style="color:#1E4535;font-weight:600;border:none;background:none;cursor:pointer;font-size:14px;margin-top:8px">Browse open cycles →</button></div></div>');return;}
+  const now=new Date();
+  setH('tracking-list',parts.map(p=>{
+    const c=p.funding_cycles||{};
+    const start=p.joined_at?new Date(p.joined_at):null;
+    const mIn=start?Math.min(13,Math.floor((now-start)/(30*24*60*60*1000))):0;
+    const pct=Math.min(100,Math.round((mIn/13)*100));
+    const sched=calcAmort(p.amount||500,p.joined_at);
+    const myP=payouts.filter(py=>py.cycle_id===p.cycle_id);
+    return `<div class="card" style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+        <div><div style="font-size:16px;font-weight:700">${c.cycle_name||'Funding Cycle'}</div><div style="font-size:12px;color:#64748b;margin-top:3px">Joined ${fmtDate(p.joined_at)} · $${fmt(p.amount)}</div></div>
+        <span class="chip chip-${c.status==='active'?'green':'gray'}">${c.status||'active'}</span>
+      </div>
+      <div style="margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-bottom:6px"><span>Cycle Progress</span><span>Month ${mIn} of 13</span></div>
+        <div class="prog-wrap"><div class="prog-fill" style="width:${pct}%"></div></div>
+      </div>
+      <div class="sec-title" style="margin-bottom:12px">Payout Timeline</div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-dot mora"></div><div class="tl-label">Month 1 — Moratorium</div><div class="tl-sub">No distribution · Interest accruing at 2.5%/month</div></div>
+        ${sched.map(row=>{
+          const mp=myP.find(py=>py.scheduled_date&&Math.abs(new Date(py.scheduled_date)-row.date)<35*24*60*60*1000);
+          const paid=mp?.status==='paid';
+          const isNext=!paid&&row.date>now&&!sched.filter(r=>r.date>now&&r.q<row.q).length;
+          return `<div class="tl-item">
+            <div class="tl-dot ${paid?'paid':isNext?'next':''}"></div>
+            <div class="tl-label">Q${row.q} Distribution — Month ${row.mth}</div>
+            <div class="tl-sub">${fmtShort(row.date)}${isNext?' · <strong style="color:#1E4535">Next payout</strong>':''}</div>
+            <div class="tl-amt">$${fmt(row.total)}</div>
+            <div style="font-size:11px;color:#94a3b8;margin-top:2px">Principal: $${fmt(row.principal)} · Distribution: $${fmt(row.distribution)}</div>
+            ${paid?'<span class="chip chip-green" style="margin-top:6px">✓ Paid</span>':isNext?'<span class="chip chip-blue" style="margin-top:6px">Upcoming</span>':''}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join(''));
+}
+
+// ── REWARDS ──
+function renderRewards(){
+  const pts=getPoints(), lv=getLevel(pts);
+  document.getElementById('rew-lv-card').style.background=lv.grad;
+  set('rew-icon',lv.icon); set('rew-lv-name',lv.name);
+  set('rew-pts-text',`${pts} points earned`);
+  document.getElementById('rew-bar').style.width=lv.progress+'%';
+  set('rew-next-text',lv.next);
+  const hasDep=txns.some(t=>t.type==='deposit');
+  const hasCyc=parts.length>0;
+  setH('ach-dep',hasDep?'<span class="chip chip-green">✓ Unlocked</span>':'<span class="chip chip-gray">Locked</span>');
+  setH('ach-cyc',hasCyc?'<span class="chip chip-green">✓ Unlocked</span>':'<span class="chip chip-gray">Locked</span>');
+  setH('ach-done','<span class="chip chip-gray">Locked</span>');
+  setH('ach-ref','<span class="chip chip-gray">Locked</span>');
+}
+
+// ── REFERRALS ──
+function renderReferrals(){
+  const code='GEN-'+(currentUser?.id||'').slice(0,6).toUpperCase();
+  set('ref-code',code);
+  set('ref-total',0); set('ref-conv',0); set('ref-pts',0);
+  set('ref-prog-n',0); document.getElementById('ref-prog-bar').style.width='0%';
+}
+
+// ── LEADERBOARD ──
+async function renderLeaderboard(){
+  try{
+    const{data}=await sb().from('cycle_participations')
+      .select('user_id,amount,profiles(full_name)')
+      .order('amount',{ascending:false}).limit(30);
+    const map={};
+    (data||[]).forEach(r=>{
+      if(!map[r.user_id])map[r.user_id]={uid:r.user_id,name:r.profiles?.full_name||'Participant',total:0};
+      map[r.user_id].total+=(r.amount||0);
+    });
+    lbData=Object.values(map).sort((a,b)=>b.total-a.total).slice(0,10);
+    const myIdx=lbData.findIndex(r=>r.uid===currentUser?.id);
+    set('my-rank',myIdx>=0?myIdx+1:'—');
+    const me=map[currentUser?.id];
+    set('my-total',me?fmt(me.total):'0.00');
+    renderLbList();
+  }catch(e){console.error(e);}
+}
+
+function renderLbList(){
+  if(!lbData.length){setH('lb-list','<div class="empty"><div class="empty-icon">🏆</div><div class="empty-text">Not enough data yet</div></div>');return;}
+  const medals=['🥇','🥈','🥉'];
+  setH('lb-list',lbData.map((r,i)=>{
+    const isMe=r.uid===currentUser?.id;
+    const ini=r.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'?';
+    const obf=r.name.split(' ').map((w,j)=>j===0?w[0]+'***':w[0]+'.').join(' ');
+    return `<div class="lb-row ${isMe?'me':''}">
+      <div class="lb-rank" style="color:${i<3?'#f59e0b':'#94a3b8'}">${i<3?medals[i]:i+1}</div>
+      <div class="lb-avatar">${ini}</div>
+      <div style="flex:1;font-size:13px;font-weight:600;color:#0f172a">${isMe?'You ✨':obf}</div>
+      <div class="lb-pts">$${fmt(r.total)}</div>
+    </div>`;
+  }).join(''));
+}
+
+function switchLbTab(tab){
+  lbTab=tab;
+  document.getElementById('lbt-p').classList.toggle('active',tab==='participation');
+  document.getElementById('lbt-r').classList.toggle('active',tab==='referrals');
+  if(tab==='referrals')setH('lb-list','<div class="empty"><div class="empty-icon">🤝</div><div class="empty-text">Referral leaderboard coming soon</div></div>');
+  else renderLbList();
+}
+
+// ── NOTIFICATIONS ──
+function renderNotifPage(){
+  if(!notifs.length){setH('notifs-list','<div class="empty" style="padding:32px 0"><div class="empty-icon">🔔</div><div class="empty-text">No notifications yet</div></div>');return;}
+  setH('notifs-list',notifs.map(n=>`<div class="notif-row" onclick="markRead('${n.id}')">
+    <div class="notif-dot ${n.read?'read':''}"></div>
+    <div><div class="notif-title">${n.title||'Notification'}</div><div class="notif-msg">${n.message||''}</div><div class="notif-time">${fmtDate(n.created_at)}</div></div>
+  </div>`).join(''));
+}
+
+async function markAllRead(){
+  await sb().from('notifications').update({read:true}).eq('user_id',currentUser.id);
+  notifs=notifs.map(n=>({...n,read:true}));
+  renderNotifPage(); renderSidebar(); showToast('All notifications marked as read');
+}
+async function markRead(id){
+  await sb().from('notifications').update({read:true}).eq('id',id);
+  notifs=notifs.map(n=>n.id===id?{...n,read:true}:n);
+  renderNotifPage(); renderSidebar();
+}
+
+// ────────────────────────────────────────────────────────
+// MODAL
+// ────────────────────────────────────────────────────────
+function showModal(cycleId, joinMode){
+  modalCycleId=cycleId; modalJoin=joinMode;
+  const c=cycles.find(x=>x.id===cycleId)||{};
+  set('modal-title',c.cycle_name||'Funding Cycle');
+  set('modal-sub',joinMode?'Enter your amount to see the full payout breakdown and confirm your participation':'Enter an amount to preview your quarterly payout schedule');
+  const min=c.contribution_amount||c.min_amount||100;
+  const presets=[min,min*2,min*5,min*10];
+  setH('modal-presets',presets.map(p=>`<button class="preset-btn" onclick="setModalAmt(${p})">$${fmt(p)}</button>`).join(''));
+  document.getElementById('modal-amt').value='';
+  document.getElementById('modal-body').style.display='none';
+  document.getElementById('modal-join-btn').style.display='none';
+  document.getElementById('join-modal').classList.add('open');
+}
+function closeModal(){document.getElementById('join-modal').classList.remove('open');}
+function setModalAmt(n){document.getElementById('modal-amt').value=n;calcBreakdown();}
+
+function calcBreakdown(){
+  const val=parseFloat(document.getElementById('modal-amt').value);
+  if(!val||val<=0){document.getElementById('modal-body').style.display='none';return;}
+  const c=cycles.find(x=>x.id===modalCycleId)||{};
+  const sched=calcAmort(val,c.start_date);
+  const total=sched.reduce((s,r)=>s+r.total,0);
+  const gain=((total-val)/val*100).toFixed(1);
+  document.getElementById('modal-body').style.display='block';
+  set('modal-total',fmt(total));
+  set('modal-gain',`+${gain}%`);
+  setH('q-cards',sched.map(row=>`<div class="q-card">
+    <div class="q-card-header">
+      <div style="display:flex;align-items:center;gap:8px"><span class="q-badge">Q${row.q}</span><span style="font-size:13px;font-weight:600">Month ${row.mth} Payout</span></div>
+      <span style="font-size:12px;color:#64748b">${fmtShort(row.date)}</span>
+    </div>
+    <div class="q-rows">
+      <div class="q-cell"><div class="q-cell-val">$${fmt(row.principal)}</div><div class="q-cell-lbl">Principal</div></div>
+      <div class="q-cell"><div class="q-cell-val green">$${fmt(row.distribution)}</div><div class="q-cell-lbl">Distribution</div></div>
+      <div class="q-cell"><div class="q-cell-val big">$${fmt(row.total)}</div><div class="q-cell-lbl">Total Out</div></div>
+    </div>
+  </div>`).join(''));
+  if(modalJoin)document.getElementById('modal-join-btn').style.display='block';
+}
+
+async function confirmJoin(){
+  const val=parseFloat(document.getElementById('modal-amt').value);
+  if(!val||val<=0){showToast('Enter a valid amount');return;}
+  const c=cycles.find(x=>x.id===modalCycleId)||{};
+  const min=c.contribution_amount||c.min_amount||100;
+  if(val<min){showToast(`Minimum is $${fmt(min)}`);return;}
+  if(val>(wallet?.balance_usd||0)){showToast('Insufficient wallet balance');return;}
+  const pinOk=await promptPin(); if(!pinOk){showToast('Cancelled');return;}
+  const btn=document.getElementById('modal-join-btn');
+  btn.textContent='Joining…'; btn.disabled=true;
+  try{
+    await sb().from('cycle_participations').insert({user_id:currentUser.id,cycle_id:modalCycleId,amount:val,joined_at:new Date().toISOString()});
+    await sb().from('wallets').update({balance_usd:(wallet.balance_usd||0)-val,locked_amount:(wallet.locked_amount||0)+val}).eq('user_id',currentUser.id);
+    showToast('✅ Successfully joined the cycle!');
+    notifyTelegram(`🔄 <b>Cycle Joined</b>\nUser: ${profile?.full_name||currentUser.email}\nAmount: $${fmt(val)}\nCycle ID: ${modalCycleId}`);
+    closeModal();
+    await Promise.all([loadWallet(),loadParts()]);
+    renderAll();
+  }catch(e){showToast('Error joining. Please try again.');}
+  finally{btn.textContent='Confirm & Join Cycle →';btn.disabled=false;}
+}
+
+// ────────────────────────────────────────────────────────
+// WALLET ACTIONS
+// ────────────────────────────────────────────────────────
+function togglePanel(id){
+  ['add-panel','withdraw-panel'].forEach(pid=>{
+    const el=document.getElementById(pid);
+    el.style.display=(pid===id&&el.style.display!=='block')?'block':'none';
+  });
+  // Reset add-funds panel when opened
+  if(id==='add-panel' && document.getElementById('add-panel').style.display==='block'){
+    document.getElementById('deposit-amt-ps').value='';
+    document.getElementById('deposit-amt-intl').value='';
+    document.getElementById('preview-ps').style.display='none';
+    document.getElementById('preview-intl').style.display='none';
+    switchPayTab('paystack');
+  }
+  // Reset withdrawal to step 1 when opened
+  if(id==='withdraw-panel' && document.getElementById('withdraw-panel').style.display==='block'){
+    wdGoStep1();
+    document.getElementById('wd-amt').value='';
+    document.getElementById('wd-acct-num').value='';
+    document.getElementById('wd-verify-box').style.display='none';
+    const btn=document.getElementById('wd-confirm-btn');
+    btn.disabled=true; btn.textContent='Verify Account';
+    set('wd-gross','$0.00'); set('wd-fee','-$0.00'); set('wd-net','$0.00');
+  }
+}
+// ── Telegram alert helper ─────────────────────────────────
+async function notifyTelegram(text) {
+  try { await fetch('/api/notify', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({text}) }) }
+  catch(e) { /* silent — alerts are non-critical */ }
+}
+
+// ─── PAYMENT KEYS ────────────────────────────────────────
+const PAYSTACK_KEY = 'pk_live_1de281b02e42675e498b1b185073b248be0c7a45';
+const NGN_TO_USD = 1600;
+const FX = { USD:1, GBP:1.27, EUR:1.09, CAD:0.74 };
+
+let activePayTab = 'paystack';
+let wdBanks = [], wdVerifiedName = '', wdVerifiedBank = '', wdVerifyTimer = null;
+
+function switchPayTab(tab){
+  activePayTab=tab;
+  document.getElementById('pay-paystack').style.display=tab==='paystack'?'block':'none';
+  document.getElementById('pay-intl').style.display=tab==='intl'?'block':'none';
+  const ps=document.getElementById('tab-paystack'), intl=document.getElementById('tab-intl');
+  ps.style.background=tab==='paystack'?'#1E4535':'none'; ps.style.color=tab==='paystack'?'#fff':'#64748b';
+  intl.style.background=tab==='intl'?'#1E4535':'none'; intl.style.color=tab==='intl'?'#fff':'#64748b';
+}
+
+function selectAmt(provider, n){
+  if(provider==='ps'){ document.getElementById('deposit-amt-ps').value=n; updatePreview('ps'); }
+  else { document.getElementById('deposit-amt-intl').value=n; updatePreview('intl'); }
+}
+
+function updatePreview(provider){
+  if(provider==='ps'){
+    const v=parseFloat(document.getElementById('deposit-amt-ps').value)||0;
+    const el=document.getElementById('preview-ps');
+    if(v>0){ el.style.display='block'; document.getElementById('ps-ngn').textContent='₦'+v.toLocaleString('en-NG'); document.getElementById('ps-usd').textContent='$'+fmt(v/NGN_TO_USD)+' USD'; }
+    else el.style.display='none';
+  } else {
+    const v=parseFloat(document.getElementById('deposit-amt-intl').value)||0;
+    const cur=document.getElementById('intl-currency').value;
+    const el=document.getElementById('preview-intl');
+    const sym={USD:'$',GBP:'£',EUR:'€',CAD:'CA$'};
+    if(v>0){
+      el.style.display='block';
+      const fee=parseFloat((v*0.039).toFixed(2)), charged=parseFloat((v+fee).toFixed(2)), usdEq=v*(FX[cur]||1);
+      document.getElementById('intl-deposit').textContent=(sym[cur]||'$')+v.toLocaleString();
+      document.getElementById('intl-fee').textContent=(sym[cur]||'$')+fmt(fee);
+      document.getElementById('intl-charged').textContent=(sym[cur]||'$')+fmt(charged);
+      document.getElementById('intl-usd').textContent='$'+fmt(usdEq)+' USD';
+    } else el.style.display='none';
+  }
+}
+function updateDepositPreview(){ updatePreview('ps'); }
+
+// ─── PAYSTACK ─────────────────────────────────────────────
+function proceedToPaystack(){
+  const v=parseFloat(document.getElementById('deposit-amt-ps').value)||0;
+  if(!v||v<100){showToast('Minimum deposit is ₦100');return;}
+  const usdEquiv=v/NGN_TO_USD;
+  const handler=PaystackPop.setup({
+    key: PAYSTACK_KEY,
+    email: currentUser.email,
+    amount: Math.round(v*100),
+    currency: 'NGN',
+    ref: 'GEN360_PS_'+Date.now()+'_'+Math.random().toString(36).slice(2,7).toUpperCase(),
+    metadata:{ user_id:currentUser.id, usd_equiv:usdEquiv.toFixed(2), custom_fields:[{display_name:'User ID',variable_name:'user_id',value:currentUser.id}] },
+    callback: function(response){ onDepositSuccess(response.reference, v, usdEquiv, 'NGN', 'paystack'); },
+    onClose: function(){ showToast('Payment cancelled'); }
+  });
+  handler.openIframe();
+}
+
+// ─── PAYSTACK INTERNATIONAL ───────────────────────────────
+function proceedToIntlPaystack(){
+  const v=parseFloat(document.getElementById('deposit-amt-intl').value)||0;
+  const cur=document.getElementById('intl-currency').value;
+  if(!v||v<1){showToast('Enter a valid amount');return;}
+  const fee=parseFloat((v*0.039).toFixed(2)), charged=parseFloat((v+fee).toFixed(2)), usdEq=v*(FX[cur]||1);
+  const handler=PaystackPop.setup({
+    key: PAYSTACK_KEY,
+    email: currentUser.email,
+    amount: Math.round(charged*100),
+    currency: cur,
+    ref: 'GEN360_INTL_'+Date.now()+'_'+Math.random().toString(36).slice(2,7).toUpperCase(),
+    metadata:{ user_id:currentUser.id, usd_equiv:usdEq.toFixed(2), custom_fields:[{display_name:'User ID',variable_name:'user_id',value:currentUser.id}] },
+    callback: function(response){ onDepositSuccess(response.reference, v, usdEq, cur, 'paystack'); },
+    onClose: function(){ showToast('Payment cancelled'); }
+  });
+  handler.openIframe();
+}
+
+// ─── SHARED SUCCESS HANDLER ───────────────────────────────
+async function onDepositSuccess(ref, amount, usdAmount, currency, gateway){
+  try{
+    showToast('⏳ Confirming payment…');
+    const usd=parseFloat(usdAmount.toFixed(2));
+    await sb().from('transactions').insert({
+      user_id:currentUser.id, type:'deposit', amount:usd, status:'completed',
+      payment_ref:String(ref), created_at:new Date().toISOString()
+    });
+    const newBal=(wallet?.balance_usd||0)+usd, newDep=(wallet?.total_deposited||0)+usd;
+    await sb().from('wallets').update({balance_usd:newBal,total_deposited:newDep}).eq('user_id',currentUser.id);
+    const sym={USD:'$',GBP:'£',EUR:'€',CAD:'CA$',NGN:'₦'};
+    const displayAmt=(sym[currency]||'')+(currency==='NGN'?amount.toLocaleString('en-NG'):amount.toLocaleString());
+    await sb().from('notifications').insert({
+      user_id:currentUser.id, title:'Deposit Confirmed',
+      message:`${displayAmt} received via ${gateway.charAt(0).toUpperCase()+gateway.slice(1)}. Wallet credited $${fmt(usd)} USD.`,
+      read:false, created_at:new Date().toISOString()
+    });
+    showToast(`✅ Deposit confirmed! Wallet credited $${fmt(usd)}`);
+    notifyTelegram(`💰 <b>New Deposit</b>\nUser: ${profile?.full_name||currentUser.email}\nAmount: $${fmt(usd)} USD\nGateway: ${gateway}\nRef: ${ref}`);
+    document.getElementById('add-panel').style.display='none';
+    document.getElementById('deposit-amt-ps').value='';
+    document.getElementById('deposit-amt-intl').value='';
+    document.getElementById('preview-ps').style.display='none';
+    document.getElementById('preview-intl').style.display='none';
+    await Promise.all([loadWallet(),loadTxns(),loadNotifs()]);
+    renderAll();
+  }catch(e){
+    console.error(e);
+    showToast('Payment received but wallet update failed. Ref: '+ref);
+  }
+}
+function setWd(n){document.getElementById('wd-amt').value=n;calcWd();}
+function calcWd(){
+  const v=parseFloat(document.getElementById('wd-amt').value)||0;
+  const fee=v*0.025, net=v-fee;
+  set('wd-gross','$'+fmt(v)); set('wd-fee','-$'+fmt(fee)); set('wd-net','$'+fmt(net));
+}
+
+function wdGoStep1(){
+  document.getElementById('wd-step-1').style.display='block';
+  document.getElementById('wd-step-2').style.display='none';
+  document.getElementById('wd-step-3').style.display='none';
+  document.getElementById('wd-step-dot-1').style.background='#1E4535';
+  document.getElementById('wd-step-dot-2').style.background='#e2e8f0';
+  document.getElementById('wd-step-dot-3').style.background='#e2e8f0';
+}
+
+function wdGoStep2(){
+  const v=parseFloat(document.getElementById('wd-amt').value)||0;
+  if(v<=0){showToast('Enter a valid amount');return;}
+  if(v>(wallet?.balance_usd||0)){showToast('Insufficient balance');return;}
+  if(profile?.kyc_status!=='approved'){
+    openKycModal(); return;
+  }
+  document.getElementById('wd-step-1').style.display='none';
+  document.getElementById('wd-step-2').style.display='block';
+  document.getElementById('wd-step-3').style.display='none';
+  document.getElementById('wd-step-dot-1').style.background='#1E4535';
+  document.getElementById('wd-step-dot-2').style.background='#1E4535';
+  document.getElementById('wd-step-dot-3').style.background='#e2e8f0';
+  if(wdBanks.length===0) loadWdBanks();
+}
+
+const BANKS_FALLBACK = [
+  {code:'044',name:'Access Bank'},{code:'063',name:'Access Bank (Diamond)'},{code:'035A',name:'ALAT by WEMA'},
+  {code:'050',name:'Ecobank Nigeria'},{code:'070',name:'Fidelity Bank'},{code:'011',name:'First Bank of Nigeria'},
+  {code:'214',name:'First City Monument Bank'},{code:'058',name:'Guaranty Trust Bank'},{code:'030',name:'Heritage Bank'},
+  {code:'301',name:'Jaiz Bank'},{code:'082',name:'Keystone Bank'},{code:'076',name:'Polaris Bank'},
+  {code:'101',name:'Providus Bank'},{code:'221',name:'Stanbic IBTC Bank'},{code:'068',name:'Standard Chartered Bank'},
+  {code:'232',name:'Sterling Bank'},{code:'302',name:'TAJ Bank'},{code:'032',name:'Union Bank of Nigeria'},
+  {code:'033',name:'United Bank For Africa'},{code:'215',name:'Unity Bank'},{code:'035',name:'Wema Bank'},
+  {code:'057',name:'Zenith Bank'},{code:'120001',name:'9PSB'},{code:'090267',name:'Kuda Bank'},
+  {code:'090405',name:'Moniepoint MFB'},{code:'000026',name:'Carbon'},{code:'100004',name:'Opay'},
+  {code:'100033',name:'Palmpay'},{code:'000023',name:'GTWorld (GTB Mobile)'},{code:'100002',name:'Rubies MFB'},
+];
+
+async function loadWdBanks(){
+  const sel=document.getElementById('wd-bank');
+  sel.innerHTML='<option value="">Loading banks…</option>';
+  try{
+    const r=await fetch('/api/banks');
+    const d=await r.json();
+    const list=d.data&&d.data.length>0?d.data:BANKS_FALLBACK;
+    wdBanks=list;
+    sel.innerHTML='<option value="">Select your bank</option>'+wdBanks.map(b=>`<option value="${b.code}">${b.name}</option>`).join('');
+  }catch(e){
+    wdBanks=BANKS_FALLBACK;
+    sel.innerHTML='<option value="">Select your bank</option>'+wdBanks.map(b=>`<option value="${b.code}">${b.name}</option>`).join('');
+  }
+}
+
+function wdBankChanged(){
+  wdVerifiedName=''; wdVerifiedBank='';
+  document.getElementById('wd-verify-box').style.display='none';
+  const btn=document.getElementById('wd-confirm-btn');
+  btn.disabled=true; btn.textContent='Verify Account';
+  const acct=document.getElementById('wd-acct-num').value.replace(/\D/g,'');
+  if(acct.length===10) wdVerifyAccount();
+}
+
+function wdAcctChanged(){
+  const raw=document.getElementById('wd-acct-num').value.replace(/\D/g,'');
+  document.getElementById('wd-acct-num').value=raw;
+  wdVerifiedName=''; wdVerifiedBank='';
+  document.getElementById('wd-verify-box').style.display='none';
+  const btn=document.getElementById('wd-confirm-btn');
+  btn.disabled=true; btn.textContent='Verify Account';
+  if(raw.length===10){
+    if(wdVerifyTimer) clearTimeout(wdVerifyTimer);
+    wdVerifyTimer=setTimeout(wdVerifyAccount, 600);
+  }
+}
+
+async function wdVerifyAccount(){
+  const acct=document.getElementById('wd-acct-num').value.replace(/\D/g,'');
+  const bankCode=document.getElementById('wd-bank').value;
+  if(!acct||acct.length!==10||!bankCode) return;
+  const box=document.getElementById('wd-verify-box');
+  const btn=document.getElementById('wd-confirm-btn');
+  box.style.display='block';
+  box.style.cssText='display:block;border-radius:10px;padding:12px;margin-bottom:10px;font-size:13px;background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8';
+  box.textContent='🔍 Verifying account…';
+  btn.disabled=true; btn.textContent='Verifying…';
+  try{
+    const r=await fetch(`/api/verify-account?account_number=${acct}&bank_code=${bankCode}`);
+    const d=await r.json();
+    if(d.status && d.data?.account_name){
+      const verName=d.data.account_name;
+      const profileWords=(profile?.full_name||'').toUpperCase().split(/\s+/).filter(w=>w.length>1);
+      const verUpper=verName.toUpperCase();
+      const matchCount=profileWords.filter(w=>verUpper.includes(w)).length;
+      const isMatch=matchCount>=(profileWords.length>=2?2:1);
+      if(isMatch){
+        wdVerifiedName=verName;
+        const bankSel=document.getElementById('wd-bank');
+        wdVerifiedBank=bankSel.options[bankSel.selectedIndex]?.text||bankCode;
+        box.style.cssText='display:block;border-radius:10px;padding:12px;margin-bottom:10px;font-size:13px;background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d';
+        box.textContent='✅ '+verName;
+        btn.disabled=false; btn.textContent='Continue →';
+      } else {
+        box.style.cssText='display:block;border-radius:10px;padding:12px;margin-bottom:10px;font-size:13px;background:#fef2f2;border:1px solid #fecaca;color:#dc2626';
+        box.textContent='❌ Account name ('+verName+') does not match your profile. Please use an account registered in your name.';
+        btn.disabled=true; btn.textContent='Verify Account';
+      }
+    } else {
+      box.style.cssText='display:block;border-radius:10px;padding:12px;margin-bottom:10px;font-size:13px;background:#fef2f2;border:1px solid #fecaca;color:#dc2626';
+      box.textContent='❌ Account not found. Check your account number and bank.';
+      btn.disabled=false; btn.textContent='Try Again';
+    }
+  }catch(e){
+    box.style.cssText='display:block;border-radius:10px;padding:12px;margin-bottom:10px;font-size:13px;background:#fff7ed;border:1px solid #fed7aa;color:#c2410c';
+    box.textContent='⚠️ Could not reach verification service. Make sure the server is running (node serve.cjs) and a Paystack secret key is set.';
+    btn.disabled=false; btn.textContent='Try Again';
+  }
+}
+
+function wdConfirmBtnClick(){
+  if(wdVerifiedName) wdGoStep3();
+  else wdVerifyAccount();
+}
+
+function wdGoStep3(){
+  if(!wdVerifiedName){showToast('Please verify your account first');return;}
+  const v=parseFloat(document.getElementById('wd-amt').value)||0;
+  const fee=v*0.025, net=v-fee;
+  set('wd-confirm-net','$'+fmt(net));
+  set('wd-confirm-bank',wdVerifiedBank);
+  set('wd-confirm-acct',document.getElementById('wd-acct-num').value);
+  set('wd-confirm-name',wdVerifiedName);
+  document.getElementById('wd-step3-err').style.display='none';
+  document.getElementById('wd-step-1').style.display='none';
+  document.getElementById('wd-step-2').style.display='none';
+  document.getElementById('wd-step-3').style.display='block';
+  document.getElementById('wd-step-dot-1').style.background='#1E4535';
+  document.getElementById('wd-step-dot-2').style.background='#1E4535';
+  document.getElementById('wd-step-dot-3').style.background='#1E4535';
+}
+
+async function doWithdraw(){
+  if(profile?.kyc_status!=='approved'){openKycModal();return;}
+  const pinOk = await promptPin();
+  if(!pinOk){showToast('Withdrawal cancelled');return;}
+  const v=parseFloat(document.getElementById('wd-amt').value)||0;
+  if(v<=0){showToast('Enter a valid amount');return;}
+  if(v>(wallet?.balance_usd||0)){showToast('Insufficient balance');return;}
+  if(!wdVerifiedName){showToast('Account verification required');return;}
+  const fee=v*0.025, net=v-fee;
+  const errBox=document.getElementById('wd-step3-err');
+  errBox.style.display='none';
+  try{
+    await sb().from('transactions').insert({
+      user_id:currentUser.id, type:'withdrawal', amount:parseFloat(net.toFixed(2)), status:'pending',
+      payment_ref:'WD_'+Date.now()+'_'+Math.random().toString(36).slice(2,7).toUpperCase(),
+      created_at:new Date().toISOString()
+    });
+    await sb().from('wallets').update({balance_usd:parseFloat(((wallet?.balance_usd||0)-v).toFixed(2))}).eq('user_id',currentUser.id);
+    await sb().from('notifications').insert({
+      user_id:currentUser.id, title:'Withdrawal Requested',
+      message:`Withdrawal of $${fmt(net)} (after 2.5% fee) to ${wdVerifiedBank} — ${document.getElementById('wd-acct-num').value} submitted. Processing within 1–3 business days.`,
+      read:false, created_at:new Date().toISOString()
+    });
+    showToast('✅ Withdrawal submitted! Processing within 1–3 business days.');
+    notifyTelegram(`📤 <b>Withdrawal Request</b>\nUser: ${profile?.full_name||currentUser.email}\nAmount: $${fmt(net)} (after fee)\nBank: ${wdVerifiedBank}\nAccount: ${document.getElementById('wd-acct-num').value}`);
+    document.getElementById('withdraw-panel').style.display='none';
+    wdVerifiedName=''; wdVerifiedBank='';
+    await Promise.all([loadWallet(),loadTxns(),loadNotifs()]);
+    renderAll();
+  }catch(e){
+    console.error(e);
+    errBox.style.display='block'; errBox.textContent='Failed to submit withdrawal. Please try again.';
+  }
+}
+
+// ────────────────────────────────────────────────────────
+// COUNTDOWN
+// ────────────────────────────────────────────────────────
+function startCountdown(dateStr){
+  if(cdTick)clearInterval(cdTick);
+  function tick(){
+    const diff=new Date(dateStr)-new Date();
+    if(diff<=0){clearInterval(cdTick);return;}
+    set('cd-d',pad(Math.floor(diff/86400000)));
+    set('cd-h',pad(Math.floor((diff%86400000)/3600000)));
+    set('cd-m',pad(Math.floor((diff%3600000)/60000)));
+    set('cd-s',pad(Math.floor((diff%60000)/1000)));
+  }
+  tick(); cdTick=setInterval(tick,1000);
+}
+
+// ────────────────────────────────────────────────────────
+// NAVIGATION
+// ────────────────────────────────────────────────────────
+function showPage(name){
+  currentPage=name;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const pg=document.getElementById('page-'+name);
+  if(pg)pg.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  const ni=document.getElementById('nav-'+name);
+  if(ni)ni.classList.add('active');
+  document.querySelectorAll('.mnav-item').forEach(el=>el.classList.remove('active'));
+  const mn=document.getElementById('mnav-'+name);
+  if(mn)mn.classList.add('active');
+  window.scrollTo(0,0);
+  if(name==='tracking'){
+    const fr=document.getElementById('tracking_intel_iframe');
+    if(fr&&!fr.src)fr.src='/investor-intelligence';
+  }
+}
+function showMoreSheet(){document.getElementById('more-sheet').classList.add('open');}
+function hideMoreSheet(){document.getElementById('more-sheet').classList.remove('open');}
+
+// ────────────────────────────────────────────────────────
+// REFERRALS
+// ────────────────────────────────────────────────────────
+function copyRefLink(){
+  const code=document.getElementById('ref-code').textContent;
+  const link=`${location.origin}/register?ref=${code}`;
+  navigator.clipboard.writeText(link).then(()=>showToast('Referral link copied!')).catch(()=>showToast('Code: '+code));
+}
+function shareWA(){
+  const code=document.getElementById('ref-code').textContent;
+  const msg=encodeURIComponent(`Join Genesis360 — a structured funding cycle platform supporting African food businesses. Use my code ${code}: ${location.origin}/register?ref=${code}`);
+  window.open(`https://wa.me/?text=${msg}`,'_blank');
+}
+
+// ────────────────────────────────────────────────────────
+// SIGN OUT
+// ────────────────────────────────────────────────────────
+async function signOut(){await sb().auth.signOut();window.location.href='/preview.html';}
+
+// ────────────────────────────────────────────────────────
+// BOOT
+// ────────────────────────────────────────────────────────
+init();
+
+// ── Transaction PIN ───────────────────────────────────────────
+async function hashPin(pin) {
+  const data = new TextEncoder().encode(pin + '_g360_txpin_v1')
+  const buf  = await crypto.subtle.digest('SHA-256', data)
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('')
+}
+
+let _pinResolve = null
+
+function promptPin() {
+  return new Promise(resolve => {
+    _pinResolve = resolve
+    const m = document.getElementById('pin-modal')
+    m.style.display = 'flex'
+    document.getElementById('pin-modal-err').style.display = 'none'
+    document.querySelectorAll('.pm-box').forEach(b => { b.value=''; b.classList.remove('pm-filled') })
+    document.querySelector('.pm-box[data-idx="0"]').focus()
+  })
+}
+
+async function confirmPin() {
+  const entered = [...document.querySelectorAll('.pm-box')].map(b => b.value).join('')
+  const errEl   = document.getElementById('pin-modal-err')
+  if (entered.length !== 4) { errEl.textContent='Enter all 4 digits'; errEl.style.display='block'; return }
+  const hash = await hashPin(entered)
+  if (hash !== profile?.transaction_pin) {
+    errEl.textContent = 'Incorrect PIN. Try again.'
+    errEl.style.display = 'block'
+    document.querySelectorAll('.pm-box').forEach(b => { b.value=''; b.classList.remove('pm-filled') })
+    document.querySelector('.pm-box[data-idx="0"]').focus()
+    return
+  }
+  document.getElementById('pin-modal').style.display = 'none'
+  if (_pinResolve) { _pinResolve(true); _pinResolve = null }
+}
+
+function cancelPin() {
+  document.getElementById('pin-modal').style.display = 'none'
+  if (_pinResolve) { _pinResolve(false); _pinResolve = null }
+}
+
+function resetPin() {
+  if (_pinResolve) { _pinResolve(false); _pinResolve = null }
+  document.getElementById('pin-modal').style.display = 'none'
+  window.location.href = '/setup-pin'
+}
+
+// Wire up PIN box key navigation
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.pm-box').forEach(input => {
+    input.addEventListener('input', e => {
+      const v = e.target.value.replace(/\D/g,'')
+      e.target.value = v ? v[0] : ''
+      e.target.classList.toggle('pm-filled', !!v)
+      if (v) {
+        const next = document.querySelector(`.pm-box[data-idx="${parseInt(e.target.dataset.idx)+1}"]`)
+        if (next) next.focus()
+      }
+    })
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !e.target.value) {
+        const prev = document.querySelector(`.pm-box[data-idx="${parseInt(e.target.dataset.idx)-1}"]`)
+        if (prev) { prev.value=''; prev.classList.remove('pm-filled'); prev.focus() }
+      }
+      if (e.key === 'Enter') confirmPin()
+    })
+  })
+})
+</script>
+
+<!-- Transaction PIN Modal -->
+<div id="pin-modal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.7);backdrop-filter:blur(4px);z-index:999;align-items:center;justify-content:center;padding:1rem">
+  <div style="background:#fff;border-radius:20px;padding:28px;width:100%;max-width:340px;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="width:48px;height:48px;background:#f0fdf4;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px">
+        <svg width="24" height="24" fill="none" stroke="#1E4535" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+      </div>
+      <h3 style="font-size:17px;font-weight:700;color:#1e293b;margin-bottom:4px">Enter Transaction PIN</h3>
+      <p style="font-size:13px;color:#64748b">Enter your 4-digit PIN to continue</p>
+    </div>
+    <div style="display:flex;justify-content:center;gap:12px;margin-bottom:12px">
+      <input type="tel" class="pm-box" data-idx="0" maxlength="1" inputmode="numeric" style="width:56px;height:64px;text-align:center;font-size:24px;font-weight:700;border:2px solid #e2e8f0;border-radius:12px;outline:none;-webkit-text-security:disc;appearance:none;-moz-appearance:textfield;transition:border .15s">
+      <input type="tel" class="pm-box" data-idx="1" maxlength="1" inputmode="numeric" style="width:56px;height:64px;text-align:center;font-size:24px;font-weight:700;border:2px solid #e2e8f0;border-radius:12px;outline:none;-webkit-text-security:disc;appearance:none;-moz-appearance:textfield;transition:border .15s">
+      <input type="tel" class="pm-box" data-idx="2" maxlength="1" inputmode="numeric" style="width:56px;height:64px;text-align:center;font-size:24px;font-weight:700;border:2px solid #e2e8f0;border-radius:12px;outline:none;-webkit-text-security:disc;appearance:none;-moz-appearance:textfield;transition:border .15s">
+      <input type="tel" class="pm-box" data-idx="3" maxlength="1" inputmode="numeric" style="width:56px;height:64px;text-align:center;font-size:24px;font-weight:700;border:2px solid #e2e8f0;border-radius:12px;outline:none;-webkit-text-security:disc;appearance:none;-moz-appearance:textfield;transition:border .15s">
+    </div>
+    <div id="pin-modal-err" style="display:none;color:#dc2626;font-size:13px;text-align:center;margin-bottom:10px"></div>
+    <button onclick="confirmPin()" style="width:100%;padding:13px;background:#1E4535;color:#fff;font-weight:600;border-radius:12px;border:none;cursor:pointer;font-size:15px;margin-bottom:8px">Confirm</button>
+    <button onclick="cancelPin()" style="width:100%;padding:10px;background:none;border:none;color:#64748b;font-size:14px;cursor:pointer">Cancel</button>
+    <div style="text-align:center;margin-top:8px"><button onclick="resetPin()" style="background:none;border:none;color:#1E4535;font-size:13px;cursor:pointer;text-decoration:underline">Forgot PIN? Reset it</button></div>
+  </div>
+</div>
+
+<!-- ── KYC VERIFICATION MODAL ──────────────────────────────── -->
+<div id="kyc-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:none;align-items:center;justify-content:center;padding:16px">
+  <div style="background:#fff;border-radius:20px;padding:28px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto">
+    <div style="font-size:16px;font-weight:800;color:#0f172a;margin-bottom:4px">🔐 Identity Verification</div>
+    <div style="font-size:13px;color:#64748b;margin-bottom:20px">Required before your first withdrawal. One-time process.</div>
+
+    <!-- Step 1: Details -->
+    <div id="kyc-step-1">
+      <div style="margin-bottom:12px">
+        <label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">Full Name</label>
+        <input id="kyc-name" type="text" class="input-field" placeholder="As on your ID" style="width:100%"/>
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">Phone Number</label>
+        <input id="kyc-phone" type="tel" class="input-field" placeholder="+234 or local format" style="width:100%"/>
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">NIN or BVN</label>
+        <input id="kyc-nin" type="text" class="input-field" placeholder="11-digit NIN or BVN" style="width:100%"/>
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">Home Address</label>
+        <input id="kyc-address" type="text" class="input-field" placeholder="Street, City, State" style="width:100%"/>
+      </div>
+      <div id="kyc-step1-err" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:10px;font-size:13px;color:#dc2626;margin-bottom:12px"></div>
+      <button onclick="kycSendOtp()" id="kyc-send-btn" class="btn-primary" style="width:100%;padding:13px">Send Verification Code →</button>
+      <button onclick="closeKycModal()" style="width:100%;padding:10px;background:none;border:none;color:#64748b;font-size:13px;cursor:pointer;margin-top:6px">Cancel</button>
+    </div>
+
+    <!-- Step 2: OTP -->
+    <div id="kyc-step-2" style="display:none">
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px;margin-bottom:16px;font-size:13px;color:#166534">
+        A 6-digit code was sent to your email. Enter it below to verify your identity.
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="font-size:11px;font-weight:700;color:#64748b;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">Verification Code</label>
+        <input id="kyc-otp" type="text" maxlength="6" class="input-field" placeholder="6-digit code" style="width:100%;letter-spacing:.2em;font-size:18px;font-weight:700;text-align:center"/>
+      </div>
+      <div id="kyc-step2-err" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:10px;font-size:13px;color:#dc2626;margin-bottom:12px"></div>
+      <button onclick="kycVerifyOtp()" id="kyc-verify-btn" class="btn-primary" style="width:100%;padding:13px">Verify & Continue</button>
+      <button onclick="kycBackToStep1()" style="width:100%;padding:10px;background:none;border:none;color:#64748b;font-size:13px;cursor:pointer;margin-top:6px">← Back</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function openKycModal(){
+  const m=document.getElementById('kyc-modal');
+  m.style.display='flex';
+  document.getElementById('kyc-step-1').style.display='block';
+  document.getElementById('kyc-step-2').style.display='none';
+  if(profile?.full_name) document.getElementById('kyc-name').value=profile.full_name;
+}
+function closeKycModal(){ document.getElementById('kyc-modal').style.display='none'; }
+function kycBackToStep1(){
+  document.getElementById('kyc-step-1').style.display='block';
+  document.getElementById('kyc-step-2').style.display='none';
+}
+async function kycSendOtp(){
+  const name=document.getElementById('kyc-name').value.trim();
+  const phone=document.getElementById('kyc-phone').value.trim();
+  const nin=document.getElementById('kyc-nin').value.trim();
+  const address=document.getElementById('kyc-address').value.trim();
+  const err=document.getElementById('kyc-step1-err');
+  if(!name||!phone||!nin||!address){err.style.display='block';err.textContent='Please fill in all fields.';return;}
+  const btn=document.getElementById('kyc-send-btn');
+  btn.disabled=true; btn.textContent='Sending…';
+  err.style.display='none';
+  try{
+    const r=await fetch('/api/kyc/send-otp',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({user_id:currentUser.id,email:currentUser.email,full_name:name,phone,nin_bvn:nin,address})});
+    const d=await r.json();
+    if(!d.ok){err.style.display='block';err.textContent=d.error||'Failed to send code.';btn.disabled=false;btn.textContent='Send Verification Code →';return;}
+    document.getElementById('kyc-step-1').style.display='none';
+    document.getElementById('kyc-step-2').style.display='block';
+  }catch(e){err.style.display='block';err.textContent='Network error. Try again.';btn.disabled=false;btn.textContent='Send Verification Code →';}
+}
+async function kycVerifyOtp(){
+  const otp=document.getElementById('kyc-otp').value.trim();
+  const err=document.getElementById('kyc-step2-err');
+  if(otp.length!==6){err.style.display='block';err.textContent='Enter the 6-digit code.';return;}
+  const btn=document.getElementById('kyc-verify-btn');
+  btn.disabled=true; btn.textContent='Verifying…';
+  err.style.display='none';
+  try{
+    const r=await fetch('/api/kyc/verify-otp',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({user_id:currentUser.id,otp})});
+    const d=await r.json();
+    if(!d.ok){err.style.display='block';err.textContent=d.error||'Invalid code.';btn.disabled=false;btn.textContent='Verify & Continue';return;}
+    closeKycModal();
+    profile.kyc_status='approved';
+    showToast('✅ Identity verified! You can now withdraw.');
+    setTimeout(()=>togglePanel('withdraw-panel'),400);
+  }catch(e){err.style.display='block';err.textContent='Network error. Try again.';btn.disabled=false;btn.textContent='Verify & Continue';}
+}
+</script>
+</body>
+</html>

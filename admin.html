@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Admin — Genesis360</title>
+<script src="/tailwind.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/supabase-config.js"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: { sans: ['Inter','system-ui','sans-serif'] },
+      colors: {
+        brand: { 50:'#f2faf0',100:'#dff2d8',600:'#244f3c',700:'#1e4535',800:'#163428',900:'#0e2319' },
+        lime:  { 400:'#9dc43a',300:'#b8d95a' },
+        navy:  { 800:'#1e293b',900:'#0f172a' }
+      }
+    }
+  }
+}
+</script>
+<style>
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;background:#f1f5f9;color:#334155}
+/* SIDEBAR */
+.sidebar-link{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:#64748b;font-size:.8125rem;font-weight:500;text-decoration:none;transition:all .15s;border-left:3px solid transparent;margin-left:-3px;padding-left:9px}
+.sidebar-link:hover{color:#cbd5e1;background:rgba(255,255,255,.06)}
+.sidebar-link.active{color:#fff;background:rgba(157,196,58,.13);border-left-color:#9dc43a}
+.sidebar-link.active svg,.sidebar-link.active .nav-icon{color:#9dc43a}
+.nav-label{padding:14px 12px 5px;font-size:.6rem;font-weight:700;letter-spacing:.12em;color:#334155;text-transform:uppercase}
+/* METRIC CARDS */
+.mcard{background:#fff;border-radius:14px;border:1px solid #f1f5f9;box-shadow:0 1px 4px rgba(0,0,0,.06);padding:18px 20px;position:relative;overflow:hidden}
+.mcard::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0}
+.mcard-green::after{background:linear-gradient(90deg,#1e4535,#52b788)}
+.mcard-yellow::after{background:linear-gradient(90deg,#b45309,#fbbf24)}
+.mcard-blue::after{background:linear-gradient(90deg,#1d4ed8,#60a5fa)}
+.mcard-orange::after{background:linear-gradient(90deg,#c2410c,#fb923c)}
+.mcard-lime::after{background:linear-gradient(90deg,#4d7c0f,#9dc43a)}
+.mcard-purple::after{background:linear-gradient(90deg,#7c3aed,#a78bfa)}
+.mic{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;flex-shrink:0}
+/* CARD */
+.card{background:#fff;border-radius:14px;border:1px solid #f1f5f9;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+/* TABLES */
+.dtbl{width:100%;border-collapse:collapse}
+.dtbl th{padding:.6rem 1rem;font-size:.6875rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;text-align:left;border-bottom:1px solid #f1f5f9;background:#f8fafc;white-space:nowrap}
+.dtbl td{padding:.8rem 1rem;font-size:.8125rem;border-bottom:1px solid #f8fafc;vertical-align:middle}
+.dtbl tr:last-child td{border-bottom:none}
+.dtbl tbody tr:hover td{background:#fafbfc}
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:.2rem .65rem;border-radius:9999px;font-size:.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.badge-pending{background:#fef9c3;color:#92400e}.badge-pending::before{background:#d97706}
+.badge-approved{background:#dcfce7;color:#166534}.badge-approved::before{background:#16a34a}
+.badge-rejected{background:#fee2e2;color:#991b1b}.badge-rejected::before{background:#dc2626}
+.badge-upcoming{background:#f1f5f9;color:#64748b}.badge-upcoming::before{background:#94a3b8}
+.badge-open{background:#d9f99d;color:#3f6212}.badge-open::before{background:#65a30d}
+.badge-full{background:#fef3c7;color:#92400e}.badge-full::before{background:#d97706}
+.badge-active{background:#dbeafe;color:#1e40af}.badge-active::before{background:#3b82f6}
+.badge-completed{background:#f0fdf4;color:#166534}.badge-completed::before{background:#22c55e}
+.badge-sent{background:#dcfce7;color:#166534}.badge-sent::before{background:#16a34a}
+.badge-confirmed{background:#d1fae5;color:#065f46}.badge-confirmed::before{background:#059669}
+/* INPUTS */
+.inp{width:100%;padding:.6rem 1rem;border:1.5px solid #e2e8f0;border-radius:10px;font-size:.875rem;font-family:inherit;color:#0f172a;background:#fff;transition:border-color .15s;outline:none}
+.inp:focus{border-color:#1e4535}
+/* BUTTONS */
+.btn-p{background:#1e4535;color:#fff;font-weight:700;border-radius:10px;padding:.6rem 1.2rem;font-size:.875rem;border:none;cursor:pointer;transition:background .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-p:hover{background:#244f3c}
+.btn-o{background:#fff;color:#475569;font-weight:600;border-radius:10px;padding:.5rem 1rem;font-size:.875rem;border:1.5px solid #e2e8f0;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-o:hover{border-color:#cbd5e1;background:#f8fafc}
+/* MODAL */
+.mbk{position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(4px);z-index:50;display:flex;align-items:center;justify-content:center;padding:1rem}
+.mbox{background:#fff;border-radius:20px;padding:1.75rem;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 25px 60px rgba(0,0,0,.2)}
+/* TOAST */
+#admin-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#0f172a;color:#fff;padding:11px 22px;border-radius:12px;font-size:.875rem;font-weight:500;z-index:999;transition:transform .3s,opacity .3s;opacity:0;white-space:nowrap;max-width:90vw;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+#admin-toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+/* ANIMATION */
+.fi{animation:fi .3s ease forwards}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+/* MOBILE */
+@media(max-width:1023px){
+  #admin-sidebar{transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+  #admin-sidebar.open{transform:translateX(0)}
+  #admin-main{margin-left:0!important;padding:.75rem}
+  #mob-tb{display:flex}
+  #mob-bd{display:none;position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(2px);z-index:29}
+  #mob-bd.open{display:block}
+}
+@media(min-width:1024px){
+  #mob-tb{display:none!important}
+  #mob-bd{display:none!important}
+}
+.tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.ava{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#1e4535,#52b788);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<div id="admin-toast"></div>
+<div id="mob-bd" onclick="closeSidebar()"></div>
+
+<!-- Loading -->
+<div id="loading" class="fixed inset-0 flex items-center justify-center z-50" style="background:#0f172a">
+  <div class="text-center">
+    <img src="logo.png" onerror="this.src='logo.svg'" alt="Genesis360" style="height:72px;width:auto;background:#fff;border-radius:12px;padding:8px 16px;display:block;margin:0 auto 20px;"/>
+    <div class="flex gap-1.5 justify-center mb-4">
+      <div class="w-2 h-2 bg-lime-400 rounded-full animate-bounce" style="animation-delay:0ms"></div>
+      <div class="w-2 h-2 bg-lime-400 rounded-full animate-bounce" style="animation-delay:150ms"></div>
+      <div class="w-2 h-2 bg-lime-400 rounded-full animate-bounce" style="animation-delay:300ms"></div>
+    </div>
+    <p style="color:#475569;font-size:.75rem">Admin Console</p>
+  </div>
+</div>
+
+<!-- Admin Login -->
+<div id="admin-login" style="display:none;position:fixed;inset:0;background:#0f172a;align-items:center;justify-content:center;z-index:40;padding:1rem">
+  <div style="background:#1e293b;border-radius:20px;padding:2rem;width:100%;max-width:380px;box-shadow:0 25px 60px rgba(0,0,0,.4)">
+    <img src="logo.png" onerror="this.src='logo.svg'" alt="Genesis360" style="height:64px;width:auto;background:#fff;border-radius:10px;padding:6px 14px;display:block;margin:0 auto 4px;"/>
+    <p style="color:#9dc43a;font-size:.7rem;font-weight:700;text-align:center;letter-spacing:.12em;text-transform:uppercase;margin-bottom:1.5rem">Admin Console</p>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div>
+        <label style="display:block;font-size:.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Admin PIN</label>
+        <div style="position:relative">
+          <input id="login-pass" type="password" placeholder="Enter admin PIN" class="inp" style="background:#0f172a;border-color:#334155;color:#fff;padding-right:42px;width:100%;box-sizing:border-box" onkeydown="if(event.key==='Enter')adminLogin()" autofocus/>
+          <button type="button" onclick="toggleAdminPin()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;color:#64748b;line-height:1" id="pin-eye">
+            <svg id="pin-eye-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+          </button>
+        </div>
+      </div>
+      <div id="login-err" style="display:none;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:10px 12px;color:#f87171;font-size:.8125rem"></div>
+      <button onclick="adminLogin()" id="login-btn" class="btn-p w-full justify-center py-3 mt-1">Unlock Admin Console</button>
+    </div>
+  </div>
+</div>
+
+<!-- Denied -->
+<div id="denied" class="hidden fixed inset-0 flex items-center justify-center z-50" style="background:#0f172a">
+  <div class="text-center text-white p-8 max-w-xs">
+    <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5" style="background:rgba(239,68,68,.15)">
+      <svg class="w-8 h-8" style="color:#f87171" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+    </div>
+    <h2 class="text-xl font-bold mb-2">Access Denied</h2>
+    <p style="color:#64748b;font-size:.875rem" class="mb-6">You do not have admin access to this area.</p>
+    <a href="/dashboard.html" class="inline-block px-6 py-2.5 font-bold rounded-xl text-sm" style="background:#9dc43a;color:#0e2319">Go to Dashboard</a>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app" class="hidden min-h-screen flex">
+
+  <!-- SIDEBAR -->
+  <aside id="admin-sidebar" class="w-64 flex flex-col fixed inset-y-0 left-0 z-30" style="background:#0f172a">
+    <!-- Logo -->
+    <div class="px-5 py-4 flex items-center gap-3" style="border-bottom:1px solid rgba(255,255,255,.07)">
+      <img src="logo.png" onerror="this.src='logo.svg'" alt="Genesis360" style="height:36px;width:auto;background:#fff;border-radius:8px;padding:3px 8px;"/>
+      <span class="text-xs font-bold px-2 py-0.5 rounded-full" style="background:rgba(157,196,58,.15);color:#9dc43a;letter-spacing:.05em">ADMIN</span>
+    </div>
+
+    <nav class="flex-1 px-3 py-2 overflow-y-auto">
+      <p class="nav-label">Main</p>
+      <a href="#" onclick="return showPage('overview')" class="sidebar-link active" id="nav-overview">
+        <svg class="w-4 h-4 flex-shrink-0 nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        Overview
+      </a>
+      <a href="#" onclick="return showPage('investors')" class="sidebar-link" id="nav-investors">
+        <svg class="w-4 h-4 flex-shrink-0 nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Participants
+      </a>
+      <p class="nav-label mt-1">Cycles & Payments</p>
+      <a href="#" onclick="return showPage('cycles')" class="sidebar-link" id="nav-cycles">
+        <svg class="w-4 h-4 flex-shrink-0 nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        Funding Cycles
+      </a>
+      <a href="#" onclick="return showPage('payouts')" class="sidebar-link" id="nav-payouts">
+        <svg class="w-4 h-4 flex-shrink-0 nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Payouts
+      </a>
+      <a href="#" onclick="return showPage('transactions')" class="sidebar-link" id="nav-transactions">
+        <svg class="w-4 h-4 flex-shrink-0 nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+        Transactions
+      </a>
+
+      <p class="nav-label mt-1">Intelligence</p>
+      <a href="#" onclick="return showPage('investor-intel')" class="sidebar-link" id="nav-investor-intel" style="background:rgba(166,214,74,.06);border:1px solid rgba(166,214,74,.2);">
+        <svg class="w-4 h-4 flex-shrink-0 nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        <span style="color:#A6D64A;font-weight:700;">Investor Intelligence</span>
+      </a>
+
+      <p class="nav-label mt-1">Analytics</p>
+      <a href="#" onclick="return showPage('funnel')" class="sidebar-link" id="nav-funnel">
+        <svg class="w-4 h-4 flex-shrink-0 nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/></svg>
+        Funnel
+      </a>
+      <a href="#" onclick="return showPage('leaderboard')" class="sidebar-link" id="nav-leaderboard">
+        <svg class="w-4 h-4 flex-shrink-0 nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+        Leaderboard
+      </a>
+      <a href="#" onclick="return showPage('referrals')" class="sidebar-link" id="nav-referrals">
+        <svg class="w-4 h-4 flex-shrink-0 nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Referrals
+      </a>
+
+      <p class="nav-label mt-1">Comms</p>
+      <a href="#" onclick="return showPage('notify')" class="sidebar-link" id="nav-notify">
+        <svg class="w-4 h-4 flex-shrink-0 nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        Notifications
+      </a>
+    </nav>
+
+    <!-- Admin info -->
+    <div class="px-4 py-3" style="border-top:1px solid rgba(255,255,255,.07)">
+      <div class="flex items-center gap-3">
+        <div id="avatar" class="w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm font-bold flex-shrink-0" style="background:linear-gradient(135deg,#1e4535,#52b788)"></div>
+        <div class="flex-1 min-w-0">
+          <p id="admin-name" class="text-white text-sm font-semibold truncate"></p>
+          <p id="admin-role" class="text-xs font-semibold" style="color:#9dc43a"></p>
+        </div>
+        <button onclick="signOut()" title="Sign out" class="p-1.5 rounded-lg transition-colors flex-shrink-0" style="color:#475569" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#475569'">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main id="admin-main" class="ml-64 flex-1 min-w-0 min-h-screen" style="background:#f1f5f9">
+
+    <!-- Mobile top bar -->
+    <div id="mob-tb" class="hidden sticky top-0 z-20 items-center justify-between px-4 py-3 bg-white" style="border-bottom:1px solid #f1f5f9;box-shadow:0 1px 4px rgba(0,0,0,.05)">
+      <button onclick="openSidebar()" class="p-2 rounded-xl border border-slate-200">
+        <svg class="w-5 h-5" style="color:#475569" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <img src="logo.png" onerror="this.src='logo.svg'" alt="Genesis360" style="height:32px;width:auto;background:#fff;border-radius:6px;padding:2px 6px;"/>
+      <div class="w-9"></div>
+    </div>
+
+    <div class="p-5 lg:p-7">
+
+      <!-- Page header -->
+      <div class="flex items-start justify-between mb-6 flex-wrap gap-3">
+        <div>
+          <h1 id="page-title" class="text-xl font-bold" style="color:#0f172a">Overview</h1>
+          <p id="page-sub" class="text-sm mt-0.5" style="color:#94a3b8">Genesis360 Admin Console</p>
+        </div>
+        <div id="page-action"></div>
+      </div>
+
+      <!-- ── OVERVIEW ────────────────────────────────────── -->
+      <div id="page-overview" class="fi">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div class="mcard mcard-green">
+            <div class="mic" style="background:#e8f5f0">
+              <svg class="w-5 h-5" style="color:#1e4535" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+            <p id="ov-total" class="text-2xl font-bold mb-0.5" style="color:#0f172a">—</p>
+            <p class="text-xs" style="color:#94a3b8">Total Participants</p>
+          </div>
+          <div class="mcard mcard-yellow">
+            <div class="mic" style="background:#fffbeb">
+              <svg class="w-5 h-5" style="color:#d97706" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <p id="ov-pending-kyc" class="text-2xl font-bold mb-0.5" style="color:#d97706">—</p>
+            <p class="text-xs" style="color:#94a3b8">Pending KYC</p>
+          </div>
+          <div class="mcard mcard-blue">
+            <div class="mic" style="background:#eff6ff">
+              <svg class="w-5 h-5" style="color:#2563eb" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            </div>
+            <p id="ov-active-cycles" class="text-2xl font-bold mb-0.5" style="color:#1d4ed8">—</p>
+            <p class="text-xs" style="color:#94a3b8">Active Cycles</p>
+          </div>
+          <div class="mcard mcard-orange">
+            <div class="mic" style="background:#fff7ed">
+              <svg class="w-5 h-5" style="color:#ea580c" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <p id="ov-pending-payouts" class="text-2xl font-bold mb-0.5" style="color:#ea580c">—</p>
+            <p class="text-xs" style="color:#94a3b8">Pending Payouts</p>
+          </div>
+        </div>
+        <div class="grid lg:grid-cols-2 gap-5">
+          <div class="card p-5">
+            <div class="flex items-center justify-between mb-4">
+              <p class="font-semibold text-sm" style="color:#0f172a">Recent Registrations</p>
+              <button onclick="showPage('investors')" class="text-xs font-semibold" style="color:#1e4535">View all →</button>
+            </div>
+            <div id="ov-recent-users" class="space-y-1 text-sm" style="color:#94a3b8">Loading...</div>
+          </div>
+          <div class="card p-5">
+            <div class="flex items-center justify-between mb-4">
+              <p class="font-semibold text-sm" style="color:#0f172a">Cycle Status</p>
+              <button onclick="showPage('cycles')" class="text-xs font-semibold" style="color:#1e4535">Manage →</button>
+            </div>
+            <div id="ov-cycles-summary" class="space-y-1 text-sm" style="color:#94a3b8">Loading...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PARTICIPANTS ─────────────────────────────────── -->
+      <div id="page-investors" class="fi hidden">
+        <div class="card p-3 mb-4 flex flex-wrap gap-3 items-center">
+          <input id="investor-search" type="text" placeholder="Search name or email…" oninput="filterInvestors()" class="inp flex-1" style="min-width:180px"/>
+          <select id="investor-kyc-filter" onchange="filterInvestors()" class="inp" style="width:auto">
+            <option value="">All KYC</option>
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+          </select>
+          <select id="investor-country-filter" onchange="filterInvestors()" class="inp" style="width:auto">
+            <option value="">All Countries</option>
+          </select>
+        </div>
+        <div class="card overflow-hidden">
+          <div class="tscroll">
+            <table class="dtbl">
+              <thead><tr><th>Participant</th><th>Country</th><th>KYC</th><th>Risk</th><th>Wallet</th><th>Joined</th><th></th></tr></thead>
+              <tbody id="investors-tbody"><tr><td colspan="7" class="text-center py-10" style="color:#94a3b8">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── FUNDING CYCLES ──────────────────────────────── -->
+      <div id="page-cycles" class="fi hidden">
+        <div class="card overflow-hidden">
+          <div class="flex items-center justify-between px-5 py-4" style="border-bottom:1px solid #f1f5f9">
+            <p class="font-semibold text-sm" style="color:#0f172a">All Cycles</p>
+            <button onclick="openCreateCycle()" class="btn-p text-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+              New Cycle
+            </button>
+          </div>
+          <div class="tscroll">
+            <table class="dtbl">
+              <thead><tr><th>Cycle Name</th><th>Status</th><th>Slots</th><th>Contribution</th><th>Duration</th><th>Start Date</th><th>Actions</th></tr></thead>
+              <tbody id="cycles-tbody"><tr><td colspan="7" class="text-center py-10" style="color:#94a3b8">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PAYOUTS ──────────────────────────────────────── -->
+      <div id="page-payouts" class="fi hidden">
+        <div class="card overflow-hidden">
+          <div class="flex items-center justify-between px-5 py-4 flex-wrap gap-3" style="border-bottom:1px solid #f1f5f9">
+            <p class="font-semibold text-sm" style="color:#0f172a">Payout Schedule</p>
+            <div class="flex items-center gap-3">
+              <select id="payout-status-filter" onchange="filterPayouts()" class="inp" style="width:auto">
+                <option value="pending">Pending</option>
+                <option value="">All</option>
+                <option value="sent">Sent</option>
+                <option value="confirmed">Confirmed</option>
+              </select>
+              <button onclick="exportPayoutsCSV()" class="btn-o text-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                Export
+              </button>
+            </div>
+          </div>
+          <div class="tscroll">
+            <table class="dtbl">
+              <thead><tr><th>Participant</th><th>Cycle</th><th>Amount</th><th>Scheduled</th><th>Paid Date</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="payouts-tbody"><tr><td colspan="7" class="text-center py-10" style="color:#94a3b8">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TRANSACTIONS ─────────────────────────────────── -->
+      <div id="page-transactions" class="fi hidden">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+          <div class="mcard mcard-green"><div class="mic" style="background:#e8f5f0"><svg class="w-5 h-5" style="color:#1e4535" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></div><p id="tx-sum-dep" class="text-xl font-bold mb-0.5" style="color:#0f172a">$0</p><p class="text-xs" style="color:#94a3b8">Total Deposits</p></div>
+          <div class="mcard mcard-orange"><div class="mic" style="background:#fff7ed"><svg class="w-5 h-5" style="color:#ea580c" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg></div><p id="tx-sum-wd" class="text-xl font-bold mb-0.5" style="color:#ea580c">$0</p><p class="text-xs" style="color:#94a3b8">Total Withdrawn</p></div>
+          <div class="mcard mcard-blue"><div class="mic" style="background:#eff6ff"><svg class="w-5 h-5" style="color:#2563eb" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></div><p id="tx-sum-part" class="text-xl font-bold mb-0.5" style="color:#1d4ed8">$0</p><p class="text-xs" style="color:#94a3b8">In Cycles</p></div>
+          <div class="mcard mcard-lime"><div class="mic" style="background:#f0fdf4"><svg class="w-5 h-5" style="color:#16a34a" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><p id="tx-sum-pay" class="text-xl font-bold mb-0.5" style="color:#16a34a">$0</p><p class="text-xs" style="color:#94a3b8">Payouts Sent</p></div>
+        </div>
+        <div class="card p-3 mb-4 flex flex-wrap gap-3 items-center">
+          <input id="tx-search" type="text" placeholder="Search user or ref…" oninput="filterTxns()" class="inp flex-1" style="min-width:180px"/>
+          <select id="tx-type-filter" onchange="filterTxns()" class="inp" style="width:auto">
+            <option value="">All Types</option>
+            <option value="deposit">Deposits</option>
+            <option value="withdrawal">Withdrawals</option>
+            <option value="participation">Participation</option>
+            <option value="payout">Payouts</option>
+          </select>
+          <button onclick="exportTxnsCSV()" class="btn-o text-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            Export CSV
+          </button>
+        </div>
+        <div class="card overflow-hidden">
+          <div class="tscroll">
+            <table class="dtbl">
+              <thead><tr><th>User</th><th>Type</th><th>Amount</th><th>Reference</th><th>Date</th><th>Status</th></tr></thead>
+              <tbody id="txns-tbody"><tr><td colspan="6" class="text-center py-10" style="color:#94a3b8">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── FUNNEL ───────────────────────────────────────── -->
+      <!-- INVESTOR INTELLIGENCE PAGE -->
+      <div id="page-investor-intel" class="fi hidden" style="padding:0;margin:-24px;">
+        <iframe id="intel_iframe" style="width:100%;height:calc(100vh - 64px);border:none;display:block;" loading="lazy"></iframe>
+      </div>
+
+      <div id="page-funnel" class="fi hidden">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div class="mcard mcard-green"><div class="mic" style="background:#e8f5f0"><span style="font-size:18px">👁️</span></div><p id="fn-registered" class="text-2xl font-bold mb-0.5" style="color:#0f172a">—</p><p class="text-xs" style="color:#94a3b8">Registered</p></div>
+          <div class="mcard mcard-lime"><div class="mic" style="background:#f0fdf4"><span style="font-size:18px">✅</span></div><p id="fn-kyc" class="text-2xl font-bold mb-0.5" style="color:#16a34a">—</p><p class="text-xs" style="color:#94a3b8">KYC Approved</p><p id="fn-kyc-rate" class="text-xs mt-0.5" style="color:#94a3b8">—</p></div>
+          <div class="mcard mcard-blue"><div class="mic" style="background:#eff6ff"><span style="font-size:18px">💰</span></div><p id="fn-funded" class="text-2xl font-bold mb-0.5" style="color:#1d4ed8">—</p><p class="text-xs" style="color:#94a3b8">Funded Wallet</p><p id="fn-funded-rate" class="text-xs mt-0.5" style="color:#94a3b8">—</p></div>
+          <div class="mcard mcard-orange"><div class="mic" style="background:#fff7ed"><span style="font-size:18px">🔄</span></div><p id="fn-joined" class="text-2xl font-bold mb-0.5" style="color:#ea580c">—</p><p class="text-xs" style="color:#94a3b8">Joined Cycle</p><p id="fn-joined-rate" class="text-xs mt-0.5" style="color:#94a3b8">—</p></div>
+        </div>
+        <div class="card p-5 mb-5">
+          <p class="font-semibold text-sm mb-5" style="color:#0f172a">Conversion Funnel</p>
+          <div id="funnel-bars" class="space-y-4"></div>
+        </div>
+        <div class="card p-5">
+          <p class="font-semibold text-sm mb-4" style="color:#0f172a">Drop-off Analysis</p>
+          <div id="funnel-dropoff" class="space-y-3"></div>
+        </div>
+      </div>
+
+      <!-- ── LEADERBOARD ─────────────────────────────────── -->
+      <div id="page-leaderboard" class="fi hidden">
+        <div class="card overflow-hidden">
+          <div class="flex items-center justify-between px-5 py-4 flex-wrap gap-3" style="border-bottom:1px solid #f1f5f9">
+            <div class="flex gap-2">
+              <button onclick="switchLbView('participation')" id="lb-btn-participation" class="px-4 py-1.5 text-sm font-semibold rounded-lg" style="background:#1e4535;color:#fff">Participation</button>
+              <button onclick="switchLbView('deposits')" id="lb-btn-deposits" class="px-4 py-1.5 text-sm font-semibold rounded-lg border" style="border-color:#e2e8f0;color:#475569;background:#fff">Deposits</button>
+            </div>
+            <button onclick="exportLbCSV()" class="btn-o text-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              Export
+            </button>
+          </div>
+          <div class="tscroll">
+            <table class="dtbl">
+              <thead><tr><th>#</th><th>Participant</th><th>Cycles</th><th>Total Participation</th><th>Total Deposits</th><th>Level</th></tr></thead>
+              <tbody id="lb-tbody"><tr><td colspan="6" class="text-center py-10" style="color:#94a3b8">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── REFERRALS ───────────────────────────────────── -->
+      <div id="page-referrals" class="fi hidden">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div class="mcard mcard-green"><div class="mic" style="background:#e8f5f0"><svg class="w-5 h-5" style="color:#1e4535" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg></div><p id="ref-total" class="text-2xl font-bold mb-0.5" style="color:#0f172a">—</p><p class="text-xs" style="color:#94a3b8">Total Referrals</p></div>
+          <div class="mcard mcard-lime"><div class="mic" style="background:#f0fdf4"><svg class="w-5 h-5" style="color:#16a34a" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><p id="ref-converted" class="text-2xl font-bold mb-0.5" style="color:#16a34a">—</p><p class="text-xs" style="color:#94a3b8">Converted</p></div>
+          <div class="mcard mcard-blue"><div class="mic" style="background:#eff6ff"><svg class="w-5 h-5" style="color:#2563eb" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></div><p id="ref-rate" class="text-2xl font-bold mb-0.5" style="color:#1d4ed8">—%</p><p class="text-xs" style="color:#94a3b8">Conversion Rate</p></div>
+          <div class="mcard mcard-orange"><div class="mic" style="background:#fff7ed"><svg class="w-5 h-5" style="color:#ea580c" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg></div><p id="ref-top-count" class="text-2xl font-bold mb-0.5" style="color:#ea580c">—</p><p class="text-xs" style="color:#94a3b8">Active Referrers</p></div>
+        </div>
+        <div class="grid lg:grid-cols-2 gap-5">
+          <div class="card p-5">
+            <p class="font-semibold text-sm mb-4" style="color:#0f172a">Top Referrers</p>
+            <div id="ref-top-list" style="color:#94a3b8;font-size:.875rem">Loading...</div>
+          </div>
+          <div class="card p-5">
+            <p class="font-semibold text-sm mb-4" style="color:#0f172a">Recent Referrals</p>
+            <div id="ref-activity" style="color:#94a3b8;font-size:.875rem">Loading...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── NOTIFICATIONS ──────────────────────────────── -->
+      <div id="page-notify" class="fi hidden">
+        <div style="max-width:520px">
+          <div class="card p-6">
+            <p class="font-semibold text-sm mb-5" style="color:#0f172a">Broadcast Message</p>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-xs font-bold mb-1.5" style="color:#64748b;text-transform:uppercase;letter-spacing:.05em">Recipients</label>
+                <select id="notif-recipient" class="inp">
+                  <option value="all">All Participants</option>
+                  <option value="approved">KYC Approved Only</option>
+                  <option value="pending">Pending KYC Only</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-bold mb-1.5" style="color:#64748b;text-transform:uppercase;letter-spacing:.05em">Title</label>
+                <input id="notif-title" type="text" placeholder="e.g. New Cycle Now Open" class="inp"/>
+              </div>
+              <div>
+                <label class="block text-xs font-bold mb-1.5" style="color:#64748b;text-transform:uppercase;letter-spacing:.05em">Message</label>
+                <textarea id="notif-message" rows="4" placeholder="Write your message here…" class="inp resize-none"></textarea>
+              </div>
+              <button onclick="sendNotification()" class="btn-p w-full justify-center py-3">Send Notification</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- MODALS -->
+<div id="modal-investor" class="hidden mbk" onclick="closeModal('modal-investor')">
+  <div class="mbox" onclick="event.stopPropagation()">
+    <div class="flex items-start justify-between mb-5">
+      <h2 class="text-lg font-bold" style="color:#0f172a">Participant Profile</h2>
+      <button onclick="closeModal('modal-investor')" class="p-1 rounded-lg" style="color:#94a3b8"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div id="modal-investor-content"></div>
+  </div>
+</div>
+
+
+<div id="modal-cycle" class="hidden mbk" onclick="closeModal('modal-cycle')">
+  <div class="mbox" onclick="event.stopPropagation()">
+    <div class="flex items-start justify-between mb-5">
+      <h2 id="cycle-modal-title" class="text-lg font-bold" style="color:#0f172a">New Funding Cycle</h2>
+      <button onclick="closeModal('modal-cycle')" class="p-1 rounded-lg" style="color:#94a3b8"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="space-y-4">
+      <input type="hidden" id="cycle-edit-id"/>
+      <div>
+        <label class="block text-xs font-bold mb-1.5" style="color:#64748b;text-transform:uppercase;letter-spacing:.05em">Cycle Name</label>
+        <input id="cycle-name" type="text" placeholder="e.g. Cycle 3 — Q2 2026" class="inp"/>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-bold mb-1.5" style="color:#64748b;text-transform:uppercase;letter-spacing:.05em">Total Slots</label>
+          <input id="cycle-slots" type="number" min="1" placeholder="50" class="inp"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1.5" style="color:#64748b;text-transform:uppercase;letter-spacing:.05em">Contribution (USD)</label>
+          <input id="cycle-amount" type="number" min="100" placeholder="500" class="inp"/>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-bold mb-1.5" style="color:#64748b;text-transform:uppercase;letter-spacing:.05em">Duration (months)</label>
+          <input id="cycle-duration" type="number" min="1" placeholder="13" class="inp"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1.5" style="color:#64748b;text-transform:uppercase;letter-spacing:.05em">Status</label>
+          <select id="cycle-status" class="inp">
+            <option value="upcoming">Upcoming</option>
+            <option value="open">Open</option>
+            <option value="full">Full</option>
+            <option value="active">Active</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-bold mb-1.5" style="color:#64748b;text-transform:uppercase;letter-spacing:.05em">Start Date</label>
+          <input id="cycle-start" type="date" class="inp"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1.5" style="color:#64748b;text-transform:uppercase;letter-spacing:.05em">End Date</label>
+          <input id="cycle-end" type="date" class="inp"/>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-bold mb-1.5" style="color:#64748b;text-transform:uppercase;letter-spacing:.05em">Starting Participants</label>
+          <input id="cycle-filled" type="number" min="0" placeholder="0" class="inp"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1.5" style="color:#64748b;text-transform:uppercase;letter-spacing:.05em">Amount Raised (USD)</label>
+          <input id="cycle-raised" type="number" min="0" placeholder="0" class="inp"/>
+        </div>
+      </div>
+      <div id="cycle-save-error" class="hidden text-sm rounded-xl px-4 py-3" style="color:#dc2626;background:#fef2f2"></div>
+      <button onclick="saveCycle()" class="btn-p w-full justify-center py-3">Save Cycle</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-cycle-participants" class="hidden mbk" onclick="closeModal('modal-cycle-participants')">
+  <div class="mbox" style="max-width:680px" onclick="event.stopPropagation()">
+    <div class="flex items-start justify-between mb-5">
+      <h2 id="cp-modal-title" class="text-lg font-bold" style="color:#0f172a">Cycle Participants</h2>
+      <button onclick="closeModal('modal-cycle-participants')" class="p-1 rounded-lg" style="color:#94a3b8"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div id="cp-modal-content" class="text-sm" style="color:#94a3b8">Loading...</div>
+  </div>
+</div>
+
+<!-- Failsafe: only fires on initial load, not after PIN unlock -->
+<script>
+var _adminUnlocked = false;
+window.onerror = function(msg,s,line){
+  if (_adminUnlocked) return false;
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('admin-login').style.display = 'flex';
+  var e = document.getElementById('login-err');
+  e.style.display = 'block';
+  e.textContent = 'Script error (line '+line+'): '+msg;
+};
+setTimeout(function(){
+  if (_adminUnlocked) return;
+  if (document.getElementById('loading').style.display !== 'none'){
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('admin-login').style.display = 'flex';
+  }
+}, 800);
+</script>
+
+<script>
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE)
+
+let currentUser = null
+let adminRole   = null
+let allInvestors = []
+let allKYC       = []
+let allCycles    = []
+let allPayouts   = []
+
+// ── Telegram alert helper ────────────────────────────────
+async function notifyTelegram(text) {
+  try { await fetch('/api/notify', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({text}) }) }
+  catch(e) { /* silent */ }
+}
+
+// ── AI Risk Scoring ──────────────────────────────────────
+async function runRiskScore(userId) {
+  const u = allInvestors.find(x => x.id === userId)
+  if (!u) return
+  const btn = document.getElementById('ai-score-btn-' + userId)
+  const box = document.getElementById('ai-score-box-' + userId)
+  if (btn) { btn.disabled = true; btn.textContent = '🤖 Scoring…' }
+  if (box) { box.style.display = 'block'; box.innerHTML = '<span style="color:#64748b">Analysing participant data…</span>' }
+  const { data: parts } = await sb.from('cycle_participations').select('id').eq('user_id', userId)
+  try {
+    const r = await fetch('/api/risk-score', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        full_name:       u.full_name,
+        country:         u.country,
+        kyc_status:      u.kyc_status,
+        wallet_balance:  u.wallets?.balance_usd || 0,
+        total_deposited: u.wallets?.total_deposited || 0,
+        cycles_joined:   parts?.length || 0
+      })
+    })
+    const result = await r.json()
+    if (result.error) throw new Error(result.error)
+    // Save score to DB
+    await sb.from('profiles').update({ risk_score: result.score, access_tier: result.tier }).eq('id', userId)
+    u.risk_score = result.score; u.access_tier = result.tier
+    const scoreColor = result.score >= 70 ? '#16a34a' : result.score >= 40 ? '#d97706' : '#dc2626'
+    if (box) box.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <span style="font-size:1.25rem;font-weight:800;color:${scoreColor}">${result.score}/100</span>
+        <span style="background:${scoreColor};color:#fff;padding:2px 8px;border-radius:6px;font-size:.75rem;font-weight:700;text-transform:uppercase">${result.tier}</span>
+      </div>
+      <p style="font-size:.8125rem;color:#475569;margin-bottom:4px">${result.summary}</p>
+      ${result.flags?.length ? '<p style="font-size:.75rem;color:#dc2626">⚠ ' + result.flags.join(' · ') + '</p>' : ''}`
+    if (btn) { btn.disabled = false; btn.textContent = '🔄 Re-score' }
+    renderInvestorsTable(allInvestors)
+  } catch(e) {
+    if (box) box.innerHTML = `<span style="color:#dc2626;font-size:.8125rem">Failed: ${e.message}</span>`
+    if (btn) { btn.disabled = false; btn.textContent = '🤖 AI Score' }
+  }
+}
+
+// ── ADMIN PIN AUTH (no session dependency) ──────────────
+const ADMIN_PIN = 'genesis360@admin'
+
+function init() {
+  try {
+    document.getElementById('loading').style.display = 'none'
+    document.getElementById('admin-login').style.display = 'flex'
+  } catch(e) {
+    console.error('init error:', e)
+  }
+}
+
+function toggleAdminPin() {
+  const inp = document.getElementById('login-pass');
+  const icon = document.getElementById('pin-eye-icon');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a9.97 9.97 0 012.127-3.592M6.53 6.533A9.97 9.97 0 0112 5c4.477 0 8.268 2.943 9.542 7a10.05 10.05 0 01-4.132 5.411M3 3l18 18"/>';
+  } else {
+    inp.type = 'password';
+    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>';
+  }
+}
+
+function adminLogin() {
+  const pin   = document.getElementById('login-pass').value
+  const errEl = document.getElementById('login-err')
+  const btn   = document.getElementById('login-btn')
+  errEl.style.display='none'
+  if (!pin) { errEl.textContent='Please enter the admin PIN.'; errEl.style.display='block'; return }
+  if (pin !== ADMIN_PIN) {
+    errEl.textContent='Incorrect PIN. Access denied.'
+    errEl.style.display='block'
+    return
+  }
+  _adminUnlocked = true
+  document.getElementById('admin-login').style.display = 'none'
+  document.getElementById('loading').style.display = 'flex'
+  loadAdminDashboard()
+}
+
+function withTimeout(promise, ms=8000) {
+  return Promise.race([promise, new Promise(res => setTimeout(() => res(null), ms))])
+}
+
+async function loadAdminDashboard() {
+  adminRole = 'super_admin'
+  document.getElementById('avatar').textContent     = 'A'
+  document.getElementById('admin-name').textContent = 'Admin'
+  document.getElementById('admin-role').textContent = 'Super Admin'
+
+  // Load all data with timeout — dashboard shows even if Supabase is slow/offline
+  try { await withTimeout(loadInvestors()) } catch(e) { allInvestors=[] }
+  try { await withTimeout(loadKYC()) }       catch(e) { allKYC=[] }
+  try { await withTimeout(loadCycles()) }    catch(e) { allCycles=[] }
+  try { await withTimeout(loadPayouts()) }   catch(e) { allPayouts=[] }
+
+  renderOverview()
+  document.getElementById('loading').style.display = 'none'
+  document.getElementById('app').classList.remove('hidden')
+}
+
+async function loadInvestors() {
+  try {
+    const { data } = await sb.from('profiles').select('*, wallets(balance_usd, locked_amount, total_deposited)').order('created_at', { ascending: false })
+    allInvestors = data || []
+    const countries = [...new Set(allInvestors.map(i => i.country).filter(Boolean))].sort()
+    const sel = document.getElementById('investor-country-filter')
+    sel.innerHTML = '<option value="">All Countries</option>' + countries.map(c => `<option value="${c}">${c}</option>`).join('')
+  } catch(e) { allInvestors=[] }
+}
+
+async function loadKYC() {
+  try {
+    const { data } = await sb.from('kyc_documents').select('*, profiles(full_name, email)').order('created_at', { ascending: false })
+    allKYC = data || []
+    const pending = allKYC.filter(k => k.status === 'pending').length
+    const badge = document.getElementById('kyc-count-badge')
+    if (pending > 0) { badge.textContent = pending; badge.classList.remove('hidden') }
+    else badge.classList.add('hidden')
+  } catch(e) { allKYC=[] }
+}
+
+async function loadCycles() {
+  try {
+    const { data } = await sb.from('funding_cycles').select('*').order('created_at', { ascending: false })
+    allCycles = data || []
+  } catch(e) { allCycles=[] }
+}
+
+async function loadPayouts() {
+  try {
+    const { data } = await sb.from('payouts').select('*, profiles(full_name, email), funding_cycles(cycle_name)').order('scheduled_date', { ascending: true })
+    allPayouts = data || []
+  } catch(e) { allPayouts=[] }
+}
+
+function renderOverview() {
+  document.getElementById('ov-total').textContent          = allInvestors.length
+  document.getElementById('ov-pending-kyc').textContent    = allKYC.filter(k => k.status === 'pending').length
+  document.getElementById('ov-active-cycles').textContent  = allCycles.filter(c => ['open','active'].includes(c.status)).length
+  document.getElementById('ov-pending-payouts').textContent= allPayouts.filter(p => p.status === 'pending').length
+
+  const el = document.getElementById('ov-recent-users')
+  const recent = allInvestors.slice(0, 5)
+  if (!recent.length) { el.innerHTML = '<p style="color:#94a3b8">No participants yet.</p>'; }
+  else el.innerHTML = recent.map(u => `
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f8fafc">
+      <div class="ava">${(u.full_name||u.email)[0].toUpperCase()}</div>
+      <div style="flex:1;min-width:0">
+        <p style="font-weight:600;color:#0f172a;font-size:.8125rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${u.full_name||'—'}</p>
+        <p style="font-size:.75rem;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${u.email}</p>
+      </div>
+      <span class="badge badge-${u.kyc_status||'pending'}">${u.kyc_status||'pending'}</span>
+    </div>`).join('')
+
+  const cel = document.getElementById('ov-cycles-summary')
+  if (!allCycles.length) { cel.innerHTML = '<p style="color:#94a3b8">No cycles yet.</p>'; return }
+  cel.innerHTML = allCycles.slice(0, 5).map(c => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f8fafc">
+      <div>
+        <p style="font-weight:600;color:#0f172a;font-size:.8125rem">${c.cycle_name}</p>
+        <p style="font-size:.75rem;color:#94a3b8">${c.filled_slots}/${c.total_slots} slots · $${Number(c.contribution_amount).toLocaleString()}</p>
+      </div>
+      <span class="badge badge-${c.status}">${c.status}</span>
+    </div>`).join('')
+}
+
+function filterInvestors() {
+  const search  = document.getElementById('investor-search').value.toLowerCase()
+  const kyc     = document.getElementById('investor-kyc-filter').value
+  const country = document.getElementById('investor-country-filter').value
+  const filtered = allInvestors.filter(u => {
+    if (search && !`${u.full_name} ${u.email}`.toLowerCase().includes(search)) return false
+    if (kyc && u.kyc_status !== kyc) return false
+    if (country && u.country !== country) return false
+    return true
+  })
+  renderInvestorsTable(filtered)
+}
+
+function renderInvestorsTable(list) {
+  const tbody = document.getElementById('investors-tbody')
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="7" class="text-center py-10" style="color:#94a3b8">No participants found.</td></tr>'; return }
+  tbody.innerHTML = list.map(u => `<tr>
+    <td><div style="display:flex;align-items:center;gap:10px">
+      <div class="ava">${(u.full_name||u.email||'?')[0].toUpperCase()}</div>
+      <div><p style="font-weight:600;color:#0f172a">${u.full_name||'—'}</p><p style="font-size:.75rem;color:#94a3b8">${u.email}</p></div>
+    </div></td>
+    <td style="color:#64748b">${u.country||'—'}</td>
+    <td><span class="badge badge-${u.kyc_status||'pending'}">${u.kyc_status||'pending'}</span></td>
+    <td><span class="badge ${riskColor(u.risk_score)}" style="border-radius:6px">${u.risk_score??'—'}</span></td>
+    <td style="font-weight:600;color:#0f172a">$${Number(u.wallets?.balance_usd||0).toFixed(2)}</td>
+    <td style="color:#94a3b8;font-size:.75rem">${new Date(u.created_at).toLocaleDateString()}</td>
+    <td><button onclick="viewInvestor('${u.id}')" style="color:#1e4535;font-weight:600;font-size:.75rem;background:none;border:none;cursor:pointer">View →</button></td>
+  </tr>`).join('')
+}
+
+function riskColor(score) {
+  if (score === null || score === undefined) return 'badge-upcoming'
+  if (score >= 70) return 'badge-rejected'
+  if (score >= 40) return 'badge-pending'
+  return 'badge-approved'
+}
+
+async function viewInvestor(userId) {
+  const u = allInvestors.find(x => x.id === userId)
+  if (!u) return
+  const { data: kyc } = await sb.from('kyc_documents').select('*').eq('user_id', userId).order('created_at', { ascending: false })
+  const { data: participations } = await sb.from('cycle_participations').select('*, funding_cycles(cycle_name, status)').eq('user_id', userId)
+  const content = document.getElementById('modal-investor-content')
+  content.innerHTML = `
+    <div class="space-y-5">
+      <div class="grid grid-cols-2 gap-3" style="font-size:.8125rem">
+        <div><p style="color:#94a3b8;font-size:.75rem;margin-bottom:2px">Full Name</p><p style="font-weight:600;color:#0f172a">${u.full_name||'—'}</p></div>
+        <div><p style="color:#94a3b8;font-size:.75rem;margin-bottom:2px">Email</p><p style="font-weight:600;color:#0f172a">${u.email}</p></div>
+        <div><p style="color:#94a3b8;font-size:.75rem;margin-bottom:2px">Country</p><p style="font-weight:600;color:#0f172a">${u.country||'—'}</p></div>
+        <div><p style="color:#94a3b8;font-size:.75rem;margin-bottom:2px">Phone</p><p style="font-weight:600;color:#0f172a">${u.phone||'—'}</p></div>
+        <div><p style="color:#94a3b8;font-size:.75rem;margin-bottom:4px">KYC Status</p><span class="badge badge-${u.kyc_status||'pending'}">${u.kyc_status||'pending'}</span></div>
+        <div><p style="color:#94a3b8;font-size:.75rem;margin-bottom:2px">Access Tier</p><p style="font-weight:600;color:#0f172a;text-transform:capitalize">${u.access_tier||'standard'}</p></div>
+        <div><p style="color:#94a3b8;font-size:.75rem;margin-bottom:2px">Wallet Balance</p><p style="font-weight:700;color:#0f172a">$${Number(u.wallets?.balance_usd||0).toFixed(2)}</p></div>
+        <div><p style="color:#94a3b8;font-size:.75rem;margin-bottom:2px">Total Deposited</p><p style="font-weight:600;color:#0f172a">$${Number(u.wallets?.total_deposited||0).toFixed(2)}</p></div>
+      </div>
+      ${kyc&&kyc.length?`<div>
+        <p style="font-size:.7rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">KYC Documents</p>
+        <div style="display:flex;flex-direction:column;gap:8px">${kyc.map(k=>`
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#f8fafc;border-radius:10px;font-size:.8125rem">
+            <div>
+              <p style="font-weight:600;color:#0f172a;text-transform:capitalize">${(k.document_type||'').replace('_',' ')}</p>
+              <p style="font-size:.75rem;color:#94a3b8">${new Date(k.created_at).toLocaleDateString()}${k.reviewer_notes?` · ${k.reviewer_notes}`:''}</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="badge badge-${k.status}">${k.status}</span>
+              <a href="${k.file_url}" target="_blank" style="color:#1e4535;font-weight:600;font-size:.75rem">View ↗</a>
+            </div>
+          </div>`).join('')}</div>
+      </div>`:'<p style="color:#94a3b8;font-size:.875rem">No KYC documents submitted.</p>'}
+      ${participations&&participations.length?`<div>
+        <p style="font-size:.7rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Cycle Participations</p>
+        <div style="display:flex;flex-direction:column;gap:8px">${participations.map(p=>`
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#f8fafc;border-radius:10px;font-size:.8125rem">
+            <div>
+              <p style="font-weight:600;color:#0f172a">${p.funding_cycles?.cycle_name||'—'}</p>
+              <p style="font-size:.75rem;color:#94a3b8">Joined ${new Date(p.joined_at).toLocaleDateString()}</p>
+            </div>
+            <div style="text-align:right">
+              <p style="font-weight:600;color:#0f172a">$${Number(p.amount).toFixed(2)}</p>
+              <span class="badge badge-${p.funding_cycles?.status||p.status}">${p.funding_cycles?.status||p.status}</span>
+            </div>
+          </div>`).join('')}</div>
+      </div>`:''}
+      <!-- AI Risk Score -->
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div>
+            <p style="font-size:.7rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em">AI Risk Score</p>
+            ${u.risk_score != null ? `<span style="font-size:1.1rem;font-weight:800;color:${u.risk_score>=70?'#16a34a':u.risk_score>=40?'#d97706':'#dc2626'}">${u.risk_score}/100 <span style="font-size:.75rem;font-weight:600;color:#64748b;text-transform:capitalize">${u.access_tier||'standard'}</span></span>` : '<p style="font-size:.8125rem;color:#94a3b8">Not yet scored</p>'}
+          </div>
+          <button id="ai-score-btn-${u.id}" onclick="runRiskScore('${u.id}')" style="padding:8px 14px;background:#1e4535;color:#fff;font-weight:700;border-radius:10px;border:none;cursor:pointer;font-size:.8125rem">🤖 AI Score</button>
+        </div>
+        <div id="ai-score-box-${u.id}" style="display:none;margin-top:6px;padding:10px;background:#fff;border-radius:8px;border:1px solid #e2e8f0"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding-top:4px">
+        <button onclick="updateAccessTier('${u.id}','priority')" style="padding:9px;background:#1e4535;color:#fff;font-weight:700;border-radius:10px;border:none;cursor:pointer;font-size:.8125rem">Priority</button>
+        <button onclick="updateAccessTier('${u.id}','restricted')" style="padding:9px;background:#fef2f2;color:#dc2626;font-weight:700;border-radius:10px;border:none;cursor:pointer;font-size:.8125rem">Restrict</button>
+        <button onclick="updateAccessTier('${u.id}','standard')" style="padding:9px;background:#f1f5f9;color:#475569;font-weight:700;border-radius:10px;border:none;cursor:pointer;font-size:.8125rem">Standard</button>
+      </div>
+    </div>`
+  document.getElementById('modal-investor').classList.remove('hidden')
+}
+
+async function updateAccessTier(userId, tier) {
+  await sb.from('profiles').update({ access_tier: tier }).eq('id', userId)
+  const u = allInvestors.find(x => x.id === userId)
+  if (u) u.access_tier = tier
+  closeModal('modal-investor')
+  renderInvestorsTable(allInvestors)
+}
+
+function filterKYC() {
+  const status = document.getElementById('kyc-status-filter').value
+  renderKYCTable(status ? allKYC.filter(k => k.status === status) : allKYC)
+}
+
+function renderKYCTable(list) {
+  const tbody = document.getElementById('kyc-tbody')
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-10" style="color:#94a3b8">No documents found.</td></tr>'; return }
+  tbody.innerHTML = list.map(k => `<tr>
+    <td><p style="font-weight:600;color:#0f172a;font-size:.8125rem">${k.profiles?.full_name||'—'}</p><p style="font-size:.75rem;color:#94a3b8">${k.profiles?.email||''}</p></td>
+    <td style="color:#64748b;text-transform:capitalize;font-size:.8125rem">${(k.document_type||'').replace('_',' ')}</td>
+    <td style="color:#94a3b8;font-size:.75rem">${new Date(k.created_at).toLocaleDateString()}</td>
+    <td><span class="badge badge-${k.status}">${k.status}</span></td>
+    <td style="display:flex;gap:12px;align-items:center">
+      <button onclick="reviewKYC('${k.id}')" style="color:#1e4535;font-weight:600;font-size:.75rem;background:none;border:none;cursor:pointer">Review</button>
+      <button onclick="viewKYCDoc('${k.file_url}')" style="color:#94a3b8;font-size:.75rem;background:none;border:none;cursor:pointer">View ↗</button>
+    </td>
+  </tr>`).join('')
+}
+
+async function viewKYCDoc(filePath) {
+  const { data } = await sb.storage.from('kyc-documents').createSignedUrl(filePath, 3600)
+  if (data?.signedUrl) window.open(data.signedUrl, '_blank')
+}
+
+async function reviewKYC(docId) {
+  const doc = allKYC.find(k => k.id === docId)
+  if (!doc) return
+  // Generate signed URL (valid 1 hour) so private storage files open correctly
+  const { data: signedData } = await sb.storage.from('kyc-documents').createSignedUrl(doc.file_url, 3600)
+  const docUrl = signedData?.signedUrl || '#'
+  document.getElementById('modal-kyc-content').innerHTML = `
+    <div class="space-y-4">
+      <div class="grid grid-cols-2 gap-3" style="font-size:.8125rem">
+        <div><p style="color:#94a3b8;font-size:.75rem;margin-bottom:2px">Participant</p><p style="font-weight:600;color:#0f172a">${doc.profiles?.full_name||'—'}</p></div>
+        <div><p style="color:#94a3b8;font-size:.75rem;margin-bottom:2px">Email</p><p style="font-weight:600;color:#0f172a">${doc.profiles?.email||'—'}</p></div>
+        <div><p style="color:#94a3b8;font-size:.75rem;margin-bottom:2px">Document</p><p style="font-weight:600;color:#0f172a;text-transform:capitalize">${(doc.document_type||'').replace('_',' ')}</p></div>
+        <div><p style="color:#94a3b8;font-size:.75rem;margin-bottom:4px">Status</p><span class="badge badge-${doc.status}">${doc.status}</span></div>
+      </div>
+      <a href="${docUrl}" target="_blank" style="display:flex;align-items:center;gap:8px;padding:12px 16px;border:2px dashed rgba(30,69,53,.3);border-radius:12px;color:#1e4535;font-weight:600;font-size:.875rem;text-decoration:none">
+        <svg style="width:16px;height:16px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        Open Document in New Tab
+      </a>
+      <div>
+        <label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Reviewer Notes</label>
+        <textarea id="kyc-notes" rows="3" placeholder="Optional notes for the participant…" class="inp resize-none">${doc.reviewer_notes||''}</textarea>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <button onclick="submitKYCDecision('${doc.id}','${doc.user_id}','approved')" style="padding:11px;background:#16a34a;color:#fff;font-weight:700;border-radius:10px;border:none;cursor:pointer">✓ Approve</button>
+        <button onclick="submitKYCDecision('${doc.id}','${doc.user_id}','rejected')" style="padding:11px;background:#dc2626;color:#fff;font-weight:700;border-radius:10px;border:none;cursor:pointer">✕ Reject</button>
+      </div>
+    </div>`
+  document.getElementById('modal-kyc').classList.remove('hidden')
+}
+
+async function submitKYCDecision(docId, userId, decision) {
+  const notes = document.getElementById('kyc-notes').value.trim()
+  await sb.from('kyc_documents').update({ status: decision, reviewer_notes: notes||null, reviewed_at: new Date().toISOString() }).eq('id', docId)
+  await sb.from('profiles').update({ kyc_status: decision }).eq('id', userId)
+  const msg = decision === 'approved'
+    ? 'Your identity has been verified. You can now join funding cycles.'
+    : `Your KYC was not approved.${notes?' Note: '+notes:' Please contact support to resubmit.'}`
+  await sb.from('notifications').insert({ user_id: userId, title: decision==='approved'?'KYC Approved ✓':'KYC Rejected', message: msg })
+  const doc = allKYC.find(k => k.id === docId)
+  if (doc) { doc.status = decision; doc.reviewer_notes = notes }
+  const inv = allInvestors.find(u => u.id === userId)
+  if (inv) inv.kyc_status = decision
+  await loadKYC()
+  closeModal('modal-kyc')
+  filterKYC()
+  renderOverview()
+  adminToast(decision === 'approved' ? '✅ KYC Approved' : '❌ KYC Rejected')
+  const inv2 = allInvestors.find(u => u.id === userId)
+  notifyTelegram(decision === 'approved'
+    ? `✅ <b>KYC Approved</b>\nUser: ${inv2?.full_name||userId}\nCountry: ${inv2?.country||'—'}`
+    : `❌ <b>KYC Rejected</b>\nUser: ${inv2?.full_name||userId}\nNotes: ${notes||'none'}`)
+}
+
+function renderCyclesTable() {
+  const tbody = document.getElementById('cycles-tbody')
+  if (!allCycles.length) { tbody.innerHTML = '<tr><td colspan="7" class="text-center py-10" style="color:#94a3b8">No cycles yet.</td></tr>'; return }
+  tbody.innerHTML = allCycles.map(c => `<tr>
+    <td style="font-weight:600;color:#0f172a">${c.cycle_name}</td>
+    <td><span class="badge badge-${c.status}">${c.status}</span></td>
+    <td>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div style="flex:1;height:6px;background:#f1f5f9;border-radius:99px;overflow:hidden;min-width:60px">
+          <div style="height:100%;background:#1e4535;border-radius:99px;width:${c.total_slots?Math.round(c.filled_slots/c.total_slots*100):0}%"></div>
+        </div>
+        <span style="font-size:.75rem;color:#64748b;white-space:nowrap">${c.filled_slots}/${c.total_slots}</span>
+      </div>
+    </td>
+    <td style="font-weight:600;color:#0f172a">$${Number(c.contribution_amount).toLocaleString()}</td>
+    <td style="color:#64748b">${c.duration_months}mo</td>
+    <td style="color:#94a3b8;font-size:.75rem">${c.start_date?new Date(c.start_date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'—'}</td>
+    <td style="display:flex;gap:12px;align-items:center">
+      <button onclick="openEditCycle('${c.id}')" style="color:#1e4535;font-weight:600;font-size:.75rem;background:none;border:none;cursor:pointer">Edit</button>
+      <button onclick="viewCycleParticipants('${c.id}')" style="color:#94a3b8;font-weight:600;font-size:.75rem;background:none;border:none;cursor:pointer">View</button>
+    </td>
+  </tr>`).join('')
+}
+
+function openCreateCycle() {
+  document.getElementById('cycle-edit-id').value = ''
+  document.getElementById('cycle-modal-title').textContent = 'New Funding Cycle'
+  document.getElementById('cycle-name').value    = ''
+  document.getElementById('cycle-slots').value   = ''
+  document.getElementById('cycle-amount').value  = ''
+  document.getElementById('cycle-duration').value= '13'
+  document.getElementById('cycle-status').value  = 'upcoming'
+  document.getElementById('cycle-start').value   = ''
+  document.getElementById('cycle-end').value     = ''
+  document.getElementById('cycle-filled').value  = '0'
+  document.getElementById('cycle-raised').value  = '0'
+  document.getElementById('cycle-save-error').classList.add('hidden')
+  document.getElementById('modal-cycle').classList.remove('hidden')
+}
+
+function openEditCycle(cycleId) {
+  const c = allCycles.find(x => x.id === cycleId)
+  if (!c) return
+  document.getElementById('cycle-edit-id').value  = c.id
+  document.getElementById('cycle-modal-title').textContent = 'Edit Funding Cycle'
+  document.getElementById('cycle-name').value     = c.cycle_name
+  document.getElementById('cycle-slots').value    = c.total_slots
+  document.getElementById('cycle-amount').value   = c.contribution_amount
+  document.getElementById('cycle-duration').value = c.duration_months
+  document.getElementById('cycle-status').value   = c.status
+  document.getElementById('cycle-start').value    = c.start_date||''
+  document.getElementById('cycle-end').value      = c.end_date||''
+  document.getElementById('cycle-filled').value   = c.filled_slots||0
+  document.getElementById('cycle-raised').value   = c.amount_raised||0
+  document.getElementById('cycle-save-error').classList.add('hidden')
+  document.getElementById('modal-cycle').classList.remove('hidden')
+}
+
+async function saveCycle() {
+  const errEl = document.getElementById('cycle-save-error')
+  errEl.classList.add('hidden')
+  const name     = document.getElementById('cycle-name').value.trim()
+  const slots    = parseInt(document.getElementById('cycle-slots').value)
+  const amount   = parseFloat(document.getElementById('cycle-amount').value)
+  const duration = parseInt(document.getElementById('cycle-duration').value)
+  const status   = document.getElementById('cycle-status').value
+  const start    = document.getElementById('cycle-start').value||null
+  const end      = document.getElementById('cycle-end').value||null
+  const filled   = parseInt(document.getElementById('cycle-filled').value)||0
+  const raised   = parseFloat(document.getElementById('cycle-raised').value)||0
+  const editId   = document.getElementById('cycle-edit-id').value
+  if (!name||isNaN(slots)||isNaN(amount)||isNaN(duration)) {
+    errEl.textContent='Please fill in all required fields.'; errEl.classList.remove('hidden'); return
+  }
+  const payload = { cycle_name:name, total_slots:slots, contribution_amount:amount, duration_months:duration, status, start_date:start, end_date:end, filled_slots:filled, amount_raised:raised }
+  if (editId) {
+    const { error } = await sb.from('funding_cycles').update(payload).eq('id', editId)
+    if (error) { errEl.textContent=error.message; errEl.classList.remove('hidden'); return }
+  } else {
+    payload.created_by=currentUser.id
+    const { error } = await sb.from('funding_cycles').insert(payload)
+    if (error) { errEl.textContent=error.message; errEl.classList.remove('hidden'); return }
+  }
+  await loadCycles()
+  closeModal('modal-cycle')
+  renderCyclesTable()
+  renderOverview()
+  adminToast('✅ Cycle saved')
+  notifyTelegram(editId
+    ? `🔄 <b>Cycle Updated</b>\nName: ${name}\nStatus: ${status}\nSlots: ${slots} @ $${amount}`
+    : `🆕 <b>New Cycle Created</b>\nName: ${name}\nSlots: ${slots} @ $${amount}\nStatus: ${status}`)
+}
+
+async function viewCycleParticipants(cycleId) {
+  const c = allCycles.find(x => x.id === cycleId)
+  document.getElementById('cp-modal-title').textContent = `${c?.cycle_name||'Cycle'} — Participants`
+  document.getElementById('modal-cycle-participants').classList.remove('hidden')
+  const { data } = await sb.from('cycle_participations').select('*, profiles(full_name, email, country)').eq('cycle_id', cycleId).order('joined_at', { ascending: true })
+  const el = document.getElementById('cp-modal-content')
+  if (!data||!data.length) { el.innerHTML='<p style="color:#94a3b8;text-align:center;padding:24px 0">No participants yet.</p>'; return }
+  el.innerHTML = `<div class="tscroll"><table class="dtbl">
+    <thead><tr><th>Name</th><th>Country</th><th>Amount</th><th>Joined</th><th>Status</th></tr></thead>
+    <tbody>${data.map(p=>`<tr>
+      <td><p style="font-weight:600;color:#0f172a;font-size:.8125rem">${p.profiles?.full_name||'—'}</p><p style="font-size:.75rem;color:#94a3b8">${p.profiles?.email||''}</p></td>
+      <td style="color:#64748b;font-size:.8125rem">${p.profiles?.country||'—'}</td>
+      <td style="font-weight:600;color:#0f172a">$${Number(p.amount).toFixed(2)}</td>
+      <td style="color:#94a3b8;font-size:.75rem">${new Date(p.joined_at).toLocaleDateString()}</td>
+      <td><span class="badge badge-${p.status}">${p.status}</span></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`
+}
+
+function filterPayouts() {
+  const status = document.getElementById('payout-status-filter').value
+  renderPayoutsTable(status ? allPayouts.filter(p => p.status === status) : allPayouts)
+}
+
+function renderPayoutsTable(list) {
+  const tbody = document.getElementById('payouts-tbody')
+  if (!list.length) { tbody.innerHTML='<tr><td colspan="7" class="text-center py-10" style="color:#94a3b8">No payouts found.</td></tr>'; return }
+  tbody.innerHTML = list.map(p=>`<tr>
+    <td><p style="font-weight:600;color:#0f172a;font-size:.8125rem">${p.profiles?.full_name||'—'}</p><p style="font-size:.75rem;color:#94a3b8">${p.profiles?.email||''}</p></td>
+    <td style="color:#64748b;font-size:.8125rem">${p.funding_cycles?.cycle_name||'—'}</td>
+    <td style="font-weight:700;color:#0f172a">$${Number(p.amount).toFixed(2)}</td>
+    <td style="color:#94a3b8;font-size:.75rem">${p.scheduled_date?new Date(p.scheduled_date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'—'}</td>
+    <td style="color:#94a3b8;font-size:.75rem">${p.paid_date?new Date(p.paid_date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'—'}</td>
+    <td><span class="badge badge-${p.status}">${p.status}</span></td>
+    <td>${p.status==='pending'?`<button onclick="markPayoutSent('${p.id}','${p.user_id}')" style="color:#1e4535;font-weight:600;font-size:.75rem;background:none;border:none;cursor:pointer">Mark Sent</button>`:'—'}</td>
+  </tr>`).join('')
+}
+
+async function markPayoutSent(payoutId, userId) {
+  if (!confirm('Mark this payout as sent to the participant?')) return
+  const today = new Date().toISOString().split('T')[0]
+  await sb.from('payouts').update({ status:'sent', paid_date:today }).eq('id', payoutId)
+  const p = allPayouts.find(x => x.id === payoutId)
+  if (p) {
+    await sb.from('notifications').insert({ user_id:userId, title:'Payout Sent', message:`Your payout of $${Number(p.amount).toFixed(2)} from ${p.funding_cycles?.cycle_name||'your cycle'} has been sent.` })
+    p.status='sent'; p.paid_date=today
+  }
+  await loadPayouts(); filterPayouts(); renderOverview()
+  adminToast('✅ Payout marked as sent')
+}
+
+function exportPayoutsCSV() {
+  const rows=[['Participant','Email','Cycle','Amount','Scheduled','Paid Date','Status']]
+  allPayouts.forEach(p=>rows.push([p.profiles?.full_name||'',p.profiles?.email||'',p.funding_cycles?.cycle_name||'',p.amount,p.scheduled_date||'',p.paid_date||'',p.status]))
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n')
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}))
+  a.download=`genesis360-payouts-${new Date().toISOString().split('T')[0]}.csv`; a.click()
+}
+
+async function sendNotification() {
+  const recipient=document.getElementById('notif-recipient').value
+  const title=document.getElementById('notif-title').value.trim()
+  const message=document.getElementById('notif-message').value.trim()
+  if (!title||!message) { adminToast('Please fill in title and message.'); return }
+  let users=allInvestors
+  if (recipient==='approved') users=allInvestors.filter(u=>u.kyc_status==='approved')
+  if (recipient==='pending')  users=allInvestors.filter(u=>u.kyc_status==='pending')
+  if (!users.length) { adminToast('No matching recipients.'); return }
+  const { error }=await sb.from('notifications').insert(users.map(u=>({user_id:u.id,title,message})))
+  if (error) { adminToast('Error: '+error.message); return }
+  adminToast(`✅ Sent to ${users.length} participant${users.length!==1?'s':''}`, 4000)
+  document.getElementById('notif-title').value=''
+  document.getElementById('notif-message').value=''
+}
+
+let allTxns=[]
+async function loadTxns() {
+  const { data }=await sb.from('transactions').select('*, profiles(full_name, email)').order('created_at',{ascending:false})
+  allTxns=data||[]
+}
+
+function filterTxns() {
+  const search=document.getElementById('tx-search').value.toLowerCase()
+  const type=document.getElementById('tx-type-filter').value
+  const list=allTxns.filter(t=>{
+    if (type&&t.type!==type) return false
+    const n=(t.profiles?.full_name||t.profiles?.email||'').toLowerCase()
+    const r=(t.payment_ref||'').toLowerCase()
+    if (search&&!n.includes(search)&&!r.includes(search)) return false
+    return true
+  })
+  renderTxnsTable(list)
+  const deps=allTxns.filter(t=>t.type==='deposit').reduce((s,t)=>s+t.amount,0)
+  const wds=allTxns.filter(t=>t.type==='withdrawal').reduce((s,t)=>s+t.amount,0)
+  const parts=allTxns.filter(t=>t.type==='participation').reduce((s,t)=>s+t.amount,0)
+  const pays=allTxns.filter(t=>t.type==='payout').reduce((s,t)=>s+t.amount,0)
+  document.getElementById('tx-sum-dep').textContent='$'+deps.toFixed(2)
+  document.getElementById('tx-sum-wd').textContent='$'+wds.toFixed(2)
+  document.getElementById('tx-sum-part').textContent='$'+parts.toFixed(2)
+  document.getElementById('tx-sum-pay').textContent='$'+pays.toFixed(2)
+}
+
+function renderTxnsTable(list) {
+  const tbody=document.getElementById('txns-tbody')
+  if (!list.length) { tbody.innerHTML='<tr><td colspan="6" class="text-center py-10" style="color:#94a3b8">No transactions found.</td></tr>'; return }
+  const tc={deposit:'badge-approved',withdrawal:'badge-rejected',participation:'badge-active',payout:'badge-sent'}
+  tbody.innerHTML=list.map(t=>`<tr>
+    <td><p style="font-weight:600;color:#0f172a;font-size:.8125rem">${t.profiles?.full_name||'—'}</p><p style="font-size:.75rem;color:#94a3b8">${t.profiles?.email||''}</p></td>
+    <td><span class="badge ${tc[t.type]||'badge-pending'}">${t.type}</span></td>
+    <td style="font-weight:600;color:#0f172a">$${Number(t.amount).toFixed(2)}</td>
+    <td style="color:#94a3b8;font-size:.7rem;font-family:monospace">${t.payment_ref||'—'}</td>
+    <td style="color:#94a3b8;font-size:.75rem">${new Date(t.created_at).toLocaleDateString()}</td>
+    <td><span class="badge badge-${t.status==='completed'?'approved':t.status==='failed'?'rejected':'pending'}">${t.status||'—'}</span></td>
+  </tr>`).join('')
+}
+
+function exportTxnsCSV() {
+  const rows=[['User','Email','Type','Amount','Ref','Date','Status'],...allTxns.map(t=>[t.profiles?.full_name||'',t.profiles?.email||'',t.type,t.amount,t.payment_ref||'',t.created_at,t.status||''])]
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n')
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}))
+  a.download=`genesis360-transactions-${new Date().toISOString().split('T')[0]}.csv`; a.click()
+}
+
+async function renderFunnel() {
+  const registered=allInvestors.length
+  const kycApproved=allInvestors.filter(u=>u.kyc_status==='approved').length
+  const funded=allInvestors.filter(u=>(u.wallets?.total_deposited||0)>0).length
+  const { data:partData }=await sb.from('cycle_participations').select('user_id')
+  const joined=new Set((partData||[]).map(p=>p.user_id)).size
+  document.getElementById('fn-registered').textContent=registered
+  document.getElementById('fn-kyc').textContent=kycApproved
+  document.getElementById('fn-funded').textContent=funded
+  document.getElementById('fn-joined').textContent=joined
+  const kycRate=registered?Math.round(kycApproved/registered*100):0
+  const fundRate=kycApproved?Math.round(funded/kycApproved*100):0
+  const joinRate=funded?Math.round(joined/funded*100):0
+  document.getElementById('fn-kyc-rate').textContent=kycRate+'% of registered'
+  document.getElementById('fn-funded-rate').textContent=fundRate+'% of approved'
+  document.getElementById('fn-joined-rate').textContent=joinRate+'% of funded'
+  const stages=[
+    {label:'Registered',value:registered,color:'#1e4535',pct:100},
+    {label:'KYC Approved',value:kycApproved,color:'#2d6a4f',pct:registered?Math.round(kycApproved/registered*100):0},
+    {label:'Funded Wallet',value:funded,color:'#52b788',pct:registered?Math.round(funded/registered*100):0},
+    {label:'Joined Cycle',value:joined,color:'#9dc43a',pct:registered?Math.round(joined/registered*100):0}
+  ]
+  document.getElementById('funnel-bars').innerHTML=stages.map(s=>`
+    <div>
+      <div style="display:flex;justify-content:space-between;font-size:.8125rem;font-weight:600;color:#334155;margin-bottom:6px">
+        <span>${s.label}</span><span>${s.value} (${s.pct}%)</span>
+      </div>
+      <div style="background:#f1f5f9;border-radius:99px;height:10px;overflow:hidden">
+        <div style="height:100%;border-radius:99px;background:${s.color};width:${s.pct}%;transition:width 1s ease"></div>
+      </div>
+    </div>`).join('')
+  const dropoffs=[
+    {stage:'Registration → KYC Approved',lost:registered-kycApproved,rate:100-kycRate},
+    {stage:'KYC Approved → Funded Wallet',lost:kycApproved-funded,rate:100-fundRate},
+    {stage:'Funded Wallet → Joined Cycle',lost:funded-joined,rate:100-joinRate}
+  ]
+  document.getElementById('funnel-dropoff').innerHTML=dropoffs.map(d=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#fef2f2;border:1px solid #fee2e2;border-radius:10px;font-size:.8125rem">
+      <span style="color:#334155;font-weight:500">${d.stage}</span>
+      <span style="color:#dc2626;font-weight:700">${d.lost} dropped (${d.rate}%)</span>
+    </div>`).join('')
+}
+
+let lbView='participation'
+let lbRawData=[]
+
+async function renderLeaderboard() {
+  const { data:parts }=await sb.from('cycle_participations').select('user_id, amount, profiles(full_name, email, country)')
+  const { data:deps }=await sb.from('transactions').select('user_id, amount, profiles(full_name, country)').eq('type','deposit')
+  const map={}
+  ;(parts||[]).forEach(p=>{
+    if (!map[p.user_id]) map[p.user_id]={uid:p.user_id,name:p.profiles?.full_name||'—',country:p.profiles?.country||'—',cycles:0,participation:0,deposits:0}
+    map[p.user_id].cycles++; map[p.user_id].participation+=(p.amount||0)
+  })
+  ;(deps||[]).forEach(d=>{
+    if (!map[d.user_id]) map[d.user_id]={uid:d.user_id,name:d.profiles?.full_name||'—',country:d.profiles?.country||'—',cycles:0,participation:0,deposits:0}
+    map[d.user_id].deposits+=(d.amount||0)
+  })
+  lbRawData=Object.values(map)
+  renderLbTable()
+}
+
+function switchLbView(view) {
+  lbView=view
+  document.getElementById('lb-btn-participation').style.cssText=view==='participation'?'background:#1e4535;color:#fff;padding:6px 16px;font-size:.875rem;font-weight:600;border-radius:8px;border:none;cursor:pointer':'background:#fff;color:#475569;padding:6px 16px;font-size:.875rem;font-weight:600;border-radius:8px;border:1.5px solid #e2e8f0;cursor:pointer'
+  document.getElementById('lb-btn-deposits').style.cssText=view==='deposits'?'background:#1e4535;color:#fff;padding:6px 16px;font-size:.875rem;font-weight:600;border-radius:8px;border:none;cursor:pointer':'background:#fff;color:#475569;padding:6px 16px;font-size:.875rem;font-weight:600;border-radius:8px;border:1.5px solid #e2e8f0;cursor:pointer'
+  renderLbTable()
+}
+
+function getLevel(pts) {
+  if (pts>=600) return {name:'Elite',color:'#f59e0b'}
+  if (pts>=300) return {name:'Insider',color:'#059669'}
+  if (pts>=100) return {name:'Builder',color:'#3b82f6'}
+  return {name:'Explorer',color:'#64748b'}
+}
+
+function renderLbTable() {
+  const sorted=[...lbRawData].sort((a,b)=>lbView==='participation'?b.participation-a.participation:b.deposits-a.deposits).slice(0,20)
+  const medals=['🥇','🥈','🥉']
+  document.getElementById('lb-tbody').innerHTML=sorted.length?sorted.map((r,i)=>{
+    const lv=getLevel(r.cycles*100)
+    return `<tr>
+      <td style="font-weight:700;font-size:1rem">${i<3?medals[i]:i+1}</td>
+      <td><p style="font-weight:600;color:#0f172a;font-size:.8125rem">${r.name}</p><p style="font-size:.75rem;color:#94a3b8">${r.country}</p></td>
+      <td style="font-weight:600;text-align:center;color:#334155">${r.cycles}</td>
+      <td style="font-weight:600;color:#0f172a">$${r.participation.toFixed(2)}</td>
+      <td style="font-weight:600;color:#0f172a">$${r.deposits.toFixed(2)}</td>
+      <td><span style="background:${lv.color}22;color:${lv.color};padding:3px 10px;border-radius:99px;font-size:.6875rem;font-weight:700">${lv.name}</span></td>
+    </tr>`}).join('')
+    :'<tr><td colspan="6" class="text-center py-10" style="color:#94a3b8">No data yet.</td></tr>'
+}
+
+function exportLbCSV() {
+  const rows=[['Rank','Name','Country','Cycles','Participation','Deposits'],...lbRawData.map((r,i)=>[i+1,r.name,r.country,r.cycles,r.participation.toFixed(2),r.deposits.toFixed(2)])]
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n')
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}))
+  a.download=`genesis360-leaderboard-${new Date().toISOString().split('T')[0]}.csv`; a.click()
+}
+
+async function renderReferrals() {
+  const { data:referred }=await sb.from('profiles').select('id, referred_by, full_name, created_at').not('referred_by','is',null)
+  const total=(referred||[]).length
+  const { data:refDeps }=await sb.from('transactions').select('user_id').eq('type','deposit')
+  const fundedIds=new Set((refDeps||[]).map(d=>d.user_id))
+  const converted=(referred||[]).filter(r=>fundedIds.has(r.id)).length
+  document.getElementById('ref-total').textContent=total
+  document.getElementById('ref-converted').textContent=converted
+  document.getElementById('ref-rate').textContent=total?Math.round(converted/total*100)+'%':'0%'
+  const refMap={}
+  ;(referred||[]).forEach(r=>{if(r.referred_by){refMap[r.referred_by]=(refMap[r.referred_by]||0)+1}})
+  const topReferrers=Object.entries(refMap).sort((a,b)=>b[1]-a[1]).slice(0,5)
+  document.getElementById('ref-top-count').textContent=topReferrers.length
+  const topEl=document.getElementById('ref-top-list')
+  if (!topReferrers.length) topEl.innerHTML='<p style="color:#94a3b8;text-align:center;padding:16px 0">No referral data yet.</p>'
+  else {
+    const { data:topProfiles }=await sb.from('profiles').select('id,full_name').in('id',topReferrers.map(r=>r[0]))
+    const nameMap=Object.fromEntries((topProfiles||[]).map(p=>[p.id,p.full_name]))
+    topEl.innerHTML=topReferrers.map(([id,count],i)=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f1f5f9">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="ava">${i+1}</div>
+          <span style="font-weight:600;color:#0f172a;font-size:.8125rem">${nameMap[id]||'Unknown'}</span>
+        </div>
+        <span style="font-weight:700;color:#1e4535;font-size:.8125rem">${count} referral${count!==1?'s':''}</span>
+      </div>`).join('')
+  }
+  const actEl=document.getElementById('ref-activity')
+  if (!referred||!referred.length) actEl.innerHTML='<p style="color:#94a3b8;text-align:center;padding:16px 0">No referral activity yet.</p>'
+  else actEl.innerHTML=(referred||[]).slice(0,10).map(r=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f8fafc">
+      <span style="color:#334155;font-weight:500;font-size:.8125rem">${r.full_name||'New User'}</span>
+      <span style="color:#94a3b8;font-size:.75rem">${new Date(r.created_at).toLocaleDateString()}</span>
+    </div>`).join('')
+}
+
+const pageLabels={overview:'Overview',investors:'Participants',cycles:'Funding Cycles',payouts:'Payouts',notify:'Notifications',transactions:'Transactions',funnel:'Funnel Analytics',leaderboard:'Leaderboard',referrals:'Referral Analytics','investor-intel':'Investor Intelligence'}
+function showPage(p) {
+  Object.keys(pageLabels).forEach(k=>{
+    document.getElementById('page-'+k)?.classList.add('hidden')
+    document.getElementById('nav-'+k)?.classList.remove('active')
+  })
+  document.getElementById('page-'+p)?.classList.remove('hidden')
+  document.getElementById('nav-'+p)?.classList.add('active')
+  document.getElementById('page-title').textContent=pageLabels[p]||p
+  const subs={overview:'Genesis360 Admin Console',investors:'All registered participants',cycles:'Manage funding cycles',payouts:'Payout schedule & status',notify:'Broadcast messages to participants',transactions:'All platform transactions',funnel:'User conversion analytics',leaderboard:'Top participants by activity',referrals:'Referral programme analytics','investor-intel':'Loan ecosystem performance for diaspora investors'}
+  if (p==='investor-intel') { const fr=document.getElementById('intel_iframe'); if (!fr.src) fr.src='/investor-intelligence'; }
+  document.getElementById('page-sub').textContent=subs[p]||'Genesis360 Admin Console'
+  // Page-specific action button
+  const pa=document.getElementById('page-action')
+  if (p==='cycles') pa.innerHTML='<button onclick="openCreateCycle()" style="background:#1e4535;color:#fff;font-weight:700;border-radius:10px;padding:9px 18px;font-size:.875rem;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px"><svg style="width:16px;height:16px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>New Cycle</button>'
+  else pa.innerHTML=''
+  closeSidebar()
+  if (p==='investors') filterInvestors()
+  if (p==='kyc') filterKYC()
+  if (p==='cycles') renderCyclesTable()
+  if (p==='payouts') filterPayouts()
+  if (p==='transactions') { loadTxns().then(()=>filterTxns()) }
+  if (p==='funnel') renderFunnel()
+  if (p==='leaderboard') renderLeaderboard()
+  if (p==='referrals') renderReferrals()
+  return false
+}
+
+function closeModal(id) { document.getElementById(id).classList.add('hidden') }
+
+let _tt
+function adminToast(msg, dur=3000) {
+  const el=document.getElementById('admin-toast')
+  el.textContent=msg; el.classList.add('show')
+  clearTimeout(_tt); _tt=setTimeout(()=>el.classList.remove('show'),dur)
+}
+
+function openSidebar() {
+  document.getElementById('admin-sidebar').classList.add('open')
+  document.getElementById('mob-bd').classList.add('open')
+}
+function closeSidebar() {
+  document.getElementById('admin-sidebar').classList.remove('open')
+  document.getElementById('mob-bd').classList.remove('open')
+}
+
+function signOut() {
+  sessionStorage.removeItem('g360_admin_unlocked')
+  document.getElementById('app').classList.add('hidden')
+  document.getElementById('admin-login').style.display = 'flex'
+  document.getElementById('loading').style.display = 'none'
+  document.getElementById('login-pass').value = ''
+}
+
+init()
+</script>
+</body>
+</html>

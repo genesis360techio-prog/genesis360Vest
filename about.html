@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>About Us — Genesis360</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --green:#0e2114;--green2:#1a3d28;--green3:#2a5a3c;
+  --lemon:#A6D64A;--lemon2:#bde860;
+  --text:#0e2114;--muted:#5a7a66;--light:#f4f8f0;
+  --border:#dde8d8;--border2:#c5dbb8;
+  --white:#ffffff;
+  --gradient:linear-gradient(135deg,#0e2114 0%,#1a3d28 60%,#2a5a3c 100%);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;color:var(--text);background:#fff;-webkit-font-smoothing:antialiased}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;transition:box-shadow .3s}
+.nav.scrolled{box-shadow:0 2px 20px rgba(14,33,20,.08)}
+.nav-logo{font-size:1.125rem;font-weight:900;color:var(--green);letter-spacing:-.3px}
+.nav-logo span{color:var(--lemon)}
+.nav-links{display:flex;gap:28px;align-items:center}
+.nav-links a{font-size:.875rem;font-weight:500;color:var(--muted);text-decoration:none;transition:color .2s}
+.nav-links a:hover{color:var(--green)}
+.btn{padding:10px 22px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:6px;border:none;text-decoration:none}
+.btn-primary{background:var(--green);color:#fff}
+.btn-primary:hover{background:var(--green2)}
+.btn-outline{background:transparent;border:1.5px solid var(--border2);color:var(--green)}
+.btn-outline:hover{border-color:var(--green);background:rgba(14,33,20,.04)}
+.btn-lemon{background:var(--lemon);color:#0e2114}
+.btn-lemon:hover{background:var(--lemon2)}
+.btn-sm{padding:8px 18px;font-size:12px}
+.btn-lg{padding:14px 32px;font-size:15px;border-radius:12px}
+.btn-xl{padding:16px 40px;font-size:16px;border-radius:14px}
+
+/* SECTIONS */
+.container{max-width:1100px;margin:0 auto;padding:0 40px}
+section{padding:96px 0}
+.section-tag{display:inline-flex;align-items:center;gap:7px;padding:6px 14px;background:rgba(166,214,74,.12);border:1px solid rgba(166,214,74,.3);border-radius:20px;font-size:11px;font-weight:700;color:#2a6b3a;text-transform:uppercase;letter-spacing:.7px;margin-bottom:20px}
+.section-title{font-size:2.5rem;font-weight:900;color:var(--green);letter-spacing:-.5px;line-height:1.15;margin-bottom:16px}
+.section-body{font-size:1.0625rem;color:var(--muted);line-height:1.75;max-width:640px}
+
+/* HERO */
+.hero{background:var(--gradient);padding:120px 0 96px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-200px;right:-200px;width:700px;height:700px;background:rgba(166,214,74,.04);border-radius:50%}
+.hero::after{content:'';position:absolute;bottom:-150px;left:-100px;width:500px;height:500px;background:rgba(255,255,255,.02);border-radius:50%}
+.hero-inner{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 40px}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;padding:7px 16px;background:rgba(166,214,74,.12);border:1px solid rgba(166,214,74,.25);border-radius:20px;font-size:11px;font-weight:700;color:var(--lemon);text-transform:uppercase;letter-spacing:.8px;margin-bottom:28px}
+.hero-title{font-size:3.75rem;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1.1;margin-bottom:24px;max-width:720px}
+.hero-title span{color:var(--lemon)}
+.hero-body{font-size:1.125rem;color:rgba(255,255,255,.75);line-height:1.75;max-width:600px;margin-bottom:40px}
+.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:56px;padding-top:48px;border-top:1px solid rgba(255,255,255,.1)}
+.hs-item{text-align:center}
+.hs-val{font-size:2rem;font-weight:900;color:var(--lemon)}
+.hs-lbl{font-size:11px;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.6px;margin-top:4px}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap}
+
+/* MISSION */
+.mission-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:48px}
+.mission-card{background:var(--light);border:1px solid var(--border);border-radius:20px;padding:36px}
+.mc-icon{font-size:2rem;margin-bottom:16px}
+.mc-title{font-size:1.25rem;font-weight:800;color:var(--green);margin-bottom:10px}
+.mc-body{font-size:.9375rem;color:var(--muted);line-height:1.7}
+
+/* HOW IT WORKS */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:56px;position:relative}
+.steps::before{content:'';position:absolute;top:32px;left:10%;right:10%;height:2px;background:linear-gradient(90deg,var(--lemon),rgba(166,214,74,.2));z-index:0}
+.step{text-align:center;position:relative;z-index:1}
+.step-num{width:64px;height:64px;border-radius:50%;background:var(--green);color:var(--lemon);font-size:1.25rem;font-weight:900;display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
+.step-title{font-size:.9375rem;font-weight:700;color:var(--green);margin-bottom:8px}
+.step-body{font-size:.8125rem;color:var(--muted);line-height:1.6}
+
+/* PROBLEM */
+.problem-bg{background:var(--gradient)}
+.prob-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:48px}
+.prob-stat{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:28px 20px;text-align:center}
+.ps-val{font-size:2.25rem;font-weight:900;color:var(--lemon)}
+.ps-lbl{font-size:12px;color:rgba(255,255,255,.6);margin-top:6px;line-height:1.5}
+
+/* SOLUTION */
+.solution-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:48px}
+.sol-card{background:#fff;border:1px solid var(--border);border-radius:18px;padding:28px;transition:all .2s}
+.sol-card:hover{border-color:var(--lemon);box-shadow:0 8px 32px rgba(14,33,20,.08);transform:translateY(-2px)}
+.sol-icon{width:48px;height:48px;border-radius:14px;background:rgba(166,214,74,.15);display:flex;align-items:center;justify-content:center;font-size:1.375rem;margin-bottom:16px}
+.sol-title{font-size:1rem;font-weight:800;color:var(--green);margin-bottom:8px}
+.sol-body{font-size:.875rem;color:var(--muted);line-height:1.65}
+
+/* TRACTION */
+.traction-bg{background:var(--light)}
+.traction-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:48px}
+.tr-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:28px 24px;text-align:center}
+.tr-val{font-size:2.25rem;font-weight:900;color:var(--green)}
+.tr-lbl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:6px}
+.tr-sub{font-size:11px;color:var(--lemon);font-weight:600;margin-top:4px}
+
+/* LEADERSHIP */
+.team-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:48px}
+.team-card{background:var(--light);border:1px solid var(--border);border-radius:20px;padding:32px;display:flex;gap:20px}
+.tc-avatar{width:80px;height:80px;border-radius:50%;object-fit:cover;object-position:center top;flex-shrink:0;border:3px solid var(--lemon);}
+.tc-name{font-size:1.0625rem;font-weight:800;color:var(--green)}
+.tc-role{font-size:.8125rem;font-weight:600;color:var(--lemon);background:rgba(166,214,74,.12);padding:3px 10px;border-radius:8px;display:inline-block;margin:6px 0 10px}
+.tc-bio{font-size:.875rem;color:var(--muted);line-height:1.65}
+
+/* COMPLIANCE */
+.compliance-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:48px}
+.comp-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:28px;display:flex;gap:16px;align-items:flex-start}
+.comp-icon{font-size:1.75rem;flex-shrink:0}
+.comp-title{font-size:1rem;font-weight:800;color:var(--green);margin-bottom:6px}
+.comp-body{font-size:.875rem;color:var(--muted);line-height:1.6}
+
+/* CTA */
+.cta-bg{background:var(--gradient);position:relative;overflow:hidden}
+.cta-bg::before{content:'';position:absolute;top:-150px;right:-100px;width:500px;height:500px;background:rgba(166,214,74,.05);border-radius:50%}
+.cta-inner{position:relative;z-index:1;text-align:center;max-width:680px;margin:0 auto}
+.cta-title{font-size:2.75rem;font-weight:900;color:#fff;letter-spacing:-.5px;line-height:1.2;margin-bottom:20px}
+.cta-title span{color:var(--lemon)}
+.cta-body{font-size:1.0625rem;color:rgba(255,255,255,.75);line-height:1.7;margin-bottom:36px}
+.cta-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+/* FOOTER */
+footer{background:#0a1f10;padding:40px 0;text-align:center}
+.footer-logo{font-size:1.25rem;font-weight:900;color:#fff;margin-bottom:8px}
+.footer-logo span{color:var(--lemon)}
+.footer-sub{font-size:.8125rem;color:rgba(255,255,255,.4);margin-bottom:20px}
+.footer-links{display:flex;gap:20px;justify-content:center;margin-bottom:20px}
+.footer-links a{font-size:.8125rem;color:rgba(255,255,255,.5);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--lemon)}
+.footer-copy{font-size:.75rem;color:rgba(255,255,255,.25)}
+
+/* FADE IN */
+.fade-in{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+
+@media(max-width:768px){
+  .nav{padding:0 20px}
+  .hero-inner,.container{padding:0 20px}
+  .hero-title{font-size:2.25rem}
+  .section-title{font-size:1.875rem}
+  .hero-stats{grid-template-columns:repeat(2,1fr)}
+  .mission-grid,.team-grid,.compliance-grid{grid-template-columns:1fr}
+  .steps{grid-template-columns:repeat(2,1fr)}
+  .steps::before{display:none}
+  .prob-stats{grid-template-columns:repeat(2,1fr)}
+  .solution-grid,.traction-grid{grid-template-columns:1fr 1fr}
+  .cta-title{font-size:2rem}
+  .btn-xl{padding:14px 28px;font-size:14px}
+}
+@media(max-width:480px){
+  .solution-grid,.traction-grid{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="mainNav">
+  <a href="/" class="nav-logo">Genesis<span>360</span></a>
+  <div class="nav-links">
+    <a href="#mission">Mission</a>
+    <a href="#how-it-works">How It Works</a>
+    <a href="#traction">Traction</a>
+    <a href="#team">Team</a>
+    <a href="#join" class="btn btn-primary btn-sm">Join a Cycle</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">About Genesis360</div>
+    <h1 class="hero-title">Connecting Diaspora Capital<br/>to <span>Africa's Food Economy</span></h1>
+    <p class="hero-body">Genesis360 is a structured participation platform that channels diaspora funding into Nigeria's food businesses — restaurants, vendors, and catering operations — through transparent, time-bound funding cycles.</p>
+    <div class="hero-btns">
+      <a href="/register" class="btn btn-lemon btn-lg">Join the Next Cycle</a>
+      <a href="mailto:info@genesis360.com.ng" class="btn btn-outline btn-lg" style="border-color:rgba(255,255,255,.25);color:#fff;">Contact Us</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hs-item"><div class="hs-val">₦200K+</div><div class="hs-lbl">Capital Deployed</div></div>
+      <div class="hs-item"><div class="hs-val">50+</div><div class="hs-lbl">Participants</div></div>
+      <div class="hs-item"><div class="hs-val">98%</div><div class="hs-lbl">Repayment Rate</div></div>
+      <div class="hs-item"><div class="hs-val">12+</div><div class="hs-lbl">Food Businesses Funded</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- MISSION -->
+<section id="mission">
+  <div class="container">
+    <div class="fade-in">
+      <div class="section-tag">Our Purpose</div>
+      <h2 class="section-title">Built on a Simple Belief</h2>
+      <p class="section-body">That diaspora capital — when structured properly — can transform the food economy back home and create meaningful, lasting impact.</p>
+    </div>
+    <div class="mission-grid">
+      <div class="mission-card fade-in">
+        <div class="mc-icon">🎯</div>
+        <div class="mc-title">Our Mission</div>
+        <div class="mc-body">To create a reliable, transparent bridge between diaspora participants and Nigeria's food businesses — enabling structured capital access that drives growth, stability, and shared outcomes for everyone in the cycle.</div>
+      </div>
+      <div class="mission-card fade-in">
+        <div class="mc-icon">🌍</div>
+        <div class="mc-title">Our Vision</div>
+        <div class="mc-body">A future where every diaspora Nigerian can meaningfully participate in the growth of Africa's food economy — not as a donor, but as a structured participant in a system built for accountability and results.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works" style="background:var(--light)">
+  <div class="container">
+    <div class="fade-in" style="text-align:center">
+      <div class="section-tag" style="margin:0 auto 20px">The Process</div>
+      <h2 class="section-title" style="max-width:560px;margin:0 auto 16px">How a Funding Cycle Works</h2>
+      <p class="section-body" style="margin:0 auto">Every cycle is time-bound, slot-limited, and structured for clarity — so participants always know exactly where their capital is.</p>
+    </div>
+    <div class="steps">
+      <div class="step fade-in">
+        <div class="step-num">1</div>
+        <div class="step-title">Create Account</div>
+        <div class="step-body">Register and complete KYC verification to unlock participation access.</div>
+      </div>
+      <div class="step fade-in">
+        <div class="step-num">2</div>
+        <div class="step-title">Fund Your Wallet</div>
+        <div class="step-body">Deposit into your Genesis360 wallet. Funds sit securely until a cycle opens.</div>
+      </div>
+      <div class="step fade-in">
+        <div class="step-num">3</div>
+        <div class="step-title">Join a Cycle</div>
+        <div class="step-body">Claim a slot in an open funding cycle before they fill. Slots are limited per cycle.</div>
+      </div>
+      <div class="step fade-in">
+        <div class="step-num">4</div>
+        <div class="step-title">Follow the Timeline</div>
+        <div class="step-body">Capital is deployed to food businesses. Track progress through the structured cycle timeline.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem-bg">
+  <div class="container">
+    <div class="fade-in">
+      <div class="section-tag" style="background:rgba(166,214,74,.12);border-color:rgba(166,214,74,.25);color:var(--lemon)">The Problem We Solve</div>
+      <h2 class="section-title" style="color:#fff">Nigeria's Food Businesses Are Underfunded</h2>
+      <p class="section-body" style="color:rgba(255,255,255,.7)">Millions of food vendors, restaurants, and caterers operate without access to formal credit — while diaspora capital sits idle in foreign accounts with no structured pathway home.</p>
+    </div>
+    <div class="prob-stats">
+      <div class="prob-stat fade-in"><div class="ps-val">40M+</div><div class="ps-lbl">Nigerians employed in food & hospitality sector</div></div>
+      <div class="prob-stat fade-in"><div class="ps-val">72%</div><div class="ps-lbl">Of food SMEs have no access to formal financing</div></div>
+      <div class="prob-stat fade-in"><div class="ps-val">$25B+</div><div class="ps-lbl">Diaspora remittances sent to Nigeria annually</div></div>
+      <div class="prob-stat fade-in"><div class="ps-val">&lt;3%</div><div class="ps-lbl">Of that capital reaches productive food businesses</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section id="solution">
+  <div class="container">
+    <div class="fade-in">
+      <div class="section-tag">What We Built</div>
+      <h2 class="section-title">The Genesis360 Solution</h2>
+      <p class="section-body">Three interconnected layers that make diaspora-to-food-economy participation safe, structured, and scalable.</p>
+    </div>
+    <div class="solution-grid">
+      <div class="sol-card fade-in">
+        <div class="sol-icon">🔄</div>
+        <div class="sol-title">Structured Funding Cycles</div>
+        <div class="sol-body">Time-bound cycles with fixed slot counts, clear timelines, and defined deployment targets. No ambiguity — every participant knows the structure before joining.</div>
+      </div>
+      <div class="sol-card fade-in">
+        <div class="sol-icon">🍽️</div>
+        <div class="sol-title">Vetted Food Businesses</div>
+        <div class="sol-body">Capital only reaches food businesses that pass Genesis360's verification process — suppliers, restaurants, and vendors with documented operating history.</div>
+      </div>
+      <div class="sol-card fade-in">
+        <div class="sol-icon">📊</div>
+        <div class="sol-title">Full Transparency Dashboard</div>
+        <div class="sol-body">Participants track every cycle in real time — slot fill progress, deployment status, and timeline milestones visible from their dashboard at all times.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRACTION -->
+<section id="traction" class="traction-bg">
+  <div class="container">
+    <div class="fade-in">
+      <div class="section-tag">Live Platform</div>
+      <h2 class="section-title">Genesis360 Is Already Operating</h2>
+      <p class="section-body">These are live operational numbers from our platform — not projections. Genesis360 is real capital moving through real food businesses.</p>
+    </div>
+    <div class="traction-grid">
+      <div class="tr-card fade-in"><div class="tr-val">₦200K+</div><div class="tr-lbl">Capital Deployed</div><div class="tr-sub">Across active cycles</div></div>
+      <div class="tr-card fade-in"><div class="tr-val">50+</div><div class="tr-lbl">Cycle Participants</div><div class="tr-sub">Registered & verified</div></div>
+      <div class="tr-card fade-in"><div class="tr-val">98%</div><div class="tr-lbl">Repayment Rate</div><div class="tr-sub">On completed cycles</div></div>
+      <div class="tr-card fade-in"><div class="tr-val">12+</div><div class="tr-lbl">Food Businesses</div><div class="tr-sub">Funded & active</div></div>
+      <div class="tr-card fade-in"><div class="tr-val">3</div><div class="tr-lbl">Cycles Completed</div><div class="tr-sub">On schedule</div></div>
+      <div class="tr-card fade-in"><div class="tr-val">100%</div><div class="tr-lbl">KYC Verified</div><div class="tr-sub">All participants screened</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- LEADERSHIP -->
+<section id="team">
+  <div class="container">
+    <div class="fade-in">
+      <div class="section-tag">Leadership</div>
+      <h2 class="section-title">The Team Behind Genesis360</h2>
+      <p class="section-body">Built by operators who understand both the diaspora experience and the realities of Nigeria's food economy.</p>
+    </div>
+    <div class="team-grid">
+      <div class="team-card fade-in">
+        <img src="team-zephaniah.jpg" alt="Zephaniah Morakinyo" class="tc-avatar"/>
+        <div>
+          <div class="tc-name">Zephaniah Morakinyo</div>
+          <div class="tc-role">Founder & CEO</div>
+          <div class="tc-bio">Entrepreneur and systems thinker with deep roots in Nigeria's food and hospitality sector. Built Genesis360 to solve the capital access problem he witnessed firsthand — food businesses with customers and potential but no pathway to growth financing.</div>
+        </div>
+      </div>
+      <div class="team-card fade-in">
+        <img src="team-mayowa.jpg" alt="Mayowa Akinmade" class="tc-avatar"/>
+        <div>
+          <div class="tc-name">Mayowa Akinmade</div>
+          <div class="tc-role">Co-Founder & COO</div>
+          <div class="tc-bio">Operations lead with experience across fintech and food service industries. Responsible for cycle management, participant relations, and ensuring every Genesis360 deployment meets its structured timeline and repayment commitments.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPLIANCE -->
+<section style="background:var(--light)">
+  <div class="container">
+    <div class="fade-in">
+      <div class="section-tag">Trust & Compliance</div>
+      <h2 class="section-title">Built to Operate Responsibly</h2>
+      <p class="section-body">Genesis360 operates within a clear regulatory and ethical framework — protecting participants and ensuring every cycle is accountable.</p>
+    </div>
+    <div class="compliance-grid">
+      <div class="comp-card fade-in">
+        <div class="comp-icon">🏛️</div>
+        <div>
+          <div class="comp-title">CAC Registered</div>
+          <div class="comp-body">Genesis360 is a formally registered Nigerian company with full CAC documentation. All operations are conducted under a legally recognized entity.</div>
+        </div>
+      </div>
+      <div class="comp-card fade-in">
+        <div class="comp-icon">🔐</div>
+        <div>
+          <div class="comp-title">KYC & Identity Verification</div>
+          <div class="comp-body">Every participant completes identity verification before accessing any funding cycle. NIN, BVN, and document checks ensure a clean, verified participant base.</div>
+        </div>
+      </div>
+      <div class="comp-card fade-in">
+        <div class="comp-icon">📋</div>
+        <div>
+          <div class="comp-title">No Guaranteed Returns</div>
+          <div class="comp-body">Genesis360 is a participation platform, not an investment product. All cycle participation is voluntary and participants understand the structured nature of the program.</div>
+        </div>
+      </div>
+      <div class="comp-card fade-in">
+        <div class="comp-icon">🔒</div>
+        <div>
+          <div class="comp-title">Secure Infrastructure</div>
+          <div class="comp-body">Built on enterprise-grade infrastructure. All financial transactions processed via Paystack. Participant data protected with industry-standard encryption.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="join" class="cta-bg">
+  <div class="container">
+    <div class="cta-inner fade-in">
+      <div style="display:inline-flex;align-items:center;gap:8px;padding:7px 16px;background:rgba(166,214,74,.12);border:1px solid rgba(166,214,74,.25);border-radius:20px;font-size:11px;font-weight:700;color:var(--lemon);text-transform:uppercase;letter-spacing:.8px;margin-bottom:24px;">Join Genesis360</div>
+      <div class="cta-title">Ready to Participate in<br/><span>Nigeria's Food Economy?</span></div>
+      <p class="cta-body">Cycle slots are limited. Register today, complete verification, and position yourself for the next opening.</p>
+      <div class="cta-btns">
+        <a href="/register" class="btn btn-lemon btn-xl">Create Your Account</a>
+        <a href="mailto:info@genesis360.com.ng" class="btn btn-outline btn-xl" style="border-color:rgba(255,255,255,.3);color:#fff;">Contact the Team</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Genesis<span>360</span></div>
+  <div class="footer-sub">Structured Participation in Nigeria's Food Economy</div>
+  <div class="footer-links">
+    <a href="/">Home</a>
+    <a href="/about">About</a>
+    <a href="/register">Register</a>
+    <a href="/login">Login</a>
+    <a href="mailto:info@genesis360.com.ng">Contact</a>
+  </div>
+  <div class="footer-copy">&copy; 2025 Genesis360 Ltd. All rights reserved. RC: Genesis360Finance Ltd.</div>
+</footer>
+
+<script>
+// Sticky nav shadow
+window.addEventListener('scroll', () => {
+  document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 10)
+})
+
+// Fade-in on scroll
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target) } })
+}, { threshold: 0.12 })
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el))
+</script>
+</body>
+</html>

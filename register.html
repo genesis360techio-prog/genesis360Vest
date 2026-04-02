@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Create Account — Genesis360</title>
+<script src="/tailwind.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/supabase-config.js"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: { sans: ['Inter','system-ui','sans-serif'] },
+      colors: {
+        brand: { 50:'#f2faf0',100:'#dff2d8',600:'#244f3c',700:'#1e4535',800:'#163428',900:'#0e2319' },
+        lime:  { 400:'#9dc43a',300:'#b8d95a' },
+        navy:  { 800:'#1e293b',900:'#0f172a' }
+      }
+    }
+  }
+}
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  .step { display: none; }
+  .step.active { display: block; animation: fadeIn .3s ease forwards; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+  .req { display: flex; align-items: center; gap: 8px; font-size: .75rem; color: #94a3b8; transition: color .2s; }
+  .req.ok { color: #166534 !important; }
+  .req-dot { width: 8px; height: 8px; border-radius: 50%; background: #cbd5e1; flex-shrink: 0; transition: background .2s; }
+  .req.ok .req-dot { background: #16a34a !important; }
+  .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: spin .6s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col">
+
+<!-- NAVBAR -->
+<nav class="bg-navy-900 border-b border-white/10 px-4 py-3 flex items-center justify-between">
+  <a href="/preview.html">
+    <img src="logo.png" onerror="this.src='logo.svg'" alt="Genesis360" class="h-8 w-auto brightness-0 invert"/>
+  </a>
+  <a href="/preview.html" class="text-slate-400 hover:text-white text-sm transition-colors">← Back to home</a>
+</nav>
+
+<div class="flex-1 flex items-center justify-center px-4 py-12">
+  <div class="w-full max-w-md">
+
+    <!-- Step indicator -->
+    <div class="flex items-center justify-center gap-3 mb-8" id="step-indicators">
+      <div id="dot-1" class="flex items-center gap-1.5">
+        <div class="w-7 h-7 rounded-full bg-brand-700 text-white text-xs font-bold flex items-center justify-center">1</div>
+        <span class="text-xs font-medium text-navy-900">Account</span>
+      </div>
+      <div class="w-8 h-px bg-slate-300"></div>
+      <div id="dot-2" class="flex items-center gap-1.5">
+        <div class="w-7 h-7 rounded-full bg-slate-200 text-slate-500 text-xs font-bold flex items-center justify-center">2</div>
+        <span class="text-xs font-medium text-slate-400">Done</span>
+      </div>
+    </div>
+
+    <!-- ── STEP 1: Account details ───────────────────── -->
+    <div id="step-1" class="step active">
+      <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
+        <div class="mb-6">
+          <h1 class="text-2xl font-bold text-navy-900">Create your account</h1>
+          <p class="text-slate-500 text-sm mt-1">Position yourself for the next funding cycle.</p>
+        </div>
+        <form id="register-form" class="space-y-4" onsubmit="submitStep1(event)">
+          <div>
+            <label class="block text-sm font-medium text-navy-800 mb-1.5">Full Name</label>
+            <input id="r-name" type="text" placeholder="e.g. Emeka Eze" autocomplete="name"
+              class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-700 transition"/>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-navy-800 mb-1.5">Email Address</label>
+            <input id="r-email" type="email" placeholder="you@example.com" autocomplete="email"
+              class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-700 transition"/>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-navy-800 mb-1.5">Country of Residence</label>
+            <select id="r-country"
+              class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-700 transition">
+              <option value="">Select your country</option>
+              <option>United Kingdom</option><option>United States</option><option>Canada</option>
+              <option>Germany</option><option>France</option><option>Netherlands</option>
+              <option>Italy</option><option>Spain</option><option>Australia</option>
+              <option>South Africa</option><option>Ghana</option><option>Nigeria</option><option>Other</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-navy-800 mb-1.5">Password</label>
+            <div class="relative">
+              <input id="r-password" type="password" placeholder="Create a password" autocomplete="new-password"
+                oninput="checkPassword()"
+                class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-700 transition pr-10"/>
+              <button type="button" onclick="togglePw('r-password','eye1')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                <svg id="eye1" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              </button>
+            </div>
+            <!-- Password requirements -->
+            <div class="mt-3 space-y-1.5 px-1" id="pw-reqs">
+              <div class="req" style="display:flex;align-items:center;gap:8px;font-size:.75rem;color:#94a3b8;transition:color .2s" id="req-len"><div class="req-dot"></div>At least 8 characters</div>
+              <div class="req" style="display:flex;align-items:center;gap:8px;font-size:.75rem;color:#94a3b8;transition:color .2s" id="req-upper"><div class="req-dot"></div>One uppercase letter (A–Z)</div>
+              <div class="req" style="display:flex;align-items:center;gap:8px;font-size:.75rem;color:#94a3b8;transition:color .2s" id="req-lower"><div class="req-dot"></div>One lowercase letter (a–z)</div>
+              <div class="req" style="display:flex;align-items:center;gap:8px;font-size:.75rem;color:#94a3b8;transition:color .2s" id="req-num"><div class="req-dot"></div>One number (0–9)</div>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-navy-800 mb-1.5">Confirm Password</label>
+            <div class="relative">
+              <input id="r-confirm" type="password" placeholder="Re-enter your password" autocomplete="new-password"
+                oninput="checkConfirm()"
+                class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-700 transition pr-10"/>
+              <button type="button" onclick="togglePw('r-confirm','eye2')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                <svg id="eye2" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              </button>
+            </div>
+            <p id="confirm-msg" class="hidden text-xs mt-1.5 px-1"></p>
+          </div>
+
+          <div id="reg-error" class="hidden text-red-600 text-sm bg-red-50 border border-red-200 rounded-xl px-4 py-3"></div>
+
+          <button type="submit" id="reg-btn"
+            class="w-full py-3.5 bg-brand-700 hover:bg-brand-600 text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2 mt-2">
+            Create Account
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          </button>
+        </form>
+        <p class="text-center text-xs text-slate-400 mt-5">Already have an account? <a href="/login.html" class="text-brand-700 font-medium hover:underline">Sign in</a></p>
+      </div>
+    </div>
+
+    <!-- ── STEP 2: Success ──────────────────────────── -->
+    <div id="step-2" class="step">
+      <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm text-center">
+        <div class="w-16 h-16 bg-lime-400/20 rounded-full flex items-center justify-center mx-auto mb-5">
+          <svg class="w-8 h-8 text-brand-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <h2 class="text-xl font-bold text-navy-900 mb-2">You're registered!</h2>
+        <p id="success-msg" class="text-slate-500 text-sm leading-relaxed mb-6">Your account has been created. Check your email to verify and then sign in to your dashboard.</p>
+        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 mb-6 text-left space-y-2" id="success-checklist">
+          <div class="flex items-center gap-3 text-sm">
+            <span class="w-5 h-5 rounded-full bg-lime-400 text-brand-900 flex items-center justify-center text-xs font-bold flex-shrink-0">✓</span>
+            <span class="text-slate-700">Account created</span>
+          </div>
+          <div id="success-email-row" class="flex items-center gap-3 text-sm">
+            <span class="w-5 h-5 rounded-full bg-yellow-400 text-brand-900 flex items-center justify-center text-xs font-bold flex-shrink-0">!</span>
+            <span class="text-slate-700">Check your email to verify your account</span>
+          </div>
+        </div>
+        <a id="success-cta" href="/login"
+          class="w-full inline-flex items-center justify-center py-3.5 bg-brand-700 hover:bg-brand-600 text-white font-semibold rounded-xl transition-all gap-2">
+          Sign In to Dashboard
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// Telegram alert helper
+async function notifyTelegram(text) {
+  try { await fetch('/api/notify', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({text}) }) }
+  catch(e) { /* silent */ }
+}
+
+// State — defined first so nothing can block them
+let registeredUserId = null
+let hasSession       = false  // true when email confirm is OFF and Supabase returns session on signUp
+let sb               = null   // Supabase client — lazy init
+
+function getClient() {
+  if (!sb) {
+    try {
+      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON)
+    } catch(e) {
+      alert('Could not connect to the server. Please refresh and try again.\n\n' + e.message)
+    }
+  }
+  return sb
+}
+
+// ── STEP NAVIGATION ─────────────────────────────────────
+function showStep(n) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'))
+  document.getElementById('step-' + n).classList.add('active')
+  ;[1,2].forEach(i => {
+    const dot    = document.getElementById('dot-' + i)
+    const circle = dot.querySelector('div')
+    const label  = dot.querySelector('span')
+    if (i < n) {
+      circle.className = 'w-7 h-7 rounded-full bg-lime-400 text-brand-900 text-xs font-bold flex items-center justify-center'
+      circle.textContent = '✓'
+      label.className = 'text-xs font-medium text-navy-900'
+    } else if (i === n) {
+      circle.className = 'w-7 h-7 rounded-full bg-brand-700 text-white text-xs font-bold flex items-center justify-center'
+      circle.textContent = i
+      label.className = 'text-xs font-medium text-navy-900'
+    } else {
+      circle.className = 'w-7 h-7 rounded-full bg-slate-200 text-slate-500 text-xs font-bold flex items-center justify-center'
+      circle.textContent = i
+      label.className = 'text-xs font-medium text-slate-400'
+    }
+  })
+}
+
+// ── PASSWORD VALIDATION ──────────────────────────────────
+function checkPassword() {
+  const pw = document.getElementById('r-password').value
+  toggle('req-len',   pw.length >= 8)
+  toggle('req-upper', /[A-Z]/.test(pw))
+  toggle('req-lower', /[a-z]/.test(pw))
+  toggle('req-num',   /[0-9]/.test(pw))
+  if (document.getElementById('r-confirm').value) checkConfirm()
+}
+
+function toggle(id, met) {
+  const el  = document.getElementById(id)
+  const dot = el.querySelector('.req-dot')
+  el.style.color  = met ? '#166534' : '#94a3b8'
+  if (dot) dot.style.background = met ? '#16a34a' : '#cbd5e1'
+}
+
+function checkConfirm() {
+  const pw  = document.getElementById('r-password').value
+  const c   = document.getElementById('r-confirm').value
+  const msg = document.getElementById('confirm-msg')
+  if (!c) { msg.classList.add('hidden'); return }
+  if (pw === c) {
+    msg.textContent = '✓ Passwords match'
+    msg.className   = 'text-xs mt-1.5 px-1 text-green-600'
+    msg.classList.remove('hidden')
+  } else {
+    msg.textContent = '✗ Passwords do not match'
+    msg.className   = 'text-xs mt-1.5 px-1 text-red-500'
+    msg.classList.remove('hidden')
+  }
+}
+
+function passwordValid(pw) {
+  return pw.length >= 8 && /[A-Z]/.test(pw) && /[a-z]/.test(pw) && /[0-9]/.test(pw)
+}
+
+function togglePw(inputId, eyeId) {
+  const inp  = document.getElementById(inputId)
+  const show = inp.type === 'password'
+  inp.type   = show ? 'text' : 'password'
+  const eye  = document.getElementById(eyeId)
+  eye.innerHTML = show
+    ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>'
+    : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>'
+}
+
+// ── STEP 1: REGISTER ────────────────────────────────────
+async function submitStep1(e) {
+  e.preventDefault()
+  const err      = document.getElementById('reg-error')
+  const btn      = document.getElementById('reg-btn')
+  const name     = document.getElementById('r-name').value.trim()
+  const email    = document.getElementById('r-email').value.trim()
+  const country  = document.getElementById('r-country').value
+  const password = document.getElementById('r-password').value
+  const confirm  = document.getElementById('r-confirm').value
+
+  err.classList.add('hidden')
+
+  if (!name)                    return showErr(err, 'Please enter your full name.')
+  if (!email)                   return showErr(err, 'Please enter your email address.')
+  if (!country)                 return showErr(err, 'Please select your country of residence.')
+  if (!passwordValid(password)) return showErr(err, 'Your password does not meet the requirements below.')
+  if (password !== confirm)     return showErr(err, 'Passwords do not match.')
+
+  setBtn(btn, true, '<span class="spinner"></span> Creating account...')
+
+  const client = getClient()
+  if (!client) { setBtn(btn, false, 'Create Account →'); return }
+
+  const { data, error } = await client.auth.signUp({
+    email, password,
+    options: {
+      data: { full_name: name, country },
+      emailRedirectTo: window.location.origin + '/setup-pin'
+    }
+  })
+
+  if (error) {
+    showErr(err, friendlyError(error.message))
+    setBtn(btn, false, 'Create Account <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>')
+    return
+  }
+
+  registeredUserId = data.user?.id
+  hasSession       = !!data.session   // session exists when email confirm is OFF
+
+  if (registeredUserId) {
+    await client.from('profiles').upsert({
+      id: registeredUserId, full_name: name, email, country
+    }, { onConflict: 'id' })
+  }
+
+  notifyTelegram(`🆕 <b>New Registration</b>\nName: ${name}\nEmail: ${email}\nCountry: ${country}`)
+
+  // Send welcome email via Resend
+  fetch('/api/send-confirmation', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, name })
+  }).catch(() => {}) // fire and forget
+
+  showSuccessStep()
+}
+
+function showSuccessStep() {
+  const emailRow = document.getElementById('success-email-row')
+  const cta      = document.getElementById('success-cta')
+
+  if (hasSession) {
+    emailRow.classList.add('hidden')
+    cta.textContent = 'Set Transaction PIN →'
+    cta.href = '/setup-pin'
+  } else {
+    emailRow.classList.remove('hidden')
+    emailRow.innerHTML = '<span class="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">✉</span><span class="text-slate-700 font-medium">Check your inbox — verify your email to continue</span>'
+    cta.textContent = 'Waiting for email verification…'
+    cta.removeAttribute('href')
+    cta.style.opacity = '0.6'
+    cta.style.pointerEvents = 'none'
+  }
+
+  showStep(2)
+}
+
+// ── HELPERS ─────────────────────────────────────────────
+function showErr(el, msg) { el.textContent = msg; el.classList.remove('hidden') }
+function setBtn(btn, disabled, html) { btn.disabled = disabled; btn.innerHTML = html }
+
+function friendlyError(msg) {
+  if (msg.includes('already registered') || msg.includes('already been registered') || msg.includes('User already registered'))
+    return 'An account with this email already exists. Try signing in instead.'
+  if (msg.includes('email rate limit') || msg.includes('rate limit'))
+    return 'Too many sign-up attempts. Please wait a few minutes and try again — or disable email confirmation in your Supabase project (Auth → Providers → Email → turn off Confirm email).'
+  if (msg.includes('Password should be'))
+    return 'Password must be at least 8 characters.'
+  if (msg.includes('valid email'))
+    return 'Please enter a valid email address.'
+  return msg
+}
+</script>
+</body>
+</html>

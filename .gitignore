@@ -1,0 +1,17 @@
+node_modules/
+server.log
+*.log
+.env
+.env.*
+dist/
+.DS_Store
+Thumbs.db
+scraper/
+src/
+public/
+vite.config.js
+postcss.config.js
+tailwind.config.js
+setup-vps.sh
+genesis360.service
+nginx-genesis360.conf

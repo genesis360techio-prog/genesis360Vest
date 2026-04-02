@@ -1,0 +1,43 @@
+services:
+
+  # ── User App — global-genesis360.com ──────────────────────────
+  - type: web
+    name: genesis360-user
+    runtime: node
+    buildCommand: ""
+    startCommand: node serve.cjs
+    plan: free
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: SERVICE
+        value: user
+      - key: PAYSTACK_SECRET
+        sync: false        # Set in Render dashboard
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+
+  # ── Admin Panel — admin.global-genesis360.com ─────────────────
+  - type: web
+    name: genesis360-admin
+    runtime: node
+    buildCommand: ""
+    startCommand: node serve.cjs
+    plan: free
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: SERVICE
+        value: admin
+      - key: PAYSTACK_SECRET
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false

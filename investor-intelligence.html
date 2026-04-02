@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Genesis360Finance — Investor Intelligence Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:#060e08; --bg2:#0a1a0e; --bg3:#0e2114; --bg4:#122818;
+  --lemon:#A6D64A; --lemon2:#c8f060; --green:#1a6b3c;
+  --border:#1e3a24; --border2:#2a4a30;
+  --text:#f0f7ec; --muted:#8aab8e; --muted2:#4a6650;
+  --red:#ff5252; --orange:#ff9f43; --blue:#5499ff;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;}
+
+/* HEADER */
+.hdr{position:sticky;top:0;z-index:100;background:rgba(6,14,8,.95);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;}
+.hdr-left{display:flex;align-items:center;gap:14px;}
+.logo{width:36px;height:36px;background:var(--lemon);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:#060e08;flex-shrink:0;}
+.hdr-title{font-size:15px;font-weight:800;line-height:1.2;}
+.hdr-sub{font-size:11px;color:var(--muted);margin-top:2px;font-weight:400;}
+.live-badge{display:flex;align-items:center;gap:6px;padding:5px 12px;background:rgba(166,214,74,.08);border:1px solid rgba(166,214,74,.2);border-radius:20px;font-size:11px;color:var(--lemon);font-weight:600;}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--lemon);}
+.live-dot.pulse{animation:pulse .8s ease-out;}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(166,214,74,.6);}100%{box-shadow:0 0 0 8px rgba(166,214,74,0);}}
+.hdr-right{display:flex;align-items:center;gap:14px;}
+.upd-time{font-size:11px;color:var(--muted);}
+.btn-refresh{padding:7px 16px;background:var(--bg4);border:1px solid var(--border2);color:var(--text);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;}
+.btn-refresh:hover{border-color:var(--lemon);color:var(--lemon);}
+
+/* LAYOUT */
+.page{max-width:1280px;margin:0 auto;padding:28px 24px 60px;}
+
+/* KPI HERO STRIP */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
+.kpi-card{background:linear-gradient(135deg,var(--bg3),var(--bg4));border:1px solid var(--border);border-radius:14px;padding:20px 22px;position:relative;overflow:hidden;}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--lemon),transparent);}
+.kpi-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:10px;}
+.kpi-value{font-size:2rem;font-weight:900;line-height:1;color:var(--text);}
+.kpi-sub{font-size:11px;color:var(--muted);margin-top:6px;}
+.kpi-icon{position:absolute;top:18px;right:18px;font-size:22px;opacity:.25;}
+
+/* SECTION GRID */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;}
+.full-width{margin-bottom:20px;}
+
+/* SECTION CARDS */
+.sec{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:22px;}
+.sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.sec-title{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text);}
+.sec-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:12px;background:rgba(166,214,74,.1);color:var(--lemon);border:1px solid rgba(166,214,74,.2);}
+
+/* MINI STAT GRID */
+.mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
+.mini-stat{background:var(--bg4);border:1px solid var(--border);border-radius:10px;padding:13px;}
+.mini-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;font-weight:600;}
+.mini-value{font-size:1.35rem;font-weight:800;color:var(--text);line-height:1;}
+.mini-sub{font-size:10px;color:var(--muted);margin-top:3px;}
+
+/* PROGRESS BARS */
+.metric-row{margin-bottom:14px;}
+.metric-row:last-child{margin-bottom:0;}
+.metric-row-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.metric-row-label{font-size:12px;color:var(--muted);font-weight:500;}
+.metric-row-val{font-size:12px;font-weight:700;color:var(--text);}
+.progress-bar{height:6px;background:var(--border2);border-radius:3px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:3px;transition:width .6s ease;}
+.fill-lemon{background:var(--lemon);}
+.fill-orange{background:var(--orange);}
+.fill-red{background:var(--red);}
+.fill-blue{background:var(--blue);}
+
+/* CHART CONTAINERS */
+.chart-wrap{position:relative;height:180px;}
+
+/* TIER BARS */
+.tier-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.tier-row:last-child{margin-bottom:0;}
+.tier-label{width:80px;font-size:11px;font-weight:600;color:var(--muted);flex-shrink:0;}
+.tier-bar-bg{flex:1;height:8px;background:var(--border2);border-radius:4px;overflow:hidden;}
+.tier-bar-fill{height:100%;border-radius:4px;transition:width .6s ease;}
+.tier-count{width:36px;text-align:right;font-size:11px;font-weight:700;color:var(--text);flex-shrink:0;}
+
+/* RISK ROWS */
+.risk-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg4);border:1px solid var(--border);border-radius:9px;margin-bottom:8px;}
+.risk-row:last-child{margin-bottom:0;}
+.risk-row-left{display:flex;align-items:center;gap:10px;}
+.risk-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.risk-name{font-size:12px;font-weight:600;}
+.risk-count{font-size:13px;font-weight:800;}
+.risk-pct{font-size:11px;color:var(--muted);}
+
+/* CREDIBILITY STRIP */
+.credibility{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:28px 24px;}
+.cred-item{text-align:center;}
+.cred-icon{font-size:26px;margin-bottom:10px;}
+.cred-title{font-size:13px;font-weight:700;color:var(--lemon);margin-bottom:5px;}
+.cred-text{font-size:11px;color:var(--muted);line-height:1.5;}
+
+/* STAT INLINE */
+.stat-inline{display:flex;align-items:center;gap:16px;margin-top:14px;}
+.stat-inline-item{flex:1;text-align:center;background:var(--bg4);border:1px solid var(--border);border-radius:9px;padding:12px 8px;}
+.stat-inline-val{font-size:1.3rem;font-weight:800;color:var(--lemon);}
+.stat-inline-lbl{font-size:10px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.4px;}
+
+/* GROWTH BADGE */
+.growth-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.growth-pos{background:rgba(166,214,74,.1);color:var(--lemon);border:1px solid rgba(166,214,74,.2);}
+.growth-neg{background:rgba(255,82,82,.1);color:var(--red);border:1px solid rgba(255,82,82,.2);}
+.growth-neu{background:var(--bg4);color:var(--muted);border:1px solid var(--border);}
+
+/* ERROR STATE */
+.error-state{display:none;position:fixed;inset:0;background:var(--bg);z-index:999;align-items:center;justify-content:center;}
+.error-card{background:var(--bg3);border:1px solid var(--border2);border-radius:16px;padding:40px;max-width:420px;text-align:center;}
+.error-icon{font-size:40px;margin-bottom:16px;}
+.error-title{font-size:1.1rem;font-weight:800;margin-bottom:8px;}
+.error-text{font-size:13px;color:var(--muted);line-height:1.6;}
+
+/* LOADING SKELETON */
+.skel{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:4px;display:inline-block;}
+@keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+
+/* FOOTER */
+footer{text-align:center;padding:24px;border-top:1px solid var(--border);font-size:11px;color:var(--muted2);}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .kpi-strip{grid-template-columns:1fr 1fr;}
+  .grid-2{grid-template-columns:1fr;}
+  .credibility{grid-template-columns:1fr 1fr;}
+  .hdr{padding:12px 16px;}
+  .page{padding:20px 14px 48px;}
+}
+@media(max-width:540px){
+  .kpi-strip{grid-template-columns:1fr 1fr;}
+  .kpi-value{font-size:1.5rem;}
+  .credibility{grid-template-columns:1fr 1fr;}
+  .hdr-right .upd-time{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- ERROR STATE -->
+<div class="error-state" id="error_state">
+  <div class="error-card">
+    <div class="error-icon">🔒</div>
+    <div class="error-title">Access Restricted</div>
+    <div class="error-text" id="error_msg">Please use a valid investor link to access this dashboard.</div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-left">
+    <div class="logo">G3</div>
+    <div>
+      <div class="hdr-title">Genesis360Finance</div>
+      <div class="hdr-sub">Investor Intelligence Dashboard</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <div class="live-badge"><div class="live-dot" id="live_dot"></div>Live</div>
+    <span class="upd-time" id="last_updated">Loading...</span>
+    <button class="btn-refresh" onclick="fetchMetrics()">↻ Refresh</button>
+  </div>
+</header>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- KPI HERO STRIP -->
+  <div class="kpi-strip">
+    <div class="kpi-card">
+      <div class="kpi-label">Restaurants Onboarded</div>
+      <div class="kpi-value" id="m_restaurants">—</div>
+      <div class="kpi-sub" id="m_restaurants_sub">Verified food businesses</div>
+      <div class="kpi-icon">🏪</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Total Capital Deployed</div>
+      <div class="kpi-value" id="m_capital">—</div>
+      <div class="kpi-sub">Across all funding cycles</div>
+      <div class="kpi-icon">₦</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Repayment Rate</div>
+      <div class="kpi-value" id="m_repayment">—</div>
+      <div class="kpi-sub">On-schedule repayments</div>
+      <div class="kpi-icon">✓</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Active Suppliers</div>
+      <div class="kpi-value" id="m_suppliers">—</div>
+      <div class="kpi-sub">Verified supply chain partners</div>
+      <div class="kpi-icon">🚚</div>
+    </div>
+  </div>
+
+  <!-- ROW 1: Ecosystem Growth + Capital Deployment -->
+  <div class="grid-2">
+
+    <!-- SECTION 1: ECOSYSTEM GROWTH -->
+    <div class="sec">
+      <div class="sec-header">
+        <div class="sec-title">Ecosystem Growth</div>
+        <span class="growth-badge growth-neu" id="growth_badge">—</span>
+      </div>
+      <div class="mini-grid">
+        <div class="mini-stat">
+          <div class="mini-label">Restaurants</div>
+          <div class="mini-value" id="eg_restaurants">—</div>
+          <div class="mini-sub">Total onboarded</div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-label">New This Month</div>
+          <div class="mini-value" id="eg_new">—</div>
+          <div class="mini-sub">Registered</div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-label">Active Suppliers</div>
+          <div class="mini-value" id="eg_suppliers">—</div>
+          <div class="mini-sub">Verified</div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-label">Cities Covered</div>
+          <div class="mini-value" id="eg_cities">—</div>
+          <div class="mini-sub">Across Nigeria</div>
+        </div>
+      </div>
+      <div class="metric-row">
+        <div class="metric-row-hdr">
+          <span class="metric-row-label">Platform Growth Rate</span>
+          <span class="metric-row-val" id="eg_growth_rate">—</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill fill-lemon" id="eg_growth_bar" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: CAPITAL DEPLOYMENT -->
+    <div class="sec">
+      <div class="sec-header">
+        <div class="sec-title">Capital Deployment</div>
+        <span class="sec-badge" id="cd_active_badge">— Active</span>
+      </div>
+      <div class="mini-grid">
+        <div class="mini-stat">
+          <div class="mini-label">Loans Issued</div>
+          <div class="mini-value" id="cd_loans">—</div>
+          <div class="mini-sub">Total disbursed</div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-label">Capital Deployed</div>
+          <div class="mini-value" id="cd_capital">—</div>
+          <div class="mini-sub">All time</div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-label">Avg Loan Size</div>
+          <div class="mini-value" id="cd_avg">—</div>
+          <div class="mini-sub">Per restaurant</div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-label">Active Portfolio</div>
+          <div class="mini-value" id="cd_active">—</div>
+          <div class="mini-sub">Currently deployed</div>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="capitalChart"></canvas></div>
+    </div>
+
+  </div>
+
+  <!-- ROW 2: Portfolio Performance + AI Credit Engine -->
+  <div class="grid-2">
+
+    <!-- SECTION 3: PORTFOLIO PERFORMANCE -->
+    <div class="sec">
+      <div class="sec-header">
+        <div class="sec-title">Portfolio Performance</div>
+        <span class="sec-badge" id="pp_health_badge">Health —</span>
+      </div>
+      <div style="margin-bottom:18px;">
+        <div class="metric-row">
+          <div class="metric-row-hdr">
+            <span class="metric-row-label">Repayment Rate</span>
+            <span class="metric-row-val" id="pp_repayment">—</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill fill-lemon" id="pp_repayment_bar" style="width:0%"></div></div>
+        </div>
+        <div class="metric-row">
+          <div class="metric-row-hdr">
+            <span class="metric-row-label">Default Rate</span>
+            <span class="metric-row-val" id="pp_default">—</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill fill-red" id="pp_default_bar" style="width:0%"></div></div>
+        </div>
+        <div class="metric-row">
+          <div class="metric-row-hdr">
+            <span class="metric-row-label">Late Payment Ratio</span>
+            <span class="metric-row-val" id="pp_late">—</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill fill-orange" id="pp_late_bar" style="width:0%"></div></div>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="portfolioChart"></canvas></div>
+    </div>
+
+    <!-- SECTION 4: AI CREDIT ENGINE -->
+    <div class="sec">
+      <div class="sec-header">
+        <div class="sec-title">AI Credit Intelligence</div>
+        <span class="sec-badge">Automated Scoring</span>
+      </div>
+      <div class="stat-inline" style="margin-bottom:18px;margin-top:0;">
+        <div class="stat-inline-item">
+          <div class="stat-inline-val" id="ai_avg_score">—</div>
+          <div class="stat-inline-lbl">Avg Score</div>
+        </div>
+        <div class="stat-inline-item">
+          <div class="stat-inline-val" id="ai_approval">—</div>
+          <div class="stat-inline-lbl">Approval Rate</div>
+        </div>
+        <div class="stat-inline-item">
+          <div class="stat-inline-val" id="ai_manual">—</div>
+          <div class="stat-inline-lbl">Manual Review</div>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="riskChart"></canvas></div>
+    </div>
+
+  </div>
+
+  <!-- ROW 3: Credit Tier Distribution (full width) -->
+  <div class="full-width">
+    <div class="sec">
+      <div class="sec-header">
+        <div class="sec-title">Restaurant Risk Tier Distribution</div>
+        <span class="sec-badge">Live Classification</span>
+      </div>
+      <div id="tier_bars">
+        <div class="tier-row"><div class="tier-label" style="color:var(--lemon);">Elite</div><div class="tier-bar-bg"><div class="tier-bar-fill" id="tier_elite" style="width:0%;background:var(--lemon);"></div></div><div class="tier-count" id="tc_elite">0</div></div>
+        <div class="tier-row"><div class="tier-label" style="color:#8fd44a;">Strong</div><div class="tier-bar-bg"><div class="tier-bar-fill" id="tier_strong" style="width:0%;background:#8fd44a;"></div></div><div class="tier-count" id="tc_strong">0</div></div>
+        <div class="tier-row"><div class="tier-label" style="color:var(--orange);">Moderate</div><div class="tier-bar-bg"><div class="tier-bar-fill" id="tier_moderate" style="width:0%;background:var(--orange);"></div></div><div class="tier-count" id="tc_moderate">0</div></div>
+        <div class="tier-row"><div class="tier-label" style="color:#ff7043;">Weak</div><div class="tier-bar-bg"><div class="tier-bar-fill" id="tier_weak" style="width:0%;background:#ff7043;"></div></div><div class="tier-count" id="tc_weak">0</div></div>
+        <div class="tier-row"><div class="tier-label" style="color:var(--red);">Very Risky</div><div class="tier-bar-bg"><div class="tier-bar-fill" id="tier_very_risky" style="width:0%;background:var(--red);"></div></div><div class="tier-count" id="tc_very_risky">0</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 4: Loan Utilization + Risk Monitoring -->
+  <div class="grid-2">
+
+    <!-- SECTION 6: LOAN UTILIZATION -->
+    <div class="sec">
+      <div class="sec-header">
+        <div class="sec-title">Capital Utilization</div>
+        <span class="sec-badge" id="util_badge">—% Supplier</span>
+      </div>
+      <div class="chart-wrap" style="height:160px;"><canvas id="utilChart"></canvas></div>
+      <div class="stat-inline" style="margin-top:14px;">
+        <div class="stat-inline-item">
+          <div class="stat-inline-val" id="util_supplier">—</div>
+          <div class="stat-inline-lbl">Supplier Payments</div>
+        </div>
+        <div class="stat-inline-item">
+          <div class="stat-inline-val" id="util_recovery">—</div>
+          <div class="stat-inline-lbl">Recovery Rate</div>
+        </div>
+      </div>
+      <p style="font-size:11px;color:var(--muted);margin-top:12px;text-align:center;" id="util_caption">—% of funded capital reaches verified food suppliers.</p>
+    </div>
+
+    <!-- SECTION 7: RISK MONITORING -->
+    <div class="sec">
+      <div class="sec-header">
+        <div class="sec-title">Risk Intelligence</div>
+        <span class="sec-badge" id="risk_health_badge">Portfolio Health —</span>
+      </div>
+      <div id="risk_rows">
+        <div class="risk-row">
+          <div class="risk-row-left"><div class="risk-dot" style="background:var(--lemon);"></div><div class="risk-name" style="color:var(--lemon);">Low Risk</div></div>
+          <div style="display:flex;align-items:center;gap:8px;"><span class="risk-count" id="risk_low">0</span><span class="risk-pct" id="risk_low_pct"></span></div>
+        </div>
+        <div class="risk-row">
+          <div class="risk-row-left"><div class="risk-dot" style="background:var(--orange);"></div><div class="risk-name" style="color:var(--orange);">Medium Risk</div></div>
+          <div style="display:flex;align-items:center;gap:8px;"><span class="risk-count" id="risk_medium">0</span><span class="risk-pct" id="risk_medium_pct"></span></div>
+        </div>
+        <div class="risk-row">
+          <div class="risk-row-left"><div class="risk-dot" style="background:#ff7043;"></div><div class="risk-name" style="color:#ff7043;">High Risk</div></div>
+          <div style="display:flex;align-items:center;gap:8px;"><span class="risk-count" id="risk_high">0</span><span class="risk-pct" id="risk_high_pct"></span></div>
+        </div>
+        <div class="risk-row">
+          <div class="risk-row-left"><div class="risk-dot" style="background:var(--red);"></div><div class="risk-name" style="color:var(--red);">Critical Risk</div></div>
+          <div style="display:flex;align-items:center;gap:8px;"><span class="risk-count" id="risk_critical">0</span><span class="risk-pct" id="risk_critical_pct"></span></div>
+        </div>
+      </div>
+      <div style="margin-top:16px;">
+        <div class="metric-row-hdr" style="margin-bottom:6px;">
+          <span class="metric-row-label">Portfolio Health Score</span>
+          <span class="metric-row-val" id="risk_health_val">—</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill fill-lemon" id="risk_health_bar" style="width:0%"></div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SECTION 8: PLATFORM CREDIBILITY STRIP -->
+  <div class="full-width">
+    <div class="credibility">
+      <div class="cred-item">
+        <div class="cred-icon">✅</div>
+        <div class="cred-title" id="cred_repayment">— Repayment Rate</div>
+        <div class="cred-text">On-schedule repayment track record across all funded restaurants.</div>
+      </div>
+      <div class="cred-item">
+        <div class="cred-icon">🔍</div>
+        <div class="cred-title">KYC Verified</div>
+        <div class="cred-text">All restaurants complete identity verification before capital deployment.</div>
+      </div>
+      <div class="cred-item">
+        <div class="cred-icon">📡</div>
+        <div class="cred-title">Real-Time Monitoring</div>
+        <div class="cred-text">Continuous operational data tracking — not just end-of-cycle reports.</div>
+      </div>
+      <div class="cred-item">
+        <div class="cred-icon">📋</div>
+        <div class="cred-title">Structured Cycles</div>
+        <div class="cred-text">Fixed timelines. Published payout schedules. No ambiguity.</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<footer>© 2026 Genesis360Finance &nbsp;·&nbsp; Investor Intelligence Dashboard &nbsp;·&nbsp; Data refreshes every 60 seconds &nbsp;·&nbsp; All figures subject to verification</footer>
+
+<script>
+Chart.defaults.color = 'rgba(138,171,142,0.8)'
+Chart.defaults.borderColor = '#1e3a24'
+
+const TOKEN = new URLSearchParams(location.search).get('token') || ''
+let charts = {}
+
+// ── FORMAT HELPERS ────────────────────────────────────────────────────────────
+function fmtNaira(n) {
+  if (!n && n !== 0) return '—'
+  if (n >= 1e9) return '₦' + (n/1e9).toFixed(1) + 'B'
+  if (n >= 1e6) return '₦' + (n/1e6).toFixed(1) + 'M'
+  if (n >= 1e3) return '₦' + (n/1e3).toFixed(0) + 'K'
+  return '₦' + n.toLocaleString()
+}
+function fmtN(n) { return (n === null || n === undefined) ? '—' : Number(n).toLocaleString() }
+function pct(n)  { return (n === null || n === undefined) ? '—' : parseFloat(n).toFixed(1) + '%' }
+function set(id, val) { const el = document.getElementById(id); if (el) el.textContent = val }
+function setWidth(id, w) { const el = document.getElementById(id); if (el) el.style.width = Math.min(100, Math.max(0, w)) + '%' }
+
+// ── CHART INIT ────────────────────────────────────────────────────────────────
+function initCharts() {
+  const baseDonut = (id, labels, data, colors) => {
+    const ctx = document.getElementById(id)
+    if (!ctx) return null
+    if (charts[id]) { charts[id].destroy() }
+    charts[id] = new Chart(ctx, {
+      type: 'doughnut',
+      data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0, hoverOffset: 4 }] },
+      options: {
+        responsive: true, maintainAspectRatio: false, cutout: '68%',
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 12, font: { size: 11 } } } }
+      }
+    })
+    return charts[id]
+  }
+
+  baseDonut('portfolioChart',
+    ['Repaid', 'Defaulted', 'Late', 'Outstanding'],
+    [0, 0, 0, 100],
+    ['#A6D64A', '#ff5252', '#ff9f43', '#2a4a30']
+  )
+
+  baseDonut('riskChart',
+    ['Low Risk', 'Medium Risk', 'High Risk', 'Critical'],
+    [0, 0, 0, 0],
+    ['#A6D64A', '#ff9f43', '#ff7043', '#ff5252']
+  )
+
+  baseDonut('utilChart',
+    ['Supplier Payments', 'Other Usage'],
+    [82, 18],
+    ['#A6D64A', '#2a4a30']
+  )
+
+  // Capital chart — horizontal bar showing active vs rest
+  const capCtx = document.getElementById('capitalChart')
+  if (capCtx) {
+    if (charts['capitalChart']) charts['capitalChart'].destroy()
+    charts['capitalChart'] = new Chart(capCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Active Portfolio', 'Completed', 'Total Deployed'],
+        datasets: [{
+          data: [0, 0, 0],
+          backgroundColor: ['#A6D64A', '#1a6b3c', '#2a4a30'],
+          borderWidth: 0, borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { color: '#1e3a24' }, ticks: { callback: v => fmtNaira(v) } },
+          y: { grid: { display: false } }
+        }
+      }
+    })
+  }
+}
+
+// ── POPULATE METRICS ──────────────────────────────────────────────────────────
+function populateMetrics(e) {
+  // KPI STRIP
+  set('m_restaurants', fmtN(e.restaurants_onboarded))
+  set('m_capital', fmtNaira(e.total_capital_deployed))
+  set('m_repayment', pct(e.repayment_rate))
+  set('m_suppliers', fmtN(e.active_suppliers))
+  set('m_restaurants_sub', (e.new_restaurants_this_month || 0) + ' new this month')
+
+  // SECTION 1: Ecosystem Growth
+  set('eg_restaurants', fmtN(e.restaurants_onboarded))
+  set('eg_new', fmtN(e.new_restaurants_this_month))
+  set('eg_suppliers', fmtN(e.active_suppliers))
+  set('eg_cities', fmtN(e.cities_covered))
+  const gr = parseFloat(e.restaurant_growth_rate || 0)
+  set('eg_growth_rate', pct(gr))
+  setWidth('eg_growth_bar', Math.abs(gr) * 2)
+  const badge = document.getElementById('growth_badge')
+  if (badge) {
+    badge.textContent = (gr >= 0 ? '+' : '') + gr.toFixed(1) + '% MoM'
+    badge.className = 'growth-badge ' + (gr > 0 ? 'growth-pos' : gr < 0 ? 'growth-neg' : 'growth-neu')
+  }
+
+  // SECTION 2: Capital Deployment
+  set('cd_loans', fmtN(e.total_loans_issued))
+  set('cd_capital', fmtNaira(e.total_capital_deployed))
+  set('cd_avg', fmtNaira(e.avg_loan_size))
+  set('cd_active', fmtNaira(e.active_loan_portfolio))
+  set('cd_active_badge', fmtN(e.total_loans_issued) + ' Loans')
+  if (charts['capitalChart']) {
+    const active = e.active_loan_portfolio || 0
+    const total = e.total_capital_deployed || 0
+    const completed = Math.max(0, total - active)
+    charts['capitalChart'].data.datasets[0].data = [active, completed, total]
+    charts['capitalChart'].update()
+  }
+
+  // SECTION 3: Portfolio Performance
+  const rep = parseFloat(e.repayment_rate || 0)
+  const def = parseFloat(e.default_rate || 0)
+  const lat = parseFloat(e.late_payment_ratio || 0)
+  const outstanding = Math.max(0, 100 - rep - def - lat)
+  set('pp_repayment', pct(rep)); setWidth('pp_repayment_bar', rep)
+  set('pp_default', pct(def)); setWidth('pp_default_bar', def * 10) // scale for visibility
+  set('pp_late', pct(lat)); setWidth('pp_late_bar', lat * 10)
+  const health = e._portfolio_health || 0
+  set('pp_health_badge', 'Health ' + health + '/100')
+  if (charts['portfolioChart']) {
+    charts['portfolioChart'].data.datasets[0].data = [rep, def, lat, outstanding]
+    charts['portfolioChart'].update()
+  }
+
+  // SECTION 4: AI Credit Engine
+  set('ai_avg_score', (e.avg_credit_score || 0) + '/100')
+  set('ai_approval', pct(e.approval_rate))
+  set('ai_manual', pct(e.manual_review_rate))
+  const rd = e._risk_distribution || {}
+  if (charts['riskChart']) {
+    charts['riskChart'].data.datasets[0].data = [rd.low||0, rd.medium||0, rd.high||0, rd.critical||0]
+    charts['riskChart'].update()
+  }
+
+  // SECTION 5: Credit Tier Distribution
+  const td = e._tier_distribution || {}
+  const tierTotal = Object.values(td).reduce((s,v) => s+(v||0), 0) || 1
+  const tiers = ['elite','strong','moderate','weak','very_risky']
+  tiers.forEach(t => {
+    const count = td[t] || 0
+    const w = Math.round(count / tierTotal * 100)
+    setWidth('tier_' + t, w)
+    set('tc_' + t, count)
+  })
+
+  // SECTION 6: Loan Utilization
+  const supp = parseFloat(e.supplier_payment_ratio || 82)
+  const other = Math.max(0, 100 - supp)
+  set('util_supplier', pct(supp)); set('util_recovery', pct(e.recovery_rate))
+  set('util_badge', supp.toFixed(0) + '% Supplier')
+  set('util_caption', supp.toFixed(0) + '% of funded capital reaches verified food suppliers.')
+  if (charts['utilChart']) {
+    charts['utilChart'].data.datasets[0].data = [supp, other]
+    charts['utilChart'].update()
+  }
+
+  // SECTION 7: Risk Monitoring
+  const riskTotal = (rd.low||0) + (rd.medium||0) + (rd.high||0) + (rd.critical||0) || 1
+  set('risk_low', rd.low||0); set('risk_low_pct', pct((rd.low||0)/riskTotal*100))
+  set('risk_medium', rd.medium||0); set('risk_medium_pct', pct((rd.medium||0)/riskTotal*100))
+  set('risk_high', rd.high||0); set('risk_high_pct', pct((rd.high||0)/riskTotal*100))
+  set('risk_critical', rd.critical||0); set('risk_critical_pct', pct((rd.critical||0)/riskTotal*100))
+  set('risk_health_val', health + '/100'); setWidth('risk_health_bar', health)
+  const hBadge = document.getElementById('risk_health_badge')
+  if (hBadge) hBadge.textContent = 'Health ' + health + '/100'
+
+  // SECTION 8: Credibility strip
+  set('cred_repayment', rep.toFixed(0) + '% Repayment Rate')
+}
+
+// ── FETCH ─────────────────────────────────────────────────────────────────────
+async function fetchMetrics() {
+  try {
+    const dot = document.getElementById('live_dot')
+    if (dot) dot.classList.add('pulse')
+    const url = '/api/investor/ecosystem' + (TOKEN ? '?token=' + encodeURIComponent(TOKEN) : '')
+    const r = await fetch(url)
+    if (r.status === 403) {
+      document.getElementById('error_state').style.display = 'flex'
+      document.getElementById('error_msg').textContent = 'Invalid or expired investor link. Please contact Genesis360Finance.'
+      return
+    }
+    const d = await r.json()
+    if (!d.ok) {
+      document.getElementById('error_state').style.display = 'flex'
+      document.getElementById('error_msg').textContent = d.error || 'Unable to load dashboard data.'
+      return
+    }
+    populateMetrics(d.ecosystem)
+    set('last_updated', 'Last updated: ' + new Date().toLocaleTimeString())
+  } catch(e) {
+    console.error('Dashboard fetch error:', e)
+    set('last_updated', 'Update failed — retrying')
+  } finally {
+    const dot = document.getElementById('live_dot')
+    if (dot) setTimeout(() => dot.classList.remove('pulse'), 1000)
+  }
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+initCharts()
+fetchMetrics()
+setInterval(fetchMetrics, 60000)
+</script>
+</body>
+</html>

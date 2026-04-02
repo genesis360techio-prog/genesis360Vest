@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Genesis360 — Earn 24% Annual Returns Financing Nigeria's Food Economy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --green:#0F3D2E;
+  --green-mid:#1a5c42;
+  --green-light:#2d7a58;
+  --lemon:#C7FF4A;
+  --lemon-dim:#a8d93a;
+  --white:#ffffff;
+  --off:#f7f9f4;
+  --muted:#6b7280;
+  --border:#e5e7eb;
+  --card:#ffffff;
+  --navy:#0a2218;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;color:#1a1a1a;background:#fff;-webkit-font-smoothing:antialiased}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(15,61,46,0.97);backdrop-filter:blur(12px);border-bottom:1px solid rgba(199,255,74,0.1)}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;height:68px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{display:flex;align-items:center;gap:10px}
+.nav-logo img{height:36px;width:auto;background:#fff;border-radius:8px;padding:4px 10px}
+.nav-links{display:flex;align-items:center;gap:32px}
+.nav-links a{color:rgba(255,255,255,0.75);font-size:.875rem;font-weight:500;text-decoration:none;transition:color .2s}
+.nav-links a:hover{color:#C7FF4A}
+.nav-cta{display:flex;align-items:center;gap:12px}
+.btn-ghost{padding:9px 20px;border:1px solid rgba(199,255,74,0.35);color:#C7FF4A;border-radius:10px;font-size:.875rem;font-weight:600;text-decoration:none;transition:all .2s}
+.btn-ghost:hover{background:rgba(199,255,74,0.08)}
+.btn-primary{padding:9px 22px;background:#C7FF4A;color:#0F3D2E;border-radius:10px;font-size:.875rem;font-weight:700;text-decoration:none;transition:all .2s}
+.btn-primary:hover{background:#d4ff6a;transform:translateY(-1px)}
+.mob-menu-btn{display:none;background:none;border:none;cursor:pointer;color:#fff}
+
+/* ── HERO ── */
+.hero{min-height:100vh;background:linear-gradient(135deg,#0a2218 0%,#0F3D2E 45%,#1a5c42 100%);display:flex;align-items:center;padding-top:68px;position:relative;overflow:hidden}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(199,255,74,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(199,255,74,0.04) 1px,transparent 1px);background-size:60px 60px;pointer-events:none}
+.hero-glow{position:absolute;top:20%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(199,255,74,0.08) 0%,transparent 70%);pointer-events:none}
+.hero-inner{max-width:1200px;margin:0 auto;padding:80px 24px;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;position:relative;z-index:1}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(199,255,74,0.12);border:1px solid rgba(199,255,74,0.25);border-radius:100px;padding:6px 14px;margin-bottom:24px}
+.hero-badge span{color:#C7FF4A;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.hero-badge .dot{width:7px;height:7px;border-radius:50%;background:#C7FF4A;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero h1{font-size:3.25rem;font-weight:900;color:#fff;line-height:1.1;letter-spacing:-.02em;margin-bottom:20px}
+.hero h1 em{font-style:normal;color:#C7FF4A}
+.hero-sub{font-size:1.1rem;color:rgba(255,255,255,0.72);line-height:1.7;margin-bottom:32px;max-width:520px}
+.hero-bullets{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:36px}
+.hero-bullets li{display:flex;align-items:center;gap:10px;color:rgba(255,255,255,0.85);font-size:.9375rem;font-weight:500}
+.hero-bullets li::before{content:'';width:20px;height:20px;border-radius:50%;background:rgba(199,255,74,0.15);border:1.5px solid rgba(199,255,74,0.4);flex-shrink:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23C7FF4A' stroke-width='3'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap}
+.btn-hero-primary{padding:14px 28px;background:#C7FF4A;color:#0F3D2E;border-radius:12px;font-size:.9375rem;font-weight:800;text-decoration:none;transition:all .2s;box-shadow:0 8px 32px rgba(199,255,74,0.3)}
+.btn-hero-primary:hover{background:#d4ff6a;transform:translateY(-2px);box-shadow:0 12px 40px rgba(199,255,74,0.4)}
+.btn-hero-ghost{padding:14px 28px;border:1.5px solid rgba(255,255,255,0.25);color:#fff;border-radius:12px;font-size:.9375rem;font-weight:600;text-decoration:none;transition:all .2s}
+.btn-hero-ghost:hover{border-color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.05)}
+
+/* Hero card */
+.hero-card{background:rgba(255,255,255,0.07);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.12);border-radius:24px;padding:32px;position:relative}
+.hero-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.hero-card-title{color:#fff;font-size:1rem;font-weight:700}
+.hero-card-badge{background:rgba(199,255,74,0.15);border:1px solid rgba(199,255,74,0.3);color:#C7FF4A;font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:100px}
+.hero-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.hero-stat{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px}
+.hero-stat-val{font-size:1.75rem;font-weight:900;color:#C7FF4A;line-height:1}
+.hero-stat-label{font-size:.7rem;color:rgba(255,255,255,0.5);margin-top:4px;font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+.hero-divider{height:1px;background:rgba(255,255,255,0.08);margin:20px 0}
+.hero-card-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0}
+.hero-card-row-label{color:rgba(255,255,255,0.55);font-size:.8125rem}
+.hero-card-row-val{color:#fff;font-size:.875rem;font-weight:700}
+.hero-card-row-val.lemon{color:#C7FF4A}
+.hero-payout-bar{background:rgba(199,255,74,0.08);border:1px solid rgba(199,255,74,0.15);border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;margin-top:16px}
+.hero-payout-bar span:first-child{color:rgba(255,255,255,0.6);font-size:.8125rem}
+.hero-payout-bar span:last-child{color:#C7FF4A;font-size:.875rem;font-weight:700}
+
+/* ── SECTIONS ── */
+section{padding:96px 24px}
+.section-inner{max-width:1200px;margin:0 auto}
+.section-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(15,61,46,0.07);border:1px solid rgba(15,61,46,0.12);color:#0F3D2E;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 12px;border-radius:100px;margin-bottom:16px}
+.section-h{font-size:2.5rem;font-weight:900;color:#0a2218;line-height:1.15;letter-spacing:-.02em;margin-bottom:16px}
+.section-sub{font-size:1.0625rem;color:#6b7280;line-height:1.7;max-width:560px}
+.section-center{text-align:center}
+.section-center .section-sub{margin:0 auto}
+
+/* ── INVESTMENT SNAPSHOT ── */
+.snap-bg{background:var(--off)}
+.snap-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:56px}
+.snap-card{background:#fff;border:1px solid var(--border);border-radius:20px;padding:32px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s}
+.snap-card:hover{transform:translateY(-4px);box-shadow:0 20px 48px rgba(15,61,46,0.1)}
+.snap-card.featured{background:linear-gradient(145deg,#0F3D2E,#1a5c42);border:none}
+.snap-card-tag{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0F3D2E;background:rgba(15,61,46,0.08);border-radius:100px;padding:4px 12px;display:inline-block;margin-bottom:20px}
+.snap-card.featured .snap-card-tag{background:rgba(199,255,74,0.15);color:#C7FF4A}
+.snap-investment{font-size:2.5rem;font-weight:900;color:#0a2218;margin-bottom:4px}
+.snap-card.featured .snap-investment{color:#fff}
+.snap-label{font-size:.8rem;color:#9ca3af;font-weight:500;margin-bottom:28px}
+.snap-card.featured .snap-label{color:rgba(255,255,255,0.5)}
+.snap-rows{display:flex;flex-direction:column;gap:12px}
+.snap-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.05)}
+.snap-card.featured .snap-row{border-bottom-color:rgba(255,255,255,0.08)}
+.snap-row:last-child{border:none}
+.snap-row-label{font-size:.8125rem;color:#6b7280}
+.snap-card.featured .snap-row-label{color:rgba(255,255,255,0.55)}
+.snap-row-val{font-size:.9375rem;font-weight:800;color:#0F3D2E}
+.snap-card.featured .snap-row-val{color:#C7FF4A}
+.snap-note{margin-top:48px;background:#fff;border:1px solid var(--border);border-radius:16px;padding:24px 28px;display:flex;align-items:flex-start;gap:16px}
+.snap-note-icon{width:40px;height:40px;border-radius:12px;background:rgba(15,61,46,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.25rem}
+.snap-note p{color:#374151;font-size:.9rem;line-height:1.65}
+.snap-note p strong{color:#0F3D2E}
+
+/* ── HOW IT WORKS ── */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:56px;position:relative}
+.steps::before{content:'';position:absolute;top:36px;left:calc(12.5% + 36px);right:calc(12.5% + 36px);height:2px;background:linear-gradient(90deg,#C7FF4A,rgba(199,255,74,0.2));z-index:0}
+.step{display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 16px;position:relative;z-index:1}
+.step-num{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#0F3D2E,#1a5c42);border:3px solid #C7FF4A;display:flex;align-items:center;justify-content:center;font-size:1.375rem;font-weight:900;color:#C7FF4A;margin-bottom:24px;box-shadow:0 8px 24px rgba(15,61,46,0.25);flex-shrink:0}
+.step-title{font-size:1rem;font-weight:800;color:#0a2218;margin-bottom:10px}
+.step-desc{font-size:.8625rem;color:#6b7280;line-height:1.65}
+
+/* ── CAPITAL PROTECTION ── */
+.prot-bg{background:linear-gradient(135deg,#0a2218,#0F3D2E)}
+.prot-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:56px}
+.prot-card{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:28px;transition:all .2s}
+.prot-card:hover{background:rgba(255,255,255,0.09);border-color:rgba(199,255,74,0.25);transform:translateY(-3px)}
+.prot-icon{width:52px;height:52px;border-radius:14px;background:rgba(199,255,74,0.1);border:1px solid rgba(199,255,74,0.2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:20px}
+.prot-title{font-size:1rem;font-weight:800;color:#fff;margin-bottom:10px}
+.prot-desc{font-size:.85rem;color:rgba(255,255,255,0.55);line-height:1.65}
+.prot-bg .section-h{color:#fff}
+.prot-bg .section-sub{color:rgba(255,255,255,0.6)}
+.prot-bg .section-tag{background:rgba(199,255,74,0.12);border-color:rgba(199,255,74,0.2);color:#C7FF4A}
+
+/* ── REAL ASSETS ── */
+.assets-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:56px}
+.asset-card{border-radius:20px;overflow:hidden;position:relative;min-height:280px;display:flex;flex-direction:column;justify-content:flex-end}
+.asset-bg-rest{background:linear-gradient(160deg,#0F3D2E 0%,#1a5c42 100%)}
+.asset-bg-vend{background:linear-gradient(160deg,#1a3a5c 0%,#2d5c8a 100%)}
+.asset-bg-urban{background:linear-gradient(160deg,#3d2a0f 0%,#6b4a1a 100%)}
+.asset-emoji{font-size:3.5rem;position:absolute;top:28px;right:28px;opacity:.35}
+.asset-content{padding:28px;position:relative;z-index:1}
+.asset-tag{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px}
+.asset-title{font-size:1.375rem;font-weight:900;color:#fff;margin-bottom:10px}
+.asset-desc{font-size:.85rem;color:rgba(255,255,255,0.65);line-height:1.65}
+.asset-stat{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.12);border-radius:8px;padding:6px 12px;margin-top:16px;font-size:.78rem;font-weight:700;color:#fff}
+
+/* ── TRACTION ── */
+.traction-bg{background:var(--off)}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:56px}
+.metric{background:#fff;border:1px solid var(--border);border-radius:20px;padding:32px 24px;text-align:center;transition:all .2s}
+.metric:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(15,61,46,0.08)}
+.metric-val{font-size:2.5rem;font-weight:900;color:#0F3D2E;line-height:1;margin-bottom:8px}
+.metric-label{font-size:.8125rem;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.metric-sub{font-size:.75rem;color:#9ca3af;margin-top:4px}
+
+/* ── TRUSTED BY ── */
+.trusted-logos{display:flex;flex-wrap:wrap;justify-content:center;gap:20px;margin-top:48px}
+.tl-card{display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;border:1px solid var(--border);border-radius:18px;padding:20px 28px;min-width:140px;transition:all .2s}
+.tl-card:hover{border-color:#C7FF4A;box-shadow:0 8px 24px rgba(15,61,46,0.08);transform:translateY(-2px)}
+.tl-card.dark{background:#0a1628}
+.tl-card img{height:38px;width:auto;object-fit:contain;margin-bottom:8px}
+.tl-name{font-size:.72rem;font-weight:700;color:#374151;margin-top:4px}
+.tl-card.dark .tl-name{color:rgba(255,255,255,0.7)}
+.tl-role{font-size:.68rem;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;font-weight:500}
+.tl-card.dark .tl-role{color:rgba(255,255,255,0.35)}
+
+/* ── TEAM ── */
+.team-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:48px}
+.team-card{background:#fff;border:1px solid var(--border);border-radius:20px;padding:32px;display:flex;gap:22px;transition:all .2s}
+.team-card:hover{box-shadow:0 12px 36px rgba(15,61,46,0.08);border-color:rgba(15,61,46,0.2)}
+.team-photo{width:88px;height:88px;border-radius:50%;object-fit:cover;object-position:center top;flex-shrink:0;border:3px solid #C7FF4A}
+.team-name{font-size:1.0625rem;font-weight:800;color:#0a2218;margin-bottom:4px}
+.team-role{font-size:.78rem;font-weight:700;color:#0F3D2E;background:rgba(15,61,46,0.08);display:inline-block;padding:3px 12px;border-radius:100px;margin-bottom:12px}
+.team-bio{font-size:.8625rem;color:#6b7280;line-height:1.65}
+
+/* ── FOUNDER VIDEO ── */
+.founder-bg{background:linear-gradient(135deg,#0a2218,#0F3D2E)}
+.founder-inner{max-width:880px;margin:0 auto;text-align:center}
+.founder-bg .section-h{color:#fff}
+.founder-bg .section-sub{color:rgba(255,255,255,0.6);margin:0 auto 40px}
+.video-wrap{border-radius:20px;overflow:hidden;position:relative;padding-bottom:56.25%;background:rgba(0,0,0,0.3)}
+.video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none}
+.btn-watch{display:inline-flex;align-items:center;gap:10px;padding:14px 28px;background:#C7FF4A;color:#0F3D2E;border-radius:12px;font-weight:800;font-size:.9375rem;text-decoration:none;margin-top:32px;transition:all .2s}
+.btn-watch:hover{background:#d4ff6a;transform:translateY(-2px)}
+.play-icon{width:20px;height:20px;border-radius:50%;background:#0F3D2E;display:flex;align-items:center;justify-content:center}
+
+/* ── DASHBOARD PREVIEW ── */
+.dash-preview{background:#f0f4f0;border-radius:24px;padding:32px;border:1px solid var(--border);margin-top:56px}
+.dash-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.dash-title{font-size:1.0625rem;font-weight:800;color:#0a2218}
+.dash-badge{background:#0F3D2E;color:#C7FF4A;font-size:.7rem;font-weight:700;padding:4px 12px;border-radius:100px;letter-spacing:.06em;text-transform:uppercase}
+.dash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.dash-stat{background:#fff;border-radius:14px;padding:20px;border:1px solid var(--border)}
+.dash-stat-label{font-size:.72rem;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.dash-stat-val{font-size:1.5rem;font-weight:900;color:#0F3D2E}
+.dash-stat-sub{font-size:.75rem;color:#C7FF4A;font-weight:700;margin-top:4px}
+.dash-bar-section{background:#fff;border-radius:14px;padding:20px;border:1px solid var(--border)}
+.dash-bar-label{font-size:.8rem;color:#374151;font-weight:600;margin-bottom:4px;display:flex;justify-content:space-between}
+.dash-bar-track{height:8px;background:#f3f4f6;border-radius:100px;overflow:hidden;margin-bottom:12px}
+.dash-bar-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,#0F3D2E,#C7FF4A)}
+.dash-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.dash-tag{font-size:.72rem;font-weight:600;padding:5px 12px;border-radius:8px;background:rgba(15,61,46,0.07);color:#0F3D2E}
+
+/* ── FINAL CTA ── */
+.cta-bg{background:linear-gradient(135deg,#0a2218 0%,#0F3D2E 50%,#1a5c42 100%);text-align:center;position:relative;overflow:hidden}
+.cta-bg::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:700px;background:radial-gradient(circle,rgba(199,255,74,0.07) 0%,transparent 70%);pointer-events:none}
+.cta-bg .section-h{color:#fff;font-size:3rem;max-width:700px;margin:0 auto 20px}
+.cta-bg .section-sub{color:rgba(255,255,255,0.65);max-width:520px;margin:0 auto 40px}
+.cta-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.btn-cta-primary{padding:16px 36px;background:#C7FF4A;color:#0F3D2E;border-radius:14px;font-size:1rem;font-weight:800;text-decoration:none;transition:all .2s;box-shadow:0 8px 32px rgba(199,255,74,0.3)}
+.btn-cta-primary:hover{background:#d4ff6a;transform:translateY(-2px)}
+.btn-cta-ghost{padding:16px 36px;border:1.5px solid rgba(255,255,255,0.25);color:#fff;border-radius:14px;font-size:1rem;font-weight:600;text-decoration:none;transition:all .2s}
+.btn-cta-ghost:hover{border-color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.06)}
+
+/* ── FOOTER ── */
+footer{background:#060f0a;padding:60px 24px 32px}
+.footer-inner{max-width:1200px;margin:0 auto}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px}
+.footer-logo img{height:36px;background:#fff;border-radius:8px;padding:4px 10px;margin-bottom:16px}
+.footer-tagline{font-size:.875rem;color:rgba(255,255,255,0.45);line-height:1.7;max-width:280px}
+.footer-col-title{font-size:.75rem;font-weight:700;color:#C7FF4A;text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px}
+.footer-col a{display:block;font-size:.875rem;color:rgba(255,255,255,0.5);text-decoration:none;margin-bottom:10px;transition:color .2s}
+.footer-col a:hover{color:#C7FF4A}
+.footer-bottom{border-top:1px solid rgba(255,255,255,0.07);padding-top:28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:gap}
+.footer-copy{font-size:.8125rem;color:rgba(255,255,255,0.3)}
+.footer-note{font-size:.75rem;color:rgba(255,255,255,0.2);max-width:480px;text-align:right;line-height:1.5}
+
+/* ── MOBILE ── */
+@media(max-width:1024px){
+  .snap-cards{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr 1fr;gap:32px}
+  .steps::before{display:none}
+  .prot-cards{grid-template-columns:1fr 1fr}
+  .assets-cards{grid-template-columns:1fr}
+  .metrics{grid-template-columns:1fr 1fr}
+  .team-grid{grid-template-columns:1fr}
+  .footer-top{grid-template-columns:1fr 1fr}
+  .dash-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:768px){
+  .hero-inner{grid-template-columns:1fr;gap:40px;padding:60px 24px}
+  .hero h1{font-size:2.25rem}
+  .nav-links{display:none}
+  .mob-menu-btn{display:block}
+  .metrics{grid-template-columns:1fr 1fr}
+  .prot-cards{grid-template-columns:1fr}
+  .footer-top{grid-template-columns:1fr}
+  .footer-bottom{flex-direction:column;gap:12px;text-align:center}
+  .footer-note{text-align:center}
+  .section-h{font-size:1.875rem}
+  .dash-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:480px){
+  .hero-btns{flex-direction:column}
+  .cta-btns{flex-direction:column;align-items:center}
+  .metrics{grid-template-columns:1fr}
+  .dash-grid{grid-template-columns:1fr 1fr}
+  .snap-cards{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══════════════════════════════════════════════════════ -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">
+      <img src="logo.png" onerror="this.style.display='none'" alt="Genesis360"/>
+    </div>
+    <div class="nav-links">
+      <a href="#how-it-works">How It Works</a>
+      <a href="#returns">Returns</a>
+      <a href="#traction">Traction</a>
+      <a href="#team">Team</a>
+    </div>
+    <div class="nav-cta">
+      <a href="/login" class="btn-ghost">Sign In</a>
+      <a href="/register" class="btn-primary">Join Cycle</a>
+    </div>
+    <button class="mob-menu-btn" onclick="document.querySelector('.nav-links').style.display=document.querySelector('.nav-links').style.display==='flex'?'none':'flex'">
+      <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- ══ HERO ══════════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-badge">
+        <span class="dot"></span>
+        <span>Next Cycle Opens Soon — Limited Slots</span>
+      </div>
+      <h1>Earn <em>24% Annual Returns</em> by Financing Nigeria's Food Economy</h1>
+      <p class="hero-sub">Genesis360 enables diaspora investors to fund profitable restaurants and food supply operations while earning 2% monthly returns with structured quarterly payouts.</p>
+      <ul class="hero-bullets">
+        <li>24% Target Annual Return</li>
+        <li>2% Monthly Earnings</li>
+        <li>Quarterly Profit & Capital Payouts</li>
+        <li>Real Economy Asset Financing</li>
+      </ul>
+      <div class="hero-btns">
+        <a href="/register" class="btn-hero-primary">Join the Next Investment Cycle</a>
+        <a href="/dashboard" class="btn-hero-ghost">View Investor Dashboard</a>
+      </div>
+    </div>
+
+    <!-- Investment Snapshot Card -->
+    <div class="hero-card">
+      <div class="hero-card-header">
+        <span class="hero-card-title">Investment Snapshot</span>
+        <span class="hero-card-badge">Live Portfolio</span>
+      </div>
+      <div class="hero-stat-grid">
+        <div class="hero-stat">
+          <div class="hero-stat-val">24%</div>
+          <div class="hero-stat-label">Annual Return</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-val">2%</div>
+          <div class="hero-stat-label">Monthly Yield</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-val">Q</div>
+          <div class="hero-stat-label">Payouts</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-val">98%</div>
+          <div class="hero-stat-label">Repayment Rate</div>
+        </div>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-card-row">
+        <span class="hero-card-row-label">Capital Protection</span>
+        <span class="hero-card-row-val">Structured Agreements</span>
+      </div>
+      <div class="hero-card-row">
+        <span class="hero-card-row-label">Asset Backing</span>
+        <span class="hero-card-row-val">Food Economy</span>
+      </div>
+      <div class="hero-card-row">
+        <span class="hero-card-row-label">Min. Investment</span>
+        <span class="hero-card-row-val lemon">$5,000</span>
+      </div>
+      <div class="hero-payout-bar">
+        <span>Next Payout</span>
+        <span>Quarterly Schedule</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ INVESTMENT SNAPSHOT ════════════════════════════════════ -->
+<section class="snap-bg" id="returns">
+  <div class="section-inner">
+    <div class="section-center">
+      <div class="section-tag">Investment Tiers</div>
+      <h2 class="section-h">Pick Your Investment Level</h2>
+      <p class="section-sub">Your capital finances restaurant inventory and food supply chain operations, generating predictable returns on every deployment.</p>
+    </div>
+    <div class="snap-cards">
+      <div class="snap-card">
+        <span class="snap-card-tag">Starter</span>
+        <div class="snap-investment">$5,000</div>
+        <div class="snap-label">Entry investment</div>
+        <div class="snap-rows">
+          <div class="snap-row">
+            <span class="snap-row-label">Monthly Return</span>
+            <span class="snap-row-val">$100</span>
+          </div>
+          <div class="snap-row">
+            <span class="snap-row-label">Annual Return</span>
+            <span class="snap-row-val">$1,200</span>
+          </div>
+          <div class="snap-row">
+            <span class="snap-row-label">Return Rate</span>
+            <span class="snap-row-val">24%</span>
+          </div>
+          <div class="snap-row">
+            <span class="snap-row-label">Payout Schedule</span>
+            <span class="snap-row-val">Quarterly</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="snap-card featured">
+        <span class="snap-card-tag">⭐ Most Popular</span>
+        <div class="snap-investment">$10,000</div>
+        <div class="snap-label">Growth investment</div>
+        <div class="snap-rows">
+          <div class="snap-row">
+            <span class="snap-row-label">Monthly Return</span>
+            <span class="snap-row-val">$200</span>
+          </div>
+          <div class="snap-row">
+            <span class="snap-row-label">Annual Return</span>
+            <span class="snap-row-val">$2,400</span>
+          </div>
+          <div class="snap-row">
+            <span class="snap-row-label">Return Rate</span>
+            <span class="snap-row-val">24%</span>
+          </div>
+          <div class="snap-row">
+            <span class="snap-row-label">Payout Schedule</span>
+            <span class="snap-row-val">Quarterly</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="snap-card">
+        <span class="snap-card-tag">Premium</span>
+        <div class="snap-investment">$25,000</div>
+        <div class="snap-label">High-yield investment</div>
+        <div class="snap-rows">
+          <div class="snap-row">
+            <span class="snap-row-label">Monthly Return</span>
+            <span class="snap-row-val">$500</span>
+          </div>
+          <div class="snap-row">
+            <span class="snap-row-label">Annual Return</span>
+            <span class="snap-row-val">$6,000</span>
+          </div>
+          <div class="snap-row">
+            <span class="snap-row-label">Return Rate</span>
+            <span class="snap-row-val">24%</span>
+          </div>
+          <div class="snap-row">
+            <span class="snap-row-label">Payout Schedule</span>
+            <span class="snap-row-val">Quarterly</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="snap-note">
+      <div class="snap-note-icon">🏦</div>
+      <p>Your capital is deployed into <strong>vetted restaurants and food supply businesses</strong> across Nigeria. Each deployment is backed by structured lending agreements and tracked through our AI-powered repayment engine, ensuring capital recovery and investor returns on schedule.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ HOW IT WORKS ═══════════════════════════════════════════ -->
+<section id="how-it-works">
+  <div class="section-inner">
+    <div class="section-center">
+      <div class="section-tag">The Process</div>
+      <h2 class="section-h">How the Investment Works</h2>
+      <p class="section-sub">A structured, transparent cycle from capital deployment to investor payout.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-title">Join a Funding Cycle</div>
+        <p class="step-desc">Investor registers, selects their investment tier, and joins the next active Genesis360 funding cycle.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-title">Capital Deployed</div>
+        <p class="step-desc">Capital is deployed into vetted restaurants and food vendors through structured financing agreements.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-title">Businesses Repay</div>
+        <p class="step-desc">Partner businesses repay through scheduled installments, tracked by our AI credit engine in real time.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-title">Investors Get Paid</div>
+        <p class="step-desc">Quarterly payouts delivered — principal protected, returns distributed, portfolio dashboard updated.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CAPITAL PROTECTION ═════════════════════════════════════ -->
+<section class="prot-bg">
+  <div class="section-inner">
+    <div class="section-center">
+      <div class="section-tag">Why It's Safe</div>
+      <h2 class="section-h">Capital Protection System</h2>
+      <p class="section-sub">Multiple layers of protection ensure your investment is tracked, secured, and paid back on schedule.</p>
+    </div>
+    <div class="prot-cards">
+      <div class="prot-card">
+        <div class="prot-icon">🤖</div>
+        <div class="prot-title">AI Credit Engine</div>
+        <p class="prot-desc">AI-powered credit scoring evaluates every borrower before capital is deployed, reducing default risk from day one.</p>
+      </div>
+      <div class="prot-card">
+        <div class="prot-icon">📊</div>
+        <div class="prot-title">Automated Repayment Tracking</div>
+        <p class="prot-desc">Every payment is logged and monitored in real time. Missed payments trigger automatic recovery escalation.</p>
+      </div>
+      <div class="prot-card">
+        <div class="prot-icon">📄</div>
+        <div class="prot-title">Structured Lending Agreements</div>
+        <p class="prot-desc">Each deployment is backed by a legally structured financing agreement outlining repayment terms and obligations.</p>
+      </div>
+      <div class="prot-card">
+        <div class="prot-icon">📈</div>
+        <div class="prot-title">Investor Reporting Dashboard</div>
+        <p class="prot-desc">Full visibility into your portfolio — capital deployed, repayments received, returns earned, and cycle timeline.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ REAL ASSETS ════════════════════════════════════════════ -->
+<section>
+  <div class="section-inner">
+    <div class="section-center">
+      <div class="section-tag">Real Economy</div>
+      <h2 class="section-h">What Your Capital Finances</h2>
+      <p class="section-sub">Every dollar deployed funds real businesses operating in Nigeria's essential food economy.</p>
+    </div>
+    <div class="assets-cards">
+      <div class="asset-card asset-bg-rest">
+        <div class="asset-emoji">🍽️</div>
+        <div class="asset-content">
+          <div class="asset-tag">Sector 01</div>
+          <div class="asset-title">Restaurants</div>
+          <p class="asset-desc">Capital finances inventory, operations, and growth for vetted restaurant businesses in urban Nigeria.</p>
+          <span class="asset-stat">🏪 Active Portfolio</span>
+        </div>
+      </div>
+      <div class="asset-card asset-bg-vend">
+        <div class="asset-emoji">🥬</div>
+        <div class="asset-content">
+          <div class="asset-tag">Sector 02</div>
+          <div class="asset-title">Food Vendors</div>
+          <p class="asset-desc">Supports small and medium food vendors with working capital to scale their operations and repayment capacity.</p>
+          <span class="asset-stat">🛒 Active Portfolio</span>
+        </div>
+      </div>
+      <div class="asset-card asset-bg-urban">
+        <div class="asset-emoji">🌆</div>
+        <div class="asset-content">
+          <div class="asset-tag">Sector 03</div>
+          <div class="asset-title">Urban Food Supply</div>
+          <p class="asset-desc">Finances the supply chain connecting food producers to urban distribution networks across Nigerian cities.</p>
+          <span class="asset-stat">🚚 Active Portfolio</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TRACTION ═══════════════════════════════════════════════ -->
+<section class="traction-bg" id="traction">
+  <div class="section-inner">
+    <div class="section-center">
+      <div class="section-tag">Traction</div>
+      <h2 class="section-h">Genesis360 by the Numbers</h2>
+      <p class="section-sub">Real metrics from an operating business funding Nigeria's food economy.</p>
+    </div>
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-val">10,250+</div>
+        <div class="metric-label">Platform Users</div>
+        <div class="metric-sub">Registered & verified</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val">$350K+</div>
+        <div class="metric-label">Transactions Processed</div>
+        <div class="metric-sub">Across all cycles</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val">$200K+</div>
+        <div class="metric-label">Loans Deployed</div>
+        <div class="metric-sub">To food businesses</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val">10+</div>
+        <div class="metric-label">Partner Food Vendors</div>
+        <div class="metric-sub">Vetted & active</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TRUSTED BY ═════════════════════════════════════════════ -->
+<section>
+  <div class="section-inner">
+    <div class="section-center">
+      <div class="section-tag">Ecosystem</div>
+      <h2 class="section-h">Backed by Partners Building Africa's Food Economy</h2>
+      <p class="section-sub">Ecosystem partners, accelerators, and institutions backing Genesis360's mission.</p>
+    </div>
+    <div class="trusted-logos">
+      <div class="tl-card">
+        <img src="https://www.extramile.africa/wp-content/uploads/2021/09/extramile-logo.png" alt="Extramile Africa" onerror="this.onerror=null;this.src='https://www.google.com/s2/favicons?domain=extramileafrica.com&sz=64';this.style.height='28px'"/>
+        <div class="tl-name">Extramile Africa</div>
+        <div class="tl-role">Accelerator</div>
+      </div>
+      <div class="tl-card">
+        <img src="https://i0.wp.com/fatefoundation.org/wp-content/uploads/2025/07/FATEFound.jpg?fit=1060%2C495&ssl=1" alt="Fate Foundation" onerror="this.onerror=null;this.src='https://www.google.com/s2/favicons?domain=fatefoundation.org&sz=64';this.style.height='28px'"/>
+        <div class="tl-name">Fate Foundation</div>
+        <div class="tl-role">Entrepreneurship</div>
+      </div>
+      <div class="tl-card">
+        <img src="https://www.google.com/s2/favicons?domain=mono.co&sz=64" alt="Mono" style="height:32px;"/>
+        <div class="tl-name">Mono</div>
+        <div class="tl-role">Open Banking</div>
+      </div>
+      <div class="tl-card">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/07/Sterling_Bank_Logo_Straight.png" alt="Sterling Bank" onerror="this.onerror=null;this.src='https://www.google.com/s2/favicons?domain=sterling.ng&sz=64';this.style.height='28px'"/>
+        <div class="tl-name">Sterling Bank</div>
+        <div class="tl-role">Banking Partner</div>
+      </div>
+      <div class="tl-card">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f9/Paystack_Logo.svg" alt="Paystack" onerror="this.onerror=null;this.src='https://www.google.com/s2/favicons?domain=paystack.com&sz=64';this.style.height='28px'"/>
+        <div class="tl-name">Paystack</div>
+        <div class="tl-role">Payments</div>
+      </div>
+      <div class="tl-card dark">
+        <img src="https://www.getanchor.co/images/anchor-logo-white.svg" alt="Anchor" onerror="this.onerror=null;this.src='https://www.google.com/s2/favicons?domain=getanchor.co&sz=64';this.style.height='28px'"/>
+        <div class="tl-name">Anchor</div>
+        <div class="tl-role">Banking as a Service</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TEAM ═══════════════════════════════════════════════════ -->
+<section style="background:var(--off)" id="team">
+  <div class="section-inner">
+    <div class="section-center">
+      <div class="section-tag">Leadership</div>
+      <h2 class="section-h">The Team Behind Genesis360</h2>
+      <p class="section-sub">Operators who built this from the ground up — with skin in the game and deep roots in Nigeria's food economy.</p>
+    </div>
+    <div class="team-grid">
+      <div class="team-card">
+        <img src="team-zephaniah.jpg" alt="Zephaniah Morakinyo" class="team-photo"/>
+        <div>
+          <div class="team-name">Zephaniah Morakinyo</div>
+          <div class="team-role">Founder & CEO</div>
+          <p class="team-bio">Entrepreneur and systems thinker with deep roots in Nigeria's food and hospitality sector. Built Genesis360 to solve the capital access problem he witnessed firsthand — food businesses with potential but no pathway to growth financing.</p>
+        </div>
+      </div>
+      <div class="team-card">
+        <img src="team-mayowa.jpg" alt="Mayowa Akinmade" class="team-photo"/>
+        <div>
+          <div class="team-name">Mayowa Akinmade</div>
+          <div class="team-role">Co-Founder & COO</div>
+          <p class="team-bio">Operations lead with experience across fintech and food service industries. Responsible for cycle management, participant relations, and ensuring every Genesis360 deployment meets its structured timeline and repayment commitments.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOUNDER VIDEO ══════════════════════════════════════════ -->
+<section class="founder-bg">
+  <div class="section-inner">
+    <div class="founder-inner">
+      <div class="section-tag" style="background:rgba(199,255,74,0.12);border-color:rgba(199,255,74,0.2);color:#C7FF4A;margin:0 auto 16px">Founder Message</div>
+      <h2 class="section-h">Hear From Our Founder</h2>
+      <p class="section-sub">A message from the CEO on why Genesis360 exists and what we're building for Africa's food economy.</p>
+      <div class="video-wrap">
+        <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID" title="Genesis360 — Founder Message" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+      <a href="https://www.youtube.com/watch?v=YOUR_VIDEO_ID" target="_blank" class="btn-watch">
+        <span class="play-icon">
+          <svg width="8" height="10" viewBox="0 0 8 10" fill="white"><path d="M0 0l8 5-8 5V0z"/></svg>
+        </span>
+        Watch Founder Video
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ DASHBOARD PREVIEW ══════════════════════════════════════ -->
+<section>
+  <div class="section-inner">
+    <div class="section-center">
+      <div class="section-tag">Platform</div>
+      <h2 class="section-h">Your Investor Dashboard</h2>
+      <p class="section-sub">Full portfolio visibility — capital deployed, repayments tracked, returns earned. All in one place.</p>
+    </div>
+    <div class="dash-preview">
+      <div class="dash-header">
+        <span class="dash-title">Portfolio Overview</span>
+        <span class="dash-badge">Live Dashboard</span>
+      </div>
+      <div class="dash-grid">
+        <div class="dash-stat">
+          <div class="dash-stat-label">Capital Deployed</div>
+          <div class="dash-stat-val">$10,000</div>
+          <div class="dash-stat-sub">Active in Cycle 3</div>
+        </div>
+        <div class="dash-stat">
+          <div class="dash-stat-label">Total Earned</div>
+          <div class="dash-stat-val">$600</div>
+          <div class="dash-stat-sub">+$200 this quarter</div>
+        </div>
+        <div class="dash-stat">
+          <div class="dash-stat-label">Next Payout</div>
+          <div class="dash-stat-val">$200</div>
+          <div class="dash-stat-sub">Scheduled Q2 2026</div>
+        </div>
+        <div class="dash-stat">
+          <div class="dash-stat-label">Repayment Rate</div>
+          <div class="dash-stat-val">98%</div>
+          <div class="dash-stat-sub">Across portfolio</div>
+        </div>
+      </div>
+      <div class="dash-bar-section">
+        <div class="dash-bar-label"><span>Restaurant Portfolio</span><span style="color:#0F3D2E;font-weight:800">82%</span></div>
+        <div class="dash-bar-track"><div class="dash-bar-fill" style="width:82%"></div></div>
+        <div class="dash-bar-label"><span>Food Vendor Portfolio</span><span style="color:#0F3D2E;font-weight:800">67%</span></div>
+        <div class="dash-bar-track"><div class="dash-bar-fill" style="width:67%"></div></div>
+        <div class="dash-bar-label"><span>Supply Chain Portfolio</span><span style="color:#0F3D2E;font-weight:800">91%</span></div>
+        <div class="dash-bar-track"><div class="dash-bar-fill" style="width:91%"></div></div>
+        <div class="dash-tags">
+          <span class="dash-tag">Capital Protected</span>
+          <span class="dash-tag">Quarterly Payouts</span>
+          <span class="dash-tag">AI Monitored</span>
+          <span class="dash-tag">Real Asset Backed</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FINAL CTA ══════════════════════════════════════════════ -->
+<section class="cta-bg">
+  <div class="section-inner" style="position:relative;z-index:1">
+    <h2 class="section-h">Start Earning From Nigeria's Food Economy</h2>
+    <p class="section-sub">Join diaspora investors already earning 24% annual returns by financing real food businesses across Nigeria.</p>
+    <div class="cta-btns">
+      <a href="/register" class="btn-cta-primary">Join Investment Cycle</a>
+      <a href="#" class="btn-cta-ghost">Download Investor Brief</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ═════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-logo">
+        <img src="logo.png" onerror="this.style.display='none'" alt="Genesis360"/>
+        <p class="footer-tagline">Enabling diaspora investors to earn structured returns by financing Nigeria's essential food economy.</p>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Platform</div>
+        <a href="/register">Join a Cycle</a>
+        <a href="/login">Investor Login</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/about">About</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Company</div>
+        <a href="/about">About Us</a>
+        <a href="#team">The Team</a>
+        <a href="#traction">Traction</a>
+        <a href="#how-it-works">How It Works</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Legal</div>
+        <a href="#">Terms of Service</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Investment Risks</a>
+        <a href="#">Compliance</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2026 Genesis360. All rights reserved.</span>
+      <span class="footer-note">Investment involves risk. Past returns do not guarantee future results. Genesis360 operates as a structured lending platform. Returns are subject to borrower repayment performance.</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

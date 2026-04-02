@@ -1,0 +1,14 @@
+{
+  "name": "genesis360vest",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start":       "node serve.cjs",
+    "start:user":  "SERVICE=user node serve.cjs",
+    "start:admin": "SERVICE=admin node serve.cjs",
+    "dev":         "node serve.cjs"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

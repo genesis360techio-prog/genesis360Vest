@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Sign In — Genesis360</title>
+<script src="/tailwind.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/supabase-config.js"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: { sans: ['Inter','system-ui','sans-serif'] },
+      colors: {
+        brand: { 50:'#f2faf0',100:'#dff2d8',600:'#244f3c',700:'#1e4535',800:'#163428',900:'#0e2319' },
+        lime:  { 400:'#9dc43a',300:'#b8d95a' },
+        navy:  { 800:'#1e293b',900:'#0f172a' }
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  .spinner { display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col">
+
+<nav class="bg-navy-900 border-b border-white/10 px-4 py-3 flex items-center justify-between">
+  <a href="/preview.html">
+    <img src="logo.png" onerror="this.src='logo.svg'" alt="Genesis360" class="h-8 w-auto brightness-0 invert"/>
+  </a>
+  <a href="/preview.html" class="text-slate-400 hover:text-white text-sm transition-colors">← Back to home</a>
+</nav>
+
+<div class="flex-1 flex items-center justify-center px-4 py-12">
+  <div class="w-full max-w-md">
+
+    <!-- Sign in card -->
+    <div id="card-login" class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
+      <div class="mb-6">
+        <h1 class="text-2xl font-bold text-navy-900">Welcome back</h1>
+        <p class="text-slate-500 text-sm mt-1">Sign in to your Genesis360 account.</p>
+      </div>
+
+      <form onsubmit="doLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-navy-800 mb-1.5">Email Address</label>
+          <input id="l-email" type="email" placeholder="you@example.com" autocomplete="email"
+            class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-700 transition"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-navy-800 mb-1.5">Password</label>
+          <div class="relative">
+            <input id="l-password" type="password" placeholder="Your password" autocomplete="current-password"
+              class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-700 transition pr-10"/>
+            <button type="button" onclick="togglePw()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+              <svg id="eye-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+            </button>
+          </div>
+          <div class="flex justify-end mt-1">
+            <button type="button" onclick="showReset()" class="text-xs text-brand-700 hover:underline">Forgot password?</button>
+          </div>
+        </div>
+
+        <div id="login-error" class="hidden text-red-600 text-sm bg-red-50 border border-red-200 rounded-xl px-4 py-3"></div>
+        <div id="login-info" class="hidden text-blue-700 text-sm bg-blue-50 border border-blue-200 rounded-xl px-4 py-3"></div>
+
+        <button type="submit" id="login-btn"
+          class="w-full py-3.5 bg-brand-700 hover:bg-brand-600 text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2">
+          Sign In
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </button>
+      </form>
+      <p class="text-center text-xs text-slate-400 mt-5">Don't have an account? <a href="/register" class="text-brand-700 font-medium hover:underline">Create Account</a></p>
+    </div>
+
+    <!-- Reset password card -->
+    <div id="card-reset" class="hidden bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
+      <div class="mb-6">
+        <h2 class="text-xl font-bold text-navy-900">Reset Password</h2>
+        <p class="text-slate-500 text-sm mt-1">Enter your email and we'll send a reset link.</p>
+      </div>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-navy-800 mb-1.5">Email Address</label>
+          <input id="r-email" type="email" placeholder="you@example.com"
+            class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-700 transition"/>
+        </div>
+        <div id="reset-msg" class="hidden text-sm rounded-xl px-4 py-3"></div>
+        <button onclick="doReset()" id="reset-btn"
+          class="w-full py-3.5 bg-brand-700 hover:bg-brand-600 text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2">
+          Send Reset Link
+        </button>
+        <button onclick="showLogin()" class="w-full py-2.5 text-slate-400 hover:text-slate-600 text-sm font-medium transition-colors">
+          ← Back to Sign In
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let _sb = null
+function sb() {
+  if (!_sb) _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON)
+  return _sb
+}
+
+// Check if already logged in
+;(async () => {
+  try {
+    const { data: { session } } = await sb().auth.getSession()
+    if (session) window.location.href = '/dashboard'
+  } catch(e) { /* ignore */ }
+})()
+
+async function doLogin(e) {
+  e.preventDefault()
+  const email    = document.getElementById('l-email').value.trim()
+  const password = document.getElementById('l-password').value
+  const btn      = document.getElementById('login-btn')
+  const err      = document.getElementById('login-error')
+  const info     = document.getElementById('login-info')
+
+  err.classList.add('hidden')
+  info.classList.add('hidden')
+
+  if (!email || !password) {
+    err.textContent = 'Please enter your email and password.'
+    err.classList.remove('hidden')
+    return
+  }
+
+  btn.innerHTML = '<span class="spinner"></span> Signing in...'
+  btn.disabled  = true
+
+  const { data, error } = await sb().auth.signInWithPassword({ email, password })
+
+  if (error) {
+    const msg = error.message.includes('Invalid login') || error.message.includes('invalid_credentials')
+      ? 'Incorrect email or password. Please try again.'
+      : error.message.includes('Email not confirmed')
+        ? 'Please verify your email first. Check your inbox for the confirmation link.'
+        : error.message
+    err.textContent = msg
+    err.classList.remove('hidden')
+    btn.innerHTML = 'Sign In <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>'
+    btn.disabled = false
+    return
+  }
+
+  // Check if user has set a transaction PIN
+  const userId = data.user?.id || data.session?.user?.id
+  if (userId) {
+    const { data: prof } = await sb().from('profiles').select('transaction_pin').eq('id', userId).single()
+    if (!prof?.transaction_pin) {
+      window.location.href = '/setup-pin'
+      return
+    }
+  }
+  window.location.href = '/dashboard'
+}
+
+function togglePw() {
+  const inp  = document.getElementById('l-password')
+  const icon = document.getElementById('eye-icon')
+  const show = inp.type === 'password'
+  inp.type   = show ? 'text' : 'password'
+  icon.innerHTML = show
+    ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>'
+    : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>'
+}
+
+async function doReset() {
+  const email = document.getElementById('r-email').value.trim()
+  const msg   = document.getElementById('reset-msg')
+  const btn   = document.getElementById('reset-btn')
+  if (!email) { msg.textContent='Please enter your email.'; msg.className='text-sm rounded-xl px-4 py-3 bg-red-50 border border-red-200 text-red-600'; msg.classList.remove('hidden'); return }
+  btn.textContent = 'Sending...'
+  btn.disabled = true
+  await sb().auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + '/dashboard' })
+  msg.textContent = 'Reset link sent! Check your inbox.'
+  msg.className   = 'text-sm rounded-xl px-4 py-3 bg-green-50 border border-green-200 text-green-700'
+  msg.classList.remove('hidden')
+  btn.textContent = 'Send Reset Link'
+  btn.disabled = false
+}
+
+function showReset() {
+  document.getElementById('card-login').classList.add('hidden')
+  document.getElementById('card-reset').classList.remove('hidden')
+}
+function showLogin() {
+  document.getElementById('card-reset').classList.add('hidden')
+  document.getElementById('card-login').classList.remove('hidden')
+}
+</script>
+</body>
+</html>
