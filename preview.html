@@ -88,29 +88,33 @@ section{padding:96px 24px}
 .section-center .section-sub{margin:0 auto}
 
 /* ── INVESTMENT SNAPSHOT ── */
-.snap-bg{background:var(--off)}
+.snap-bg{background:#F3F3F3}
 .snap-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:56px}
-.snap-card{background:#fff;border:1px solid var(--border);border-radius:20px;padding:32px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s}
-.snap-card:hover{transform:translateY(-4px);box-shadow:0 20px 48px rgba(15,61,46,0.1)}
-.snap-card.featured{background:linear-gradient(145deg,#0F3D2E,#1a5c42);border:none}
-.snap-card-tag{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0F3D2E;background:rgba(15,61,46,0.08);border-radius:100px;padding:4px 12px;display:inline-block;margin-bottom:20px}
-.snap-card.featured .snap-card-tag{background:rgba(199,255,74,0.15);color:#C7FF4A}
-.snap-investment{font-size:2.5rem;font-weight:900;color:#0a2218;margin-bottom:4px}
-.snap-card.featured .snap-investment{color:#fff}
-.snap-label{font-size:.8rem;color:#9ca3af;font-weight:500;margin-bottom:28px}
-.snap-card.featured .snap-label{color:rgba(255,255,255,0.5)}
-.snap-rows{display:flex;flex-direction:column;gap:12px}
-.snap-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.05)}
-.snap-card.featured .snap-row{border-bottom-color:rgba(255,255,255,0.08)}
+@media(max-width:900px){.snap-cards{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.snap-cards{grid-template-columns:1fr}}
+.snap-card{background:#fff;border:2px solid #e5e7eb;border-radius:20px;padding:32px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;display:flex;flex-direction:column;gap:0}
+.snap-card:hover{transform:translateY(-4px);box-shadow:0 20px 48px rgba(30,74,67,0.1)}
+.snap-card.featured{background:#fff;border:2px solid #A9C83A;box-shadow:0 8px 32px rgba(169,200,58,0.15)}
+.snap-card-tag{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#1E4A43;background:rgba(30,74,67,0.08);border-radius:100px;padding:5px 14px;display:inline-block;margin-bottom:20px}
+.snap-card.featured .snap-card-tag{background:#A9C83A;color:#fff}
+.snap-investment{font-size:2.5rem;font-weight:900;color:#1E4A43;margin-bottom:4px}
+.snap-label{font-size:.8rem;color:#9ca3af;font-weight:500;margin-bottom:24px}
+.snap-rows{display:flex;flex-direction:column;gap:0;flex:1}
+.snap-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid rgba(0,0,0,0.06)}
 .snap-row:last-child{border:none}
 .snap-row-label{font-size:.8125rem;color:#6b7280}
-.snap-card.featured .snap-row-label{color:rgba(255,255,255,0.55)}
-.snap-row-val{font-size:.9375rem;font-weight:800;color:#0F3D2E}
-.snap-card.featured .snap-row-val{color:#C7FF4A}
-.snap-note{margin-top:48px;background:#fff;border:1px solid var(--border);border-radius:16px;padding:24px 28px;display:flex;align-items:flex-start;gap:16px}
-.snap-note-icon{width:40px;height:40px;border-radius:12px;background:rgba(15,61,46,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.25rem}
-.snap-note p{color:#374151;font-size:.9rem;line-height:1.65}
-.snap-note p strong{color:#0F3D2E}
+.snap-row-val{font-size:.9375rem;font-weight:800;color:#1E4A43}
+.snap-row-val.highlight{color:#A9C83A}
+.snap-row-val.big{font-size:1.0625rem}
+.snap-cta{display:block;width:100%;text-align:center;margin-top:24px;padding:13px;background:#A9C83A;color:#fff;font-weight:800;font-size:.9375rem;border-radius:12px;text-decoration:none;transition:all .2s}
+.snap-cta:hover{background:#8db030;transform:translateY(-1px)}
+.snap-max{text-align:center;margin-top:16px;font-size:.8125rem;color:#6b7280;font-weight:500}
+.snap-max strong{color:#1E4A43}
+.snap-note{margin-top:40px;background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:20px 24px;display:flex;align-items:flex-start;gap:14px}
+.snap-note-icon{width:38px;height:38px;border-radius:10px;background:rgba(30,74,67,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.125rem}
+.snap-note p{color:#374151;font-size:.875rem;line-height:1.65}
+.snap-note p strong{color:#1E4A43}
+.snap-disclaimer{text-align:center;margin-top:20px;font-size:.775rem;color:#9ca3af;line-height:1.6;max-width:620px;margin-left:auto;margin-right:auto}
 
 /* ── HOW IT WORKS ── */
 .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:56px;position:relative}
@@ -271,6 +275,7 @@ footer{background:#060f0a;padding:60px 24px 32px}
     <div class="nav-links">
       <a href="#how-it-works">How It Works</a>
       <a href="#returns">Returns</a>
+      <a href="#calculator">Calculator</a>
       <a href="#traction">Traction</a>
       <a href="#team">Team</a>
     </div>
@@ -298,7 +303,7 @@ footer{background:#060f0a;padding:60px 24px 32px}
       <p class="hero-sub">Genesis360 enables diaspora investors to fund profitable restaurants and food supply operations while earning 2% monthly returns with structured quarterly payouts.</p>
       <ul class="hero-bullets">
         <li>24% Target Annual Return</li>
-        <li>2% Monthly Earnings</li>
+        <li>2% Monthly Interest Rate</li>
         <li>Quarterly Profit & Capital Payouts</li>
         <li>Real Economy Asset Financing</li>
       </ul>
@@ -311,27 +316,26 @@ footer{background:#060f0a;padding:60px 24px 32px}
     <!-- Investment Snapshot Card -->
     <div class="hero-card">
       <div class="hero-card-header">
-        <span class="hero-card-title">Investment Snapshot</span>
+        <span class="hero-card-title">Investor Snapshot</span>
         <span class="hero-card-badge">Live Portfolio</span>
       </div>
-      <div class="hero-stat-grid">
-        <div class="hero-stat">
-          <div class="hero-stat-val">24%</div>
-          <div class="hero-stat-label">Annual Return</div>
+
+      <!-- 3-metric strip -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+        <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:18px 14px;text-align:center;transition:background .2s" onmouseover="this.style.background='rgba(199,255,74,0.07)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+          <div style="font-size:1.75rem;font-weight:900;color:#C7FF4A;line-height:1;margin-bottom:6px">24%</div>
+          <div style="font-size:.65rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:.07em;font-weight:600">Annual ROI</div>
         </div>
-        <div class="hero-stat">
-          <div class="hero-stat-val">2%</div>
-          <div class="hero-stat-label">Monthly Yield</div>
+        <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:18px 14px;text-align:center;transition:background .2s" onmouseover="this.style.background='rgba(199,255,74,0.07)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+          <div style="font-size:1.75rem;font-weight:900;color:#C7FF4A;line-height:1;margin-bottom:6px">2%</div>
+          <div style="font-size:.65rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:.07em;font-weight:600">Quarterly Payout</div>
         </div>
-        <div class="hero-stat">
-          <div class="hero-stat-val">Q</div>
-          <div class="hero-stat-label">Payouts</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-val">98%</div>
-          <div class="hero-stat-label">Repayment Rate</div>
+        <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:18px 14px;text-align:center;transition:background .2s" onmouseover="this.style.background='rgba(199,255,74,0.07)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+          <div style="font-size:1.75rem;font-weight:900;color:#C7FF4A;line-height:1;margin-bottom:6px">98%</div>
+          <div style="font-size:.65rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:.07em;font-weight:600">Repayment Rate</div>
         </div>
       </div>
+
       <div class="hero-divider"></div>
       <div class="hero-card-row">
         <span class="hero-card-row-label">Capital Protection</span>
@@ -343,7 +347,7 @@ footer{background:#060f0a;padding:60px 24px 32px}
       </div>
       <div class="hero-card-row">
         <span class="hero-card-row-label">Min. Investment</span>
-        <span class="hero-card-row-val lemon">$5,000</span>
+        <span class="hero-card-row-val lemon">$100</span>
       </div>
       <div class="hero-payout-bar">
         <span>Next Payout</span>
@@ -362,83 +366,106 @@ footer{background:#060f0a;padding:60px 24px 32px}
       <p class="section-sub">Your capital finances restaurant inventory and food supply chain operations, generating predictable returns on every deployment.</p>
     </div>
     <div class="snap-cards">
+
+      <!-- STARTER $500 -->
       <div class="snap-card">
         <span class="snap-card-tag">Starter</span>
-        <div class="snap-investment">$5,000</div>
-        <div class="snap-label">Entry investment</div>
+        <div class="snap-investment">$500</div>
+        <div class="snap-label">Min. $100 · Entry investment</div>
         <div class="snap-rows">
           <div class="snap-row">
-            <span class="snap-row-label">Monthly Return</span>
-            <span class="snap-row-val">$100</span>
+            <span class="snap-row-label">Est. Daily Earnings</span>
+            <span class="snap-row-val highlight">~$0.17 / day</span>
           </div>
           <div class="snap-row">
-            <span class="snap-row-label">Annual Return</span>
-            <span class="snap-row-val">$1,200</span>
+            <span class="snap-row-label">Quarterly Payout</span>
+            <span class="snap-row-val big">$141.84</span>
           </div>
           <div class="snap-row">
-            <span class="snap-row-label">Return Rate</span>
-            <span class="snap-row-val">24%</span>
+            <span class="snap-row-label">Est. Total Return (13 mo)</span>
+            <span class="snap-row-val">$567.36</span>
           </div>
           <div class="snap-row">
             <span class="snap-row-label">Payout Schedule</span>
             <span class="snap-row-val">Quarterly</span>
           </div>
+          <div class="snap-row">
+            <span class="snap-row-label">Structure</span>
+            <span class="snap-row-val">Principal + Interest</span>
+          </div>
         </div>
+        <a href="/register" class="snap-cta">Start Investing</a>
       </div>
 
+      <!-- MOST POPULAR $1,000 -->
       <div class="snap-card featured">
         <span class="snap-card-tag">⭐ Most Popular</span>
-        <div class="snap-investment">$10,000</div>
+        <div class="snap-investment">$1,000</div>
         <div class="snap-label">Growth investment</div>
         <div class="snap-rows">
           <div class="snap-row">
-            <span class="snap-row-label">Monthly Return</span>
-            <span class="snap-row-val">$200</span>
+            <span class="snap-row-label">Est. Daily Earnings</span>
+            <span class="snap-row-val highlight">~$0.35 / day</span>
           </div>
           <div class="snap-row">
-            <span class="snap-row-label">Annual Return</span>
-            <span class="snap-row-val">$2,400</span>
+            <span class="snap-row-label">Quarterly Payout</span>
+            <span class="snap-row-val big">$283.68</span>
           </div>
           <div class="snap-row">
-            <span class="snap-row-label">Return Rate</span>
-            <span class="snap-row-val">24%</span>
+            <span class="snap-row-label">Est. Total Return (13 mo)</span>
+            <span class="snap-row-val">$1,134.72</span>
           </div>
           <div class="snap-row">
             <span class="snap-row-label">Payout Schedule</span>
             <span class="snap-row-val">Quarterly</span>
           </div>
+          <div class="snap-row">
+            <span class="snap-row-label">Structure</span>
+            <span class="snap-row-val">Principal + Interest</span>
+          </div>
         </div>
+        <a href="/register" class="snap-cta">Start Investing</a>
       </div>
 
+      <!-- PREMIUM $2,000 -->
       <div class="snap-card">
         <span class="snap-card-tag">Premium</span>
-        <div class="snap-investment">$25,000</div>
-        <div class="snap-label">High-yield investment</div>
+        <div class="snap-investment">$2,000</div>
+        <div class="snap-label">Maximum investment</div>
         <div class="snap-rows">
           <div class="snap-row">
-            <span class="snap-row-label">Monthly Return</span>
-            <span class="snap-row-val">$500</span>
+            <span class="snap-row-label">Est. Daily Earnings</span>
+            <span class="snap-row-val highlight">~$0.69 / day</span>
           </div>
           <div class="snap-row">
-            <span class="snap-row-label">Annual Return</span>
-            <span class="snap-row-val">$6,000</span>
+            <span class="snap-row-label">Quarterly Payout</span>
+            <span class="snap-row-val big">$567.36</span>
           </div>
           <div class="snap-row">
-            <span class="snap-row-label">Return Rate</span>
-            <span class="snap-row-val">24%</span>
+            <span class="snap-row-label">Est. Total Return (13 mo)</span>
+            <span class="snap-row-val">$2,269.44</span>
           </div>
           <div class="snap-row">
             <span class="snap-row-label">Payout Schedule</span>
             <span class="snap-row-val">Quarterly</span>
           </div>
+          <div class="snap-row">
+            <span class="snap-row-label">Structure</span>
+            <span class="snap-row-val">Principal + Interest</span>
+          </div>
         </div>
+        <a href="/register" class="snap-cta">Start Investing</a>
       </div>
+
     </div>
+
+    <p class="snap-max">Minimum investment: <strong>$100</strong> &nbsp;·&nbsp; Maximum investment per investor: <strong>$2,000</strong></p>
 
     <div class="snap-note">
       <div class="snap-note-icon">🏦</div>
       <p>Your capital is deployed into <strong>vetted restaurants and food supply businesses</strong> across Nigeria. Each deployment is backed by structured lending agreements and tracked through our AI-powered repayment engine, ensuring capital recovery and investor returns on schedule.</p>
     </div>
+    <p class="snap-disclaimer">Returns are estimated based on a 2% monthly interest amortization model with quarterly payouts over a 13-month cycle. Payouts include both principal and interest. Past performance does not guarantee future results.</p>
   </div>
 </section>
 
@@ -547,6 +574,99 @@ footer{background:#060f0a;padding:60px 24px 32px}
     </div>
   </div>
 </section>
+
+<!-- ══ INVESTMENT CALCULATOR ══════════════════════════════════ -->
+<section id="calculator" style="background:#fff">
+  <div class="section-inner">
+    <div class="section-center">
+      <div class="section-tag">Calculator</div>
+      <h2 class="section-h">Investment Calculator</h2>
+      <p class="section-sub">Enter any amount to instantly see your estimated earnings based on our 2% monthly amortization model.</p>
+    </div>
+    <div style="max-width:680px;margin:48px auto 0;background:#F3F3F3;border-radius:24px;padding:40px;border:1px solid #e5e7eb">
+
+      <!-- Input -->
+      <div style="margin-bottom:28px">
+        <label style="display:block;font-size:.8rem;font-weight:700;color:#1E4A43;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">Investment Amount (USD)</label>
+        <div style="position:relative">
+          <span style="position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:1.25rem;font-weight:700;color:#1E4A43">$</span>
+          <input id="calc-input" type="number" min="100" max="2000" value="1000"
+            oninput="calcUpdate()"
+            style="width:100%;padding:16px 16px 16px 36px;font-size:1.5rem;font-weight:800;color:#1E4A43;border:2px solid #A9C83A;border-radius:14px;outline:none;background:#fff;box-sizing:border-box"/>
+        </div>
+        <input id="calc-slider" type="range" min="100" max="2000" step="50" value="1000"
+          oninput="document.getElementById('calc-input').value=this.value;calcUpdate()"
+          style="width:100%;margin-top:14px;accent-color:#A9C83A;cursor:pointer"/>
+        <div style="display:flex;justify-content:space-between;font-size:.75rem;color:#9ca3af;margin-top:4px">
+          <span>$100 min</span><span>$2,000 max</span>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px" id="calc-results">
+        <div style="background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:20px;text-align:center">
+          <div style="font-size:.68rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Daily Earnings</div>
+          <div id="calc-daily" style="font-size:1.5rem;font-weight:900;color:#1E4A43;line-height:1">$0.35</div>
+          <div style="font-size:.7rem;color:#A9C83A;font-weight:600;margin-top:4px">per day</div>
+        </div>
+        <div style="background:#1E4A43;border-radius:16px;padding:20px;text-align:center">
+          <div style="font-size:.68rem;font-weight:700;color:rgba(199,255,74,0.6);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Quarterly Payout</div>
+          <div id="calc-quarterly" style="font-size:1.5rem;font-weight:900;color:#C7FF4A;line-height:1">$283.68</div>
+          <div style="font-size:.7rem;color:rgba(255,255,255,0.5);font-weight:600;margin-top:4px">every 3 months</div>
+        </div>
+        <div style="background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:20px;text-align:center">
+          <div style="font-size:.68rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Total Return</div>
+          <div id="calc-total" style="font-size:1.5rem;font-weight:900;color:#1E4A43;line-height:1">$1,134.72</div>
+          <div style="font-size:.7rem;color:#A9C83A;font-weight:600;margin-top:4px">over 13 months</div>
+        </div>
+      </div>
+
+      <!-- Summary bar -->
+      <div style="background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div>
+          <div style="font-size:.75rem;color:#9ca3af;font-weight:500">Investment Summary</div>
+          <div style="font-size:.9rem;font-weight:700;color:#1E4A43;margin-top:2px">
+            <span id="calc-principal">$1,000</span> → <span id="calc-interest-earned" style="color:#A9C83A">+$134.72 interest</span>
+          </div>
+        </div>
+        <a href="/register" style="padding:12px 24px;background:#A9C83A;color:#fff;font-weight:800;font-size:.875rem;border-radius:10px;text-decoration:none;white-space:nowrap;transition:background .2s" onmouseover="this.style.background='#8db030'" onmouseout="this.style.background='#A9C83A'">Start Investing</a>
+      </div>
+
+      <p style="text-align:center;font-size:.72rem;color:#9ca3af;margin-top:16px;line-height:1.6">Based on 2% monthly interest, 13-month cycle, 1-month moratorium, quarterly amortized payouts.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+// Calculator logic — runs immediately when defined
+function calcUpdate() {
+  const inp    = document.getElementById('calc-input')
+  const slider = document.getElementById('calc-slider')
+  let P = parseFloat(inp.value) || 0
+  if (P < 0) P = 0
+  if (P > 2000) { P = 2000; inp.value = 2000 }
+  slider.value = P
+
+  const r   = 0.02
+  const n   = 12
+  const pmt = P > 0 ? P * r / (1 - Math.pow(1 + r, -n)) : 0
+  const quarterly = pmt * 3
+  const total     = pmt * 12
+  const interest  = total - P
+  const daily     = P > 0 ? interest / 390 : 0
+
+  document.getElementById('calc-daily').textContent     = '$' + daily.toFixed(2)
+  document.getElementById('calc-quarterly').textContent = '$' + quarterly.toFixed(2)
+  document.getElementById('calc-total').textContent     = '$' + total.toFixed(2)
+  document.getElementById('calc-principal').textContent = '$' + P.toLocaleString()
+  document.getElementById('calc-interest-earned').textContent = '+$' + interest.toFixed(2) + ' interest'
+}
+// Sync slider with typed input
+document.getElementById('calc-input').addEventListener('input', function() {
+  document.getElementById('calc-slider').value = this.value
+})
+calcUpdate()
+</script>
 
 <!-- ══ TRACTION ═══════════════════════════════════════════════ -->
 <section class="traction-bg" id="traction">
@@ -661,9 +781,9 @@ footer{background:#060f0a;padding:60px 24px 32px}
       <h2 class="section-h">Hear From Our Founder</h2>
       <p class="section-sub">A message from the CEO on why Genesis360 exists and what we're building for Africa's food economy.</p>
       <div class="video-wrap">
-        <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID" title="Genesis360 — Founder Message" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <iframe src="https://www.youtube.com/embed/9vV3BlL-8Wo" title="Genesis360 — Founder Message" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
       </div>
-      <a href="https://www.youtube.com/watch?v=YOUR_VIDEO_ID" target="_blank" class="btn-watch">
+      <a href="https://www.youtube.com/watch?v=9vV3BlL-8Wo" target="_blank" class="btn-watch">
         <span class="play-icon">
           <svg width="8" height="10" viewBox="0 0 8 10" fill="white"><path d="M0 0l8 5-8 5V0z"/></svg>
         </span>

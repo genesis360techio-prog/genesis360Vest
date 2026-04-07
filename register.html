@@ -51,14 +51,19 @@ tailwind.config = {
   <div class="w-full max-w-md">
 
     <!-- Step indicator -->
-    <div class="flex items-center justify-center gap-3 mb-8" id="step-indicators">
+    <div class="flex items-center justify-center gap-2 mb-8" id="step-indicators">
       <div id="dot-1" class="flex items-center gap-1.5">
         <div class="w-7 h-7 rounded-full bg-brand-700 text-white text-xs font-bold flex items-center justify-center">1</div>
         <span class="text-xs font-medium text-navy-900">Account</span>
       </div>
-      <div class="w-8 h-px bg-slate-300"></div>
+      <div class="w-6 h-px bg-slate-300"></div>
       <div id="dot-2" class="flex items-center gap-1.5">
         <div class="w-7 h-7 rounded-full bg-slate-200 text-slate-500 text-xs font-bold flex items-center justify-center">2</div>
+        <span class="text-xs font-medium text-slate-400">Verify</span>
+      </div>
+      <div class="w-6 h-px bg-slate-300"></div>
+      <div id="dot-3" class="flex items-center gap-1.5">
+        <div class="w-7 h-7 rounded-full bg-slate-200 text-slate-500 text-xs font-bold flex items-center justify-center">3</div>
         <span class="text-xs font-medium text-slate-400">Done</span>
       </div>
     </div>
@@ -135,27 +140,65 @@ tailwind.config = {
       </div>
     </div>
 
-    <!-- ── STEP 2: Success ──────────────────────────── -->
+    <!-- ── STEP 2: OTP Verification ──────────────────── -->
     <div id="step-2" class="step">
+      <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
+        <div class="text-center mb-6">
+          <div class="w-14 h-14 bg-brand-700/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-7 h-7 text-brand-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          </div>
+          <h2 class="text-xl font-bold text-navy-900 mb-1">Verify your email</h2>
+          <p class="text-slate-500 text-sm">We sent a 6-digit code to <strong id="otp-email-display" class="text-navy-800"></strong></p>
+        </div>
+
+        <!-- OTP input boxes -->
+        <div class="flex justify-center gap-3 mb-6" id="otp-boxes">
+          <input class="otp-box w-12 h-14 border-2 border-slate-200 rounded-xl text-center text-xl font-bold text-navy-900 focus:outline-none focus:border-brand-700 transition" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
+          <input class="otp-box w-12 h-14 border-2 border-slate-200 rounded-xl text-center text-xl font-bold text-navy-900 focus:outline-none focus:border-brand-700 transition" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
+          <input class="otp-box w-12 h-14 border-2 border-slate-200 rounded-xl text-center text-xl font-bold text-navy-900 focus:outline-none focus:border-brand-700 transition" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
+          <input class="otp-box w-12 h-14 border-2 border-slate-200 rounded-xl text-center text-xl font-bold text-navy-900 focus:outline-none focus:border-brand-700 transition" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
+          <input class="otp-box w-12 h-14 border-2 border-slate-200 rounded-xl text-center text-xl font-bold text-navy-900 focus:outline-none focus:border-brand-700 transition" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
+          <input class="otp-box w-12 h-14 border-2 border-slate-200 rounded-xl text-center text-xl font-bold text-navy-900 focus:outline-none focus:border-brand-700 transition" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
+        </div>
+
+        <div id="otp-error" class="hidden text-red-600 text-sm bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4 text-center"></div>
+
+        <button onclick="verifyOtp()" id="otp-verify-btn"
+          class="w-full py-3.5 bg-brand-700 hover:bg-brand-600 text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2 mb-4">
+          Verify Code
+        </button>
+
+        <div class="text-center">
+          <span class="text-slate-400 text-sm">Didn't receive it? </span>
+          <button id="otp-resend-btn" onclick="resendOtp()" class="text-brand-700 text-sm font-semibold hover:underline disabled:opacity-40 disabled:cursor-not-allowed">
+            Resend code
+          </button>
+          <span id="otp-countdown" class="text-slate-400 text-xs ml-1 hidden"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STEP 3: Success ────────────────────────── -->
+    <div id="step-3" class="step">
       <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm text-center">
         <div class="w-16 h-16 bg-lime-400/20 rounded-full flex items-center justify-center mx-auto mb-5">
           <svg class="w-8 h-8 text-brand-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
         </div>
-        <h2 class="text-xl font-bold text-navy-900 mb-2">You're registered!</h2>
-        <p id="success-msg" class="text-slate-500 text-sm leading-relaxed mb-6">Your account has been created. Check your email to verify and then sign in to your dashboard.</p>
-        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 mb-6 text-left space-y-2" id="success-checklist">
+        <h2 class="text-xl font-bold text-navy-900 mb-2">Email verified!</h2>
+        <p class="text-slate-500 text-sm leading-relaxed mb-6">Your account is ready. Set your transaction PIN to complete setup and access your dashboard.</p>
+        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 mb-6 text-left space-y-2">
           <div class="flex items-center gap-3 text-sm">
             <span class="w-5 h-5 rounded-full bg-lime-400 text-brand-900 flex items-center justify-center text-xs font-bold flex-shrink-0">✓</span>
             <span class="text-slate-700">Account created</span>
           </div>
-          <div id="success-email-row" class="flex items-center gap-3 text-sm">
-            <span class="w-5 h-5 rounded-full bg-yellow-400 text-brand-900 flex items-center justify-center text-xs font-bold flex-shrink-0">!</span>
-            <span class="text-slate-700">Check your email to verify your account</span>
+          <div class="flex items-center gap-3 text-sm">
+            <span class="w-5 h-5 rounded-full bg-lime-400 text-brand-900 flex items-center justify-center text-xs font-bold flex-shrink-0">✓</span>
+            <span class="text-slate-700">Email verified</span>
           </div>
         </div>
-        <a id="success-cta" href="/login"
+        <a href="/setup-pin"
           class="w-full inline-flex items-center justify-center py-3.5 bg-brand-700 hover:bg-brand-600 text-white font-semibold rounded-xl transition-all gap-2">
-          Sign In to Dashboard
+          Set Transaction PIN
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
         </a>
       </div>
@@ -191,8 +234,9 @@ function getClient() {
 function showStep(n) {
   document.querySelectorAll('.step').forEach(s => s.classList.remove('active'))
   document.getElementById('step-' + n).classList.add('active')
-  ;[1,2].forEach(i => {
-    const dot    = document.getElementById('dot-' + i)
+  ;[1,2,3].forEach(i => {
+    const dot = document.getElementById('dot-' + i)
+    if (!dot) return
     const circle = dot.querySelector('div')
     const label  = dot.querySelector('span')
     if (i < n) {
@@ -307,34 +351,133 @@ async function submitStep1(e) {
 
   notifyTelegram(`🆕 <b>New Registration</b>\nName: ${name}\nEmail: ${email}\nCountry: ${country}`)
 
-  // Send welcome email via Resend
-  fetch('/api/send-confirmation', {
+  // Send OTP email
+  const otpRes = await fetch('/api/register/send-otp', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, name })
-  }).catch(() => {}) // fire and forget
+  })
+  const otpData = await otpRes.json().catch(() => ({}))
 
-  showSuccessStep()
-}
-
-function showSuccessStep() {
-  const emailRow = document.getElementById('success-email-row')
-  const cta      = document.getElementById('success-cta')
-
-  if (hasSession) {
-    emailRow.classList.add('hidden')
-    cta.textContent = 'Set Transaction PIN →'
-    cta.href = '/setup-pin'
-  } else {
-    emailRow.classList.remove('hidden')
-    emailRow.innerHTML = '<span class="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">✉</span><span class="text-slate-700 font-medium">Check your inbox — verify your email to continue</span>'
-    cta.textContent = 'Waiting for email verification…'
-    cta.removeAttribute('href')
-    cta.style.opacity = '0.6'
-    cta.style.pointerEvents = 'none'
+  if (!otpRes.ok) {
+    showErr(err, otpData.error || 'Could not send verification email. Please try again.')
+    setBtn(btn, false, 'Create Account →')
+    return
   }
 
+  document.getElementById('otp-email-display').textContent = email
+  initOtpBoxes()
+  startResendCountdown()
   showStep(2)
+  setBtn(btn, false, 'Create Account →')
+}
+
+// ── OTP BOX KEYBOARD NAVIGATION ─────────────────────────
+function initOtpBoxes() {
+  const boxes = document.querySelectorAll('.otp-box')
+  boxes.forEach((box, i) => {
+    box.value = ''
+    box.oninput = () => {
+      box.value = box.value.replace(/[^0-9]/g, '').slice(-1)
+      if (box.value && i < boxes.length - 1) boxes[i + 1].focus()
+    }
+    box.onkeydown = (e) => {
+      if (e.key === 'Backspace' && !box.value && i > 0) boxes[i - 1].focus()
+      if (e.key === 'Enter') verifyOtp()
+    }
+    box.onpaste = (e) => {
+      e.preventDefault()
+      const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '')
+      boxes.forEach((b, j) => { b.value = pasted[j] || '' })
+      boxes[Math.min(pasted.length, boxes.length - 1)].focus()
+    }
+  })
+  boxes[0].focus()
+}
+
+// ── VERIFY OTP ───────────────────────────────────────────
+async function verifyOtp() {
+  const boxes = document.querySelectorAll('.otp-box')
+  const otp   = Array.from(boxes).map(b => b.value).join('')
+  const err   = document.getElementById('otp-error')
+  const btn   = document.getElementById('otp-verify-btn')
+  err.classList.add('hidden')
+
+  if (otp.length < 6) {
+    err.textContent = 'Please enter all 6 digits.'
+    err.classList.remove('hidden')
+    return
+  }
+
+  btn.disabled = true
+  btn.innerHTML = '<span class="spinner"></span> Verifying…'
+
+  const email = document.getElementById('otp-email-display').textContent
+  const res   = await fetch('/api/register/verify-otp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, otp })
+  })
+  const data = await res.json().catch(() => ({}))
+
+  if (!res.ok) {
+    err.textContent = data.error || 'Verification failed. Please try again.'
+    err.classList.remove('hidden')
+    boxes.forEach(b => { b.value = ''; b.classList.add('border-red-400') })
+    setTimeout(() => boxes.forEach(b => b.classList.remove('border-red-400')), 1200)
+    boxes[0].focus()
+    btn.disabled = false
+    btn.textContent = 'Verify Code'
+    return
+  }
+
+  showStep(3)
+}
+
+// ── RESEND OTP ───────────────────────────────────────────
+let _resendTimer = null
+
+async function resendOtp() {
+  const email = document.getElementById('otp-email-display').textContent
+  const btn   = document.getElementById('otp-resend-btn')
+  const err   = document.getElementById('otp-error')
+  err.classList.add('hidden')
+  btn.disabled = true
+
+  const res  = await fetch('/api/register/send-otp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email })
+  })
+
+  if (!res.ok) {
+    err.textContent = 'Failed to resend code. Please wait a moment.'
+    err.classList.remove('hidden')
+    btn.disabled = false
+    return
+  }
+
+  initOtpBoxes()
+  startResendCountdown()
+}
+
+function startResendCountdown() {
+  const btn       = document.getElementById('otp-resend-btn')
+  const countdown = document.getElementById('otp-countdown')
+  btn.disabled = true
+  countdown.classList.remove('hidden')
+  let secs = 30
+  countdown.textContent = `(${secs}s)`
+  clearInterval(_resendTimer)
+  _resendTimer = setInterval(() => {
+    secs--
+    countdown.textContent = `(${secs}s)`
+    if (secs <= 0) {
+      clearInterval(_resendTimer)
+      btn.disabled = false
+      countdown.classList.add('hidden')
+    }
+  }, 1000)
 }
 
 // ── HELPERS ─────────────────────────────────────────────

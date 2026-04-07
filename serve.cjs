@@ -31,6 +31,9 @@ const GF_SUPABASE_URL     = 'https://tsnkgwmzokymokurkxjh.supabase.co'
 const GF_SUPABASE_SERVICE = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzbmtnd216b2t5bW9rdXJreGpoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTEyNzk0NCwiZXhwIjoyMDkwNzAzOTQ0fQ.ACo8ILY9hM04R0Uutqxv4kgXHx-CSvoKPUKtge7zGz8'
 const RESEND_API_KEY        = 're_CQRa5sK8_HoUPSouk2uZ41MahFwCLAbaA'
 
+// ── In-memory OTP store for registration ─────────────────────
+const _regOtpStore = new Map() // email → { otp, expires, attempts }
+
 // ── Read raw POST body (string — needed for webhook sig) ──────
 function readRawBody(req, cb) {
   let body = ''
@@ -188,6 +191,69 @@ function handleAPI(req, url, rawUrl, res) {
       if (err) { res.writeHead(500, cors); res.end(JSON.stringify({ error: 'Verification failed' })); return }
       res.writeHead(200, cors)
       res.end(JSON.stringify(data))
+    })
+    return true
+  }
+
+  // ── POST /api/register/send-otp  — generate & email 6-digit OTP ──
+  if (req.method === 'POST' && url === '/api/register/send-otp') {
+    readBody(req, (err, body) => {
+      if (err) { res.writeHead(400, cors); res.end(JSON.stringify({ error: 'Bad request' })); return }
+      const { email, name } = body
+      if (!email) { res.writeHead(400, cors); res.end(JSON.stringify({ error: 'Email required' })); return }
+      const otp = String(Math.floor(100000 + Math.random() * 900000))
+      const expires = Date.now() + 10 * 60 * 1000 // 10 min
+      _regOtpStore.set(email.toLowerCase(), { otp, expires, attempts: 0 })
+      const firstName = (name || 'there').split(' ')[0]
+      const html = `<div style="font-family:Inter,Arial,sans-serif;max-width:520px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e2e8f0">
+        <div style="background:#0F3D2E;padding:28px 32px;text-align:center">
+          <h1 style="color:#ffffff;font-size:22px;font-weight:800;margin:0">Genesis<span style="color:#C7FF4A">360</span></h1>
+          <p style="color:rgba(255,255,255,0.5);font-size:12px;margin:4px 0 0">Investor Platform</p>
+        </div>
+        <div style="padding:36px 32px;text-align:center">
+          <h2 style="color:#0a2218;font-size:20px;font-weight:700;margin:0 0 8px">Verify your email</h2>
+          <p style="color:#6b7280;font-size:14px;margin:0 0 28px">Hi ${firstName}, use the code below to verify your Genesis360 account.</p>
+          <div style="background:#f3f4f6;border-radius:12px;padding:24px;margin:0 auto 24px;max-width:240px">
+            <div style="font-size:40px;font-weight:900;letter-spacing:12px;color:#0F3D2E;line-height:1">${otp}</div>
+            <p style="color:#9ca3af;font-size:11px;margin:10px 0 0;text-transform:uppercase;letter-spacing:.06em">Expires in 10 minutes</p>
+          </div>
+          <p style="color:#9ca3af;font-size:12px">If you did not create this account, ignore this email.</p>
+        </div>
+        <div style="background:#f9fafb;padding:18px 32px;text-align:center;border-top:1px solid #f0f0f0">
+          <p style="color:#9ca3af;font-size:11px;margin:0">&copy; 2026 Genesis360. Nigeria.</p>
+        </div>
+      </div>`
+      sendEmail(email, 'Genesis360 — Your verification code', html, (sendErr) => {
+        if (sendErr) { res.writeHead(500, cors); res.end(JSON.stringify({ error: 'Failed to send OTP email' })); return }
+        res.writeHead(200, cors); res.end(JSON.stringify({ ok: true }))
+      })
+    })
+    return true
+  }
+
+  // ── POST /api/register/verify-otp  — validate OTP ──────────────
+  if (req.method === 'POST' && url === '/api/register/verify-otp') {
+    readBody(req, (err, body) => {
+      if (err) { res.writeHead(400, cors); res.end(JSON.stringify({ error: 'Bad request' })); return }
+      const { email, otp } = body
+      if (!email || !otp) { res.writeHead(400, cors); res.end(JSON.stringify({ error: 'Missing fields' })); return }
+      const key = email.toLowerCase()
+      const record = _regOtpStore.get(key)
+      if (!record) { res.writeHead(400, cors); res.end(JSON.stringify({ error: 'No OTP found. Please resend.' })); return }
+      if (Date.now() > record.expires) {
+        _regOtpStore.delete(key)
+        res.writeHead(400, cors); res.end(JSON.stringify({ error: 'OTP expired. Please request a new one.' })); return
+      }
+      record.attempts = (record.attempts || 0) + 1
+      if (record.attempts > 5) {
+        _regOtpStore.delete(key)
+        res.writeHead(429, cors); res.end(JSON.stringify({ error: 'Too many attempts. Please register again.' })); return
+      }
+      if (otp.trim() !== record.otp) {
+        res.writeHead(400, cors); res.end(JSON.stringify({ error: 'Incorrect code. Please try again.' })); return
+      }
+      _regOtpStore.delete(key)
+      res.writeHead(200, cors); res.end(JSON.stringify({ ok: true }))
     })
     return true
   }
@@ -608,3 +674,28 @@ else                                        console.log('  ✅ Telegram configur
 if (ANTHROPIC_API_KEY.includes('REPLACE'))  console.log('  ⚠️  ANTHROPIC_API_KEY  not set — AI scoring disabled')
 else                                        console.log('  ✅ Claude AI configured')
 console.log('')
+
+// ── Vercel serverless export ──────────────────────────────────
+if (require.main !== module) {
+  module.exports = (req, res) => {
+    const rawUrl = req.url || '/'
+    let url = rawUrl.split('?')[0].split('#')[0]
+    if (url !== '/' && url.endsWith('/')) url = url.slice(0, -1)
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204, { 'Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'GET,POST','Access-Control-Allow-Headers':'Content-Type' })
+      res.end(); return
+    }
+    if (url.startsWith('/api/') && handleAPI(req, url, rawUrl, res)) return
+    const mapped   = USER_ROUTES[url]
+    const filePath = mapped ? path.resolve(DIR, mapped) : path.resolve(DIR, url.slice(1))
+    fs.readFile(filePath, (err, data) => {
+      if (err) { res.writeHead(404, {'Content-Type':'text/plain'}); res.end('Not found'); return }
+      const ext     = path.extname(filePath)
+      const type    = mime[ext] || 'text/plain'
+      const headers = { 'Content-Type': type }
+      if (ext === '.html') { headers['Cache-Control'] = 'no-store, no-cache, must-revalidate' }
+      res.writeHead(200, headers)
+      res.end(data)
+    })
+  }
+}
