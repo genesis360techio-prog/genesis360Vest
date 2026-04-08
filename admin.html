@@ -170,6 +170,11 @@ body{font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased
         <svg class="w-4 h-4 flex-shrink-0 nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
         Participants
       </a>
+      <a href="#" onclick="return showPage('kyc')" class="sidebar-link" id="nav-kyc" style="position:relative">
+        <svg class="w-4 h-4 flex-shrink-0 nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        KYC Review
+        <span id="kyc-count-badge" class="hidden" style="margin-left:auto;background:#dc2626;color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px;min-width:20px;text-align:center"></span>
+      </a>
       <p class="nav-label mt-1">Cycles & Payments</p>
       <a href="#" onclick="return showPage('cycles')" class="sidebar-link" id="nav-cycles">
         <svg class="w-4 h-4 flex-shrink-0 nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
@@ -494,11 +499,52 @@ body{font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased
         </div>
       </div>
 
+      <!-- KYC REVIEW PAGE -->
+      <div id="page-kyc" class="fi hidden">
+        <div class="card p-5">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:gap">
+            <div>
+              <p class="font-semibold text-sm" style="color:#0f172a">KYC Submissions</p>
+              <p style="font-size:.75rem;color:#94a3b8;margin-top:2px">Review and approve or reject investor identity documents</p>
+            </div>
+            <select id="kyc-status-filter" onchange="filterKYC()" class="inp" style="width:auto;font-size:.8125rem">
+              <option value="">All Submissions</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+          <div style="overflow-x:auto">
+            <table style="width:100%;border-collapse:collapse;font-size:.8125rem">
+              <thead>
+                <tr style="border-bottom:1px solid #f1f5f9">
+                  <th style="text-align:left;padding:8px 12px;font-size:.7rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em">Participant</th>
+                  <th style="text-align:left;padding:8px 12px;font-size:.7rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em">Document</th>
+                  <th style="text-align:left;padding:8px 12px;font-size:.7rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em">Status</th>
+                  <th style="text-align:left;padding:8px 12px;font-size:.7rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em">Submitted</th>
+                  <th style="text-align:left;padding:8px 12px;font-size:.7rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="kyc-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
     </div>
   </main>
 </div>
 
 <!-- MODALS -->
+<div id="modal-kyc" class="hidden mbk" onclick="closeModal('modal-kyc')">
+  <div class="mbox" onclick="event.stopPropagation()">
+    <div class="flex items-start justify-between mb-5">
+      <h2 class="text-lg font-bold" style="color:#0f172a">KYC Review</h2>
+      <button onclick="closeModal('modal-kyc')" class="p-1 rounded-lg" style="color:#94a3b8"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div id="modal-kyc-content"></div>
+  </div>
+</div>
 <div id="modal-investor" class="hidden mbk" onclick="closeModal('modal-investor')">
   <div class="mbox" onclick="event.stopPropagation()">
     <div class="flex items-start justify-between mb-5">
@@ -910,14 +956,14 @@ function filterKYC() {
 function renderKYCTable(list) {
   const tbody = document.getElementById('kyc-tbody')
   if (!list.length) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-10" style="color:#94a3b8">No documents found.</td></tr>'; return }
-  tbody.innerHTML = list.map(k => `<tr>
-    <td><p style="font-weight:600;color:#0f172a;font-size:.8125rem">${k.profiles?.full_name||'—'}</p><p style="font-size:.75rem;color:#94a3b8">${k.profiles?.email||''}</p></td>
-    <td style="color:#64748b;text-transform:capitalize;font-size:.8125rem">${(k.document_type||'').replace('_',' ')}</td>
-    <td style="color:#94a3b8;font-size:.75rem">${new Date(k.created_at).toLocaleDateString()}</td>
-    <td><span class="badge badge-${k.status}">${k.status}</span></td>
-    <td style="display:flex;gap:12px;align-items:center">
-      <button onclick="reviewKYC('${k.id}')" style="color:#1e4535;font-weight:600;font-size:.75rem;background:none;border:none;cursor:pointer">Review</button>
-      <button onclick="viewKYCDoc('${k.file_url}')" style="color:#94a3b8;font-size:.75rem;background:none;border:none;cursor:pointer">View ↗</button>
+  tbody.innerHTML = list.map(k => `<tr style="border-bottom:1px solid #f1f5f9">
+    <td style="padding:10px 12px"><p style="font-weight:600;color:#0f172a;font-size:.8125rem">${k.profiles?.full_name||'—'}</p><p style="font-size:.75rem;color:#94a3b8">${k.profiles?.email||''}</p></td>
+    <td style="padding:10px 12px;color:#64748b;text-transform:capitalize;font-size:.8125rem">${(k.document_type||'—').replace(/_/g,' ')}</td>
+    <td style="padding:10px 12px"><span class="badge badge-${k.status}">${k.status}</span></td>
+    <td style="padding:10px 12px;color:#94a3b8;font-size:.75rem">${new Date(k.created_at).toLocaleDateString()}</td>
+    <td style="padding:10px 12px;display:flex;gap:10px;align-items:center">
+      <button onclick="reviewKYC('${k.id}')" style="padding:5px 12px;background:#1e4535;color:#fff;font-weight:600;font-size:.75rem;border-radius:7px;border:none;cursor:pointer">Review</button>
+      <button onclick="viewKYCDoc('${k.file_url}')" style="padding:5px 10px;background:#f1f5f9;color:#64748b;font-size:.75rem;border-radius:7px;border:none;cursor:pointer">View ↗</button>
     </td>
   </tr>`).join('')
 }
@@ -1331,7 +1377,7 @@ async function renderReferrals() {
     </div>`).join('')
 }
 
-const pageLabels={overview:'Overview',investors:'Participants',cycles:'Funding Cycles',payouts:'Payouts',notify:'Notifications',transactions:'Transactions',funnel:'Funnel Analytics',leaderboard:'Leaderboard',referrals:'Referral Analytics','investor-intel':'Investor Intelligence'}
+const pageLabels={overview:'Overview',investors:'Participants',kyc:'KYC Review',cycles:'Funding Cycles',payouts:'Payouts',notify:'Notifications',transactions:'Transactions',funnel:'Funnel Analytics',leaderboard:'Leaderboard',referrals:'Referral Analytics','investor-intel':'Investor Intelligence'}
 function showPage(p) {
   Object.keys(pageLabels).forEach(k=>{
     document.getElementById('page-'+k)?.classList.add('hidden')
@@ -1340,7 +1386,7 @@ function showPage(p) {
   document.getElementById('page-'+p)?.classList.remove('hidden')
   document.getElementById('nav-'+p)?.classList.add('active')
   document.getElementById('page-title').textContent=pageLabels[p]||p
-  const subs={overview:'Genesis360 Admin Console',investors:'All registered participants',cycles:'Manage funding cycles',payouts:'Payout schedule & status',notify:'Broadcast messages to participants',transactions:'All platform transactions',funnel:'User conversion analytics',leaderboard:'Top participants by activity',referrals:'Referral programme analytics','investor-intel':'Loan ecosystem performance for diaspora investors'}
+  const subs={overview:'Genesis360 Admin Console',investors:'All registered participants',kyc:'Approve or reject investor identity submissions',cycles:'Manage funding cycles',payouts:'Payout schedule & status',notify:'Broadcast messages to participants',transactions:'All platform transactions',funnel:'User conversion analytics',leaderboard:'Top participants by activity',referrals:'Referral programme analytics','investor-intel':'Loan ecosystem performance for diaspora investors'}
   if (p==='investor-intel') { const fr=document.getElementById('intel_iframe'); if (!fr.src) fr.src='/investor-intelligence'; }
   document.getElementById('page-sub').textContent=subs[p]||'Genesis360 Admin Console'
   // Page-specific action button

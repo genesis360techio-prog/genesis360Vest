@@ -882,7 +882,7 @@ function renderSidebar(){
   const ini=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'?';
   set('sb-avatar',ini); set('sb-name',name);
   const kyc=profile?.kyc_status||'pending';
-  setH('sb-kyc',kyc==='approved'?'<span style="color:#9DC43A;font-size:11px">✓ KYC Verified</span>':kyc==='rejected'?'<span style="color:#ef4444;font-size:11px">✗ KYC Rejected</span>':'<span style="color:#f59e0b;font-size:11px">⏳ KYC Pending</span>');
+  setH('sb-kyc',kyc==='approved'?'<span style="color:#9DC43A;font-size:11px">✓ KYC Verified</span>':kyc==='rejected'?'<a onclick="openKycModal()" href="javascript:void(0)" style="color:#ef4444;font-size:11px;text-decoration:none;cursor:pointer">✗ KYC Rejected — Resubmit →</a>':'<a onclick="openKycModal()" href="javascript:void(0)" style="color:#f59e0b;font-size:11px;text-decoration:none;cursor:pointer">⏳ KYC Pending — Complete →</a>');
   const unread=notifs.filter(n=>!n.read).length;
   const nc=document.getElementById('notif-count'),nd=document.getElementById('notif-dot');
   if(unread>0){if(nc){nc.textContent=unread;nc.style.display='';}if(nd)nd.style.display='';}

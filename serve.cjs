@@ -111,7 +111,7 @@ function telegramSend(text, cb) {
 
 // ── Resend email helper ───────────────────────────────────────
 function sendEmail(to, subject, html, cb) {
-  const body = JSON.stringify({ from: 'Genesis360 <noreply@global-genesis360.com>', to: [to], subject, html })
+  const body = JSON.stringify({ from: 'Genesis360 <noreply@genesis360vest.com>', to: [to], subject, html })
   const options = {
     hostname: 'api.resend.com',
     path:     '/emails',
@@ -121,7 +121,13 @@ function sendEmail(to, subject, html, cb) {
   const req = https.request(options, res => {
     let data = ''
     res.on('data', d => data += d)
-    res.on('end', () => { try { cb(null, JSON.parse(data)) } catch(e) { cb(e) } })
+    res.on('end', () => {
+      try {
+        const result = JSON.parse(data)
+        console.log('Resend response:', res.statusCode, JSON.stringify(result))
+        if (res.statusCode >= 400) { cb(new Error(result.message || 'Resend error ' + res.statusCode)) } else { cb(null, result) }
+      } catch(e) { cb(e) }
+    })
   })
   req.on('error', e => { console.error('Resend error:', e.message); if (cb) cb(e) })
   req.write(body)
