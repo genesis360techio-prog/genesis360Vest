@@ -436,18 +436,16 @@ async function verifyOtp() {
     return
   }
 
-  // Sign in to establish a fresh session before going to setup-pin
+  // If server returned a magic link, redirect through Supabase auth to get a real session
+  if (data.actionLink) {
+    window.location.href = data.actionLink
+    return
+  }
+
+  // Fallback: try signInWithPassword
   if (registeredEmail && registeredPass) {
-    // Small delay to ensure Supabase processes the email confirmation
-    await new Promise(r => setTimeout(r, 800))
-    const { data: signInData, error: signInErr } = await getClient().auth.signInWithPassword({
-      email: registeredEmail, password: registeredPass
-    })
-    if (signInErr || !signInData?.session) {
-      // Retry once more after another short wait
-      await new Promise(r => setTimeout(r, 1200))
-      await getClient().auth.signInWithPassword({ email: registeredEmail, password: registeredPass })
-    }
+    await new Promise(r => setTimeout(r, 600))
+    await getClient().auth.signInWithPassword({ email: registeredEmail, password: registeredPass })
   }
 
   showStep(3)
