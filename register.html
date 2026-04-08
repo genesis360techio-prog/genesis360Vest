@@ -421,7 +421,7 @@ async function verifyOtp() {
   const res   = await fetch('/api/register/verify-otp', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, otp })
+    body: JSON.stringify({ email, otp, userId: registeredUserId })
   })
   const data = await res.json().catch(() => ({}))
 

@@ -241,7 +241,7 @@ function handleAPI(req, url, rawUrl, res) {
   if (req.method === 'POST' && url === '/api/register/verify-otp') {
     readBody(req, (err, body) => {
       if (err) { res.writeHead(400, cors); res.end(JSON.stringify({ error: 'Bad request' })); return }
-      const { email, otp } = body
+      const { email, otp, userId } = body
       if (!email || !otp) { res.writeHead(400, cors); res.end(JSON.stringify({ error: 'Missing fields' })); return }
       const key = email.toLowerCase()
       const record = _regOtpStore.get(key)
@@ -259,6 +259,27 @@ function handleAPI(req, url, rawUrl, res) {
         res.writeHead(400, cors); res.end(JSON.stringify({ error: 'Incorrect code. Please try again.' })); return
       }
       _regOtpStore.delete(key)
+
+      // Confirm user email in Supabase so signInWithPassword works
+      if (userId) {
+        const confirmBody = JSON.stringify({ email_confirm: true })
+        const opts = {
+          hostname: new URL(SUPABASE_URL).hostname,
+          path: `/auth/v1/admin/users/${userId}`,
+          method: 'PUT',
+          headers: {
+            'Authorization': 'Bearer ' + SUPABASE_SERVICE_ROLE,
+            'apikey': SUPABASE_SERVICE_ROLE,
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(confirmBody)
+          }
+        }
+        const confirmReq = https.request(opts, r => { r.resume() })
+        confirmReq.on('error', () => {})
+        confirmReq.write(confirmBody)
+        confirmReq.end()
+      }
+
       res.writeHead(200, cors); res.end(JSON.stringify({ ok: true }))
     })
     return true
