@@ -47,22 +47,22 @@ tailwind.config = {
   <a href="/preview.html" class="text-slate-400 hover:text-white text-sm transition-colors">← Back to home</a>
 </nav>
 
-<div class="flex-1 flex items-center justify-center px-4 py-12">
+<div class="flex-1 flex items-center justify-center px-3 py-6 sm:px-4 sm:py-12">
   <div class="w-full max-w-md">
 
     <!-- Step indicator -->
-    <div class="flex items-center justify-center gap-2 mb-8" id="step-indicators">
-      <div id="dot-1" class="flex items-center gap-1.5">
+    <div class="flex items-center justify-center gap-1.5 mb-8" id="step-indicators">
+      <div id="dot-1" class="flex items-center gap-1">
         <div class="w-7 h-7 rounded-full bg-brand-700 text-white text-xs font-bold flex items-center justify-center">1</div>
         <span class="text-xs font-medium text-navy-900">Account</span>
       </div>
-      <div class="w-6 h-px bg-slate-300"></div>
-      <div id="dot-2" class="flex items-center gap-1.5">
+      <div class="w-5 h-px bg-slate-300"></div>
+      <div id="dot-2" class="flex items-center gap-1">
         <div class="w-7 h-7 rounded-full bg-slate-200 text-slate-500 text-xs font-bold flex items-center justify-center">2</div>
         <span class="text-xs font-medium text-slate-400">Verify</span>
       </div>
-      <div class="w-6 h-px bg-slate-300"></div>
-      <div id="dot-3" class="flex items-center gap-1.5">
+      <div class="w-5 h-px bg-slate-300"></div>
+      <div id="dot-3" class="flex items-center gap-1">
         <div class="w-7 h-7 rounded-full bg-slate-200 text-slate-500 text-xs font-bold flex items-center justify-center">3</div>
         <span class="text-xs font-medium text-slate-400">Set PIN</span>
       </div>
@@ -70,7 +70,7 @@ tailwind.config = {
 
     <!-- ── STEP 1: Account details ───────────────────── -->
     <div id="step-1" class="step active">
-      <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-8 shadow-sm">
         <div class="mb-6">
           <h1 class="text-2xl font-bold text-navy-900">Create your account</h1>
           <p class="text-slate-500 text-sm mt-1">Position yourself for the next funding cycle.</p>
@@ -142,7 +142,7 @@ tailwind.config = {
 
     <!-- ── STEP 2: OTP Verification ──────────────────── -->
     <div id="step-2" class="step">
-      <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-8 shadow-sm">
         <div class="text-center mb-6">
           <div class="w-14 h-14 bg-brand-700/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg class="w-7 h-7 text-brand-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
@@ -152,13 +152,13 @@ tailwind.config = {
         </div>
 
         <!-- OTP input boxes -->
-        <div class="flex justify-center gap-3 mb-6" id="otp-boxes">
-          <input class="otp-box w-12 h-14 border-2 border-slate-200 rounded-xl text-center text-xl font-bold text-navy-900 focus:outline-none focus:border-brand-700 transition" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
-          <input class="otp-box w-12 h-14 border-2 border-slate-200 rounded-xl text-center text-xl font-bold text-navy-900 focus:outline-none focus:border-brand-700 transition" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
-          <input class="otp-box w-12 h-14 border-2 border-slate-200 rounded-xl text-center text-xl font-bold text-navy-900 focus:outline-none focus:border-brand-700 transition" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
-          <input class="otp-box w-12 h-14 border-2 border-slate-200 rounded-xl text-center text-xl font-bold text-navy-900 focus:outline-none focus:border-brand-700 transition" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
-          <input class="otp-box w-12 h-14 border-2 border-slate-200 rounded-xl text-center text-xl font-bold text-navy-900 focus:outline-none focus:border-brand-700 transition" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
-          <input class="otp-box w-12 h-14 border-2 border-slate-200 rounded-xl text-center text-xl font-bold text-navy-900 focus:outline-none focus:border-brand-700 transition" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
+        <div class="flex justify-center gap-2 sm:gap-3 mb-6" id="otp-boxes">
+          <input class="otp-box w-10 h-12 sm:w-12 sm:h-14 border-2 border-slate-200 rounded-xl text-center text-lg sm:text-xl font-bold text-navy-900 focus:outline-none focus:border-brand-700 transition" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
+          <input class="otp-box w-10 h-12 sm:w-12 sm:h-14 border-2 border-slate-200 rounded-xl text-center text-lg sm:text-xl font-bold text-navy-900 focus:outline-none focus:border-brand-700 transition" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
+          <input class="otp-box w-10 h-12 sm:w-12 sm:h-14 border-2 border-slate-200 rounded-xl text-center text-lg sm:text-xl font-bold text-navy-900 focus:outline-none focus:border-brand-700 transition" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
+          <input class="otp-box w-10 h-12 sm:w-12 sm:h-14 border-2 border-slate-200 rounded-xl text-center text-lg sm:text-xl font-bold text-navy-900 focus:outline-none focus:border-brand-700 transition" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
+          <input class="otp-box w-10 h-12 sm:w-12 sm:h-14 border-2 border-slate-200 rounded-xl text-center text-lg sm:text-xl font-bold text-navy-900 focus:outline-none focus:border-brand-700 transition" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
+          <input class="otp-box w-10 h-12 sm:w-12 sm:h-14 border-2 border-slate-200 rounded-xl text-center text-lg sm:text-xl font-bold text-navy-900 focus:outline-none focus:border-brand-700 transition" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
         </div>
 
         <div id="otp-error" class="hidden text-red-600 text-sm bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4 text-center"></div>
@@ -180,7 +180,7 @@ tailwind.config = {
 
     <!-- ── STEP 3: Set PIN ───────────────────────── -->
     <div id="step-3" class="step">
-      <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-8 shadow-sm">
         <div class="text-center mb-6">
           <div class="w-14 h-14 bg-lime-400/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg class="w-7 h-7 text-brand-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
@@ -223,7 +223,7 @@ tailwind.config = {
 
     <!-- ── STEP 4: All done ───────────────────────── -->
     <div id="step-4" class="step">
-      <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm text-center">
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-8 shadow-sm text-center">
         <div class="w-16 h-16 bg-lime-400/20 rounded-full flex items-center justify-center mx-auto mb-5">
           <svg class="w-8 h-8 text-brand-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
         </div>
