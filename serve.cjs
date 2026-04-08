@@ -29,7 +29,7 @@ const SUPABASE_SERVICE_ROLE = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJz
 // Supabase — Genesis360Finance (loan ecosystem data for investor intelligence)
 const GF_SUPABASE_URL     = 'https://tsnkgwmzokymokurkxjh.supabase.co'
 const GF_SUPABASE_SERVICE = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzbmtnd216b2t5bW9rdXJreGpoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTEyNzk0NCwiZXhwIjoyMDkwNzAzOTQ0fQ.ACo8ILY9hM04R0Uutqxv4kgXHx-CSvoKPUKtge7zGz8'
-const RESEND_API_KEY        = 're_CQRa5sK8_HoUPSouk2uZ41MahFwCLAbaA'
+const RESEND_API_KEY        = 're_NXDU3NRM_moBCWDH48nB6NiUkhKZpjjEo'
 
 // ── In-memory OTP store for registration ─────────────────────
 const _regOtpStore = new Map() // email → { otp, expires, attempts }
