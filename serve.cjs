@@ -288,6 +288,20 @@ function handleAPI(req, url, rawUrl, res) {
     return true
   }
 
+  // ── POST /api/set-pin  — save transaction PIN hash via service role ──
+  if (req.method === 'POST' && url === '/api/set-pin') {
+    readBody(req, (err, body) => {
+      if (err) { res.writeHead(400, cors); res.end(JSON.stringify({ error: 'Bad request' })); return }
+      const { userId, pinHash } = body
+      if (!userId || !pinHash) { res.writeHead(400, cors); res.end(JSON.stringify({ error: 'Missing fields' })); return }
+      supabaseReq('PATCH', 'profiles', 'id=eq.' + userId, { transaction_pin: pinHash }, (err2) => {
+        if (err2) { res.writeHead(500, cors); res.end(JSON.stringify({ error: 'Failed to save PIN' })); return }
+        res.writeHead(200, cors); res.end(JSON.stringify({ ok: true }))
+      })
+    })
+    return true
+  }
+
   // ── POST /api/send-confirmation  — send welcome email via Resend ──
   if (req.method === 'POST' && url === '/api/send-confirmation') {
     readBody(req, (err, body) => {

@@ -64,7 +64,7 @@ tailwind.config = {
       <div class="w-6 h-px bg-slate-300"></div>
       <div id="dot-3" class="flex items-center gap-1.5">
         <div class="w-7 h-7 rounded-full bg-slate-200 text-slate-500 text-xs font-bold flex items-center justify-center">3</div>
-        <span class="text-xs font-medium text-slate-400">Done</span>
+        <span class="text-xs font-medium text-slate-400">Set PIN</span>
       </div>
     </div>
 
@@ -178,28 +178,59 @@ tailwind.config = {
       </div>
     </div>
 
-    <!-- ── STEP 3: Success ────────────────────────── -->
+    <!-- ── STEP 3: Set PIN ───────────────────────── -->
     <div id="step-3" class="step">
+      <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
+        <div class="text-center mb-6">
+          <div class="w-14 h-14 bg-lime-400/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-7 h-7 text-brand-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          </div>
+          <h2 class="text-xl font-bold text-navy-900 mb-1">Set Your Transaction PIN</h2>
+          <p class="text-slate-500 text-sm">This 4-digit PIN secures all your transactions.</p>
+        </div>
+
+        <div id="pin-step-a">
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Enter PIN</label>
+          <div class="flex justify-center gap-3 mb-6" id="pin-boxes-1">
+            <input type="password" inputmode="numeric" maxlength="1" class="pin-box-r w-12 h-12 text-center text-xl font-bold border-2 border-slate-200 rounded-xl focus:border-brand-700 focus:outline-none" data-idx="0"/>
+            <input type="password" inputmode="numeric" maxlength="1" class="pin-box-r w-12 h-12 text-center text-xl font-bold border-2 border-slate-200 rounded-xl focus:border-brand-700 focus:outline-none" data-idx="1"/>
+            <input type="password" inputmode="numeric" maxlength="1" class="pin-box-r w-12 h-12 text-center text-xl font-bold border-2 border-slate-200 rounded-xl focus:border-brand-700 focus:outline-none" data-idx="2"/>
+            <input type="password" inputmode="numeric" maxlength="1" class="pin-box-r w-12 h-12 text-center text-xl font-bold border-2 border-slate-200 rounded-xl focus:border-brand-700 focus:outline-none" data-idx="3"/>
+          </div>
+          <button onclick="pinNext()" id="pin-next-btn" disabled
+            class="w-full py-3.5 bg-brand-700 hover:bg-brand-600 text-white font-semibold rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+            Continue →
+          </button>
+        </div>
+
+        <div id="pin-step-b" style="display:none">
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Confirm PIN</label>
+          <div class="flex justify-center gap-3 mb-4" id="pin-boxes-2">
+            <input type="password" inputmode="numeric" maxlength="1" class="pin-box-r2 w-12 h-12 text-center text-xl font-bold border-2 border-slate-200 rounded-xl focus:border-brand-700 focus:outline-none" data-idx="0"/>
+            <input type="password" inputmode="numeric" maxlength="1" class="pin-box-r2 w-12 h-12 text-center text-xl font-bold border-2 border-slate-200 rounded-xl focus:border-brand-700 focus:outline-none" data-idx="1"/>
+            <input type="password" inputmode="numeric" maxlength="1" class="pin-box-r2 w-12 h-12 text-center text-xl font-bold border-2 border-slate-200 rounded-xl focus:border-brand-700 focus:outline-none" data-idx="2"/>
+            <input type="password" inputmode="numeric" maxlength="1" class="pin-box-r2 w-12 h-12 text-center text-xl font-bold border-2 border-slate-200 rounded-xl focus:border-brand-700 focus:outline-none" data-idx="3"/>
+          </div>
+          <div id="pin-reg-err" class="hidden text-red-600 text-sm text-center mb-3"></div>
+          <button onclick="saveRegPin()" id="pin-save-btn" disabled
+            class="w-full py-3.5 bg-brand-700 hover:bg-brand-600 text-white font-semibold rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+            Set PIN & Go to Dashboard →
+          </button>
+          <button onclick="pinBack()" class="w-full mt-2 py-2 text-slate-500 text-sm hover:text-slate-700">← Back</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STEP 4: All done ───────────────────────── -->
+    <div id="step-4" class="step">
       <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm text-center">
         <div class="w-16 h-16 bg-lime-400/20 rounded-full flex items-center justify-center mx-auto mb-5">
           <svg class="w-8 h-8 text-brand-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
         </div>
-        <h2 class="text-xl font-bold text-navy-900 mb-2">Email verified!</h2>
-        <p class="text-slate-500 text-sm leading-relaxed mb-6">Your account is ready. Set your transaction PIN to complete setup and access your dashboard.</p>
-        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 mb-6 text-left space-y-2">
-          <div class="flex items-center gap-3 text-sm">
-            <span class="w-5 h-5 rounded-full bg-lime-400 text-brand-900 flex items-center justify-center text-xs font-bold flex-shrink-0">✓</span>
-            <span class="text-slate-700">Account created</span>
-          </div>
-          <div class="flex items-center gap-3 text-sm">
-            <span class="w-5 h-5 rounded-full bg-lime-400 text-brand-900 flex items-center justify-center text-xs font-bold flex-shrink-0">✓</span>
-            <span class="text-slate-700">Email verified</span>
-          </div>
-        </div>
-        <a href="/setup-pin"
-          class="w-full inline-flex items-center justify-center py-3.5 bg-brand-700 hover:bg-brand-600 text-white font-semibold rounded-xl transition-all gap-2">
-          Set Transaction PIN
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        <h2 class="text-xl font-bold text-navy-900 mb-2">You're all set!</h2>
+        <p class="text-slate-500 text-sm mb-6">Account created, email verified, PIN set. Sign in to access your dashboard.</p>
+        <a href="/login" class="w-full inline-flex items-center justify-center py-3.5 bg-brand-700 hover:bg-brand-600 text-white font-semibold rounded-xl transition-all">
+          Sign In to Dashboard →
         </a>
       </div>
     </div>
@@ -255,6 +286,102 @@ function showStep(n) {
       label.className = 'text-xs font-medium text-slate-400'
     }
   })
+  // Init PIN boxes when landing on step 3
+  if (n === 3) initRegPinBoxes()
+}
+
+// ── INLINE PIN SETUP ─────────────────────────────────────
+let _regPin1 = ''
+
+function initRegPinBoxes() {
+  document.querySelectorAll('.pin-box-r').forEach(inp => {
+    inp.value = ''
+    inp.addEventListener('input', e => {
+      e.target.value = e.target.value.replace(/\D/g,'').slice(0,1)
+      if (e.target.value) {
+        const next = document.querySelector(`.pin-box-r[data-idx="${+e.target.dataset.idx + 1}"]`)
+        if (next) next.focus()
+      }
+      document.getElementById('pin-next-btn').disabled =
+        [...document.querySelectorAll('.pin-box-r')].some(b => !b.value)
+    })
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !e.target.value) {
+        const prev = document.querySelector(`.pin-box-r[data-idx="${+e.target.dataset.idx - 1}"]`)
+        if (prev) { prev.value = ''; prev.focus() }
+      }
+    })
+  })
+  document.querySelectorAll('.pin-box-r2').forEach(inp => {
+    inp.value = ''
+    inp.addEventListener('input', e => {
+      e.target.value = e.target.value.replace(/\D/g,'').slice(0,1)
+      if (e.target.value) {
+        const next = document.querySelector(`.pin-box-r2[data-idx="${+e.target.dataset.idx + 1}"]`)
+        if (next) next.focus()
+      }
+      document.getElementById('pin-save-btn').disabled =
+        [...document.querySelectorAll('.pin-box-r2')].some(b => !b.value)
+    })
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !e.target.value) {
+        const prev = document.querySelector(`.pin-box-r2[data-idx="${+e.target.dataset.idx - 1}"]`)
+        if (prev) { prev.value = ''; prev.focus() }
+      }
+    })
+  })
+}
+
+function pinNext() {
+  _regPin1 = [...document.querySelectorAll('.pin-box-r')].map(b => b.value).join('')
+  document.getElementById('pin-step-a').style.display = 'none'
+  document.getElementById('pin-step-b').style.display = 'block'
+  document.getElementById('pin-reg-err').classList.add('hidden')
+  document.querySelectorAll('.pin-box-r2').forEach(b => { b.value = ''; })
+  document.getElementById('pin-save-btn').disabled = true
+  document.querySelector('.pin-box-r2[data-idx="0"]').focus()
+}
+
+function pinBack() {
+  document.getElementById('pin-step-b').style.display = 'none'
+  document.getElementById('pin-step-a').style.display = 'block'
+}
+
+async function hashPin(pin) {
+  const data = new TextEncoder().encode(pin + '_g360_txpin_v1')
+  const buf  = await crypto.subtle.digest('SHA-256', data)
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('')
+}
+
+async function saveRegPin() {
+  const pin2 = [...document.querySelectorAll('.pin-box-r2')].map(b => b.value).join('')
+  const errEl = document.getElementById('pin-reg-err')
+  if (pin2 !== _regPin1) {
+    errEl.textContent = 'PINs do not match. Try again.'
+    errEl.classList.remove('hidden')
+    document.querySelectorAll('.pin-box-r2').forEach(b => { b.value = ''; })
+    document.getElementById('pin-save-btn').disabled = true
+    document.querySelector('.pin-box-r2[data-idx="0"]').focus()
+    return
+  }
+  const btn = document.getElementById('pin-save-btn')
+  btn.disabled = true
+  btn.innerHTML = '<span class="spinner"></span> Saving...'
+  try {
+    const hash = await hashPin(_regPin1)
+    const res = await fetch('/api/set-pin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: registeredUserId, pinHash: hash })
+    })
+    if (!res.ok) throw new Error('Failed to save PIN')
+    showStep(4)
+  } catch(e) {
+    errEl.textContent = 'Could not save PIN. Please try again.'
+    errEl.classList.remove('hidden')
+    btn.disabled = false
+    btn.textContent = 'Set PIN & Go to Dashboard →'
+  }
 }
 
 // ── PASSWORD VALIDATION ──────────────────────────────────
@@ -434,19 +561,6 @@ async function verifyOtp() {
     btn.disabled = false
     btn.textContent = 'Verify Code'
     return
-  }
-
-  // Sign in and redirect to setup-pin with session tokens in hash
-  if (registeredEmail && registeredPass) {
-    await new Promise(r => setTimeout(r, 500))
-    const { data: signInData } = await getClient().auth.signInWithPassword({
-      email: registeredEmail, password: registeredPass
-    })
-    if (signInData?.session) {
-      const { access_token, refresh_token } = signInData.session
-      window.location.href = `/setup-pin#access_token=${access_token}&refresh_token=${refresh_token}&type=signup`
-      return
-    }
   }
 
   showStep(3)
