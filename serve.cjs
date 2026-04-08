@@ -260,7 +260,7 @@ function handleAPI(req, url, rawUrl, res) {
       }
       _regOtpStore.delete(key)
 
-      // Confirm user email in Supabase so signInWithPassword works
+      // Confirm user email in Supabase so signInWithPassword works, then respond
       if (userId) {
         const confirmBody = JSON.stringify({ email_confirm: true })
         const opts = {
@@ -274,13 +274,20 @@ function handleAPI(req, url, rawUrl, res) {
             'Content-Length': Buffer.byteLength(confirmBody)
           }
         }
-        const confirmReq = https.request(opts, r => { r.resume() })
-        confirmReq.on('error', () => {})
+        const confirmReq = https.request(opts, r => {
+          r.resume()
+          r.on('end', () => {
+            res.writeHead(200, cors); res.end(JSON.stringify({ ok: true }))
+          })
+        })
+        confirmReq.on('error', () => {
+          res.writeHead(200, cors); res.end(JSON.stringify({ ok: true }))
+        })
         confirmReq.write(confirmBody)
         confirmReq.end()
+      } else {
+        res.writeHead(200, cors); res.end(JSON.stringify({ ok: true }))
       }
-
-      res.writeHead(200, cors); res.end(JSON.stringify({ ok: true }))
     })
     return true
   }
