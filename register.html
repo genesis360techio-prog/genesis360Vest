@@ -378,15 +378,20 @@ async function saveRegPin() {
 
     // Auto sign-in so user lands on dashboard without re-entering credentials
     if (registeredEmail && registeredPass) {
-      const { data: sd } = await getClient().auth.signInWithPassword({
+      const { data: sd, error: signInErr } = await getClient().auth.signInWithPassword({
         email: registeredEmail, password: registeredPass
       })
       if (sd?.session) {
         window.location.href = '/dashboard'
         return
       }
+      // Show the actual error so we can diagnose
+      errEl.textContent = 'PIN saved! Sign-in error: ' + (signInErr?.message || 'no session returned') + ' | Email: ' + registeredEmail
+      errEl.classList.remove('hidden')
+      btn.disabled = false
+      btn.textContent = 'Retry'
+      return
     }
-    // Fallback if sign-in fails
     showStep(4)
   } catch(e) {
     errEl.textContent = 'Could not save PIN. Please try again.'
