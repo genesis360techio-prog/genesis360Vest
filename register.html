@@ -217,6 +217,8 @@ async function notifyTelegram(text) {
 // State — defined first so nothing can block them
 let registeredUserId = null
 let hasSession       = false  // true when email confirm is OFF and Supabase returns session on signUp
+let registeredEmail  = ''
+let registeredPass   = ''
 let sb               = null   // Supabase client — lazy init
 
 function getClient() {
@@ -326,6 +328,9 @@ async function submitStep1(e) {
   const client = getClient()
   if (!client) { setBtn(btn, false, 'Create Account →'); return }
 
+  registeredEmail = email
+  registeredPass  = password
+
   const { data, error } = await client.auth.signUp({
     email, password,
     options: {
@@ -429,6 +434,11 @@ async function verifyOtp() {
     btn.disabled = false
     btn.textContent = 'Verify Code'
     return
+  }
+
+  // Sign in to establish a fresh session before going to setup-pin
+  if (registeredEmail && registeredPass) {
+    await getClient().auth.signInWithPassword({ email: registeredEmail, password: registeredPass })
   }
 
   showStep(3)
