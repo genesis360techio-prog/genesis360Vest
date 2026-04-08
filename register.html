@@ -436,16 +436,17 @@ async function verifyOtp() {
     return
   }
 
-  // If server returned a magic link, redirect through Supabase auth to get a real session
-  if (data.actionLink) {
-    window.location.href = data.actionLink
-    return
-  }
-
-  // Fallback: try signInWithPassword
+  // Sign in and redirect to setup-pin with session tokens in hash
   if (registeredEmail && registeredPass) {
-    await new Promise(r => setTimeout(r, 600))
-    await getClient().auth.signInWithPassword({ email: registeredEmail, password: registeredPass })
+    await new Promise(r => setTimeout(r, 500))
+    const { data: signInData } = await getClient().auth.signInWithPassword({
+      email: registeredEmail, password: registeredPass
+    })
+    if (signInData?.session) {
+      const { access_token, refresh_token } = signInData.session
+      window.location.href = `/setup-pin#access_token=${access_token}&refresh_token=${refresh_token}&type=signup`
+      return
+    }
   }
 
   showStep(3)

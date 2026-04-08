@@ -182,17 +182,35 @@ async function savePin() {
 // ── Init ──────────────────────────────────────────────────────
 async function init() {
   try {
+    // Check for tokens passed in URL hash from registration flow
+    const hash = window.location.hash
+    if (hash && hash.includes('access_token=')) {
+      const params = new URLSearchParams(hash.replace('#', ''))
+      const access_token  = params.get('access_token')
+      const refresh_token = params.get('refresh_token')
+      if (access_token && refresh_token) {
+        const { data, error } = await sb().auth.setSession({ access_token, refresh_token })
+        if (!error && data.session) {
+          _session = data.session
+          // Clean URL
+          history.replaceState(null, '', '/setup-pin')
+          showForm()
+          return
+        }
+      }
+    }
+
+    // Check existing session in localStorage
     const { data: { session } } = await sb().auth.getSession()
     if (session) {
       _session = session
       showForm()
     } else {
-      // Wait for Supabase to process URL hash tokens (email confirm redirect)
       setTimeout(async () => {
         const { data: { session: s2 } } = await sb().auth.getSession()
         if (s2) { _session = s2; showForm() }
         else     { show('error-state') }
-      }, 1800)
+      }, 1500)
     }
   } catch(e) { show('error-state') }
 }

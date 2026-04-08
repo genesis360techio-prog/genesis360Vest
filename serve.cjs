@@ -260,44 +260,30 @@ function handleAPI(req, url, rawUrl, res) {
       }
       _regOtpStore.delete(key)
 
-      const sbHost = new URL(SUPABASE_URL).hostname
-      const sbHeaders = {
-        'Authorization': 'Bearer ' + SUPABASE_SERVICE_ROLE,
-        'apikey': SUPABASE_SERVICE_ROLE,
-        'Content-Type': 'application/json'
-      }
-
-      function supabaseAdminReq(method, path, body, cb) {
-        const bodyStr = body ? JSON.stringify(body) : ''
-        const hdrs = Object.assign({}, sbHeaders)
-        if (bodyStr) hdrs['Content-Length'] = Buffer.byteLength(bodyStr)
-        const req2 = https.request({ hostname: sbHost, path, method, headers: hdrs }, r => {
-          let d = ''
-          r.on('data', c => d += c)
-          r.on('end', () => { try { cb(null, JSON.parse(d)) } catch(e) { cb(null, {}) } })
+      // Confirm email via admin API, then respond
+      if (userId) {
+        const confirmBody = JSON.stringify({ email_confirm: true })
+        const opts = {
+          hostname: new URL(SUPABASE_URL).hostname,
+          path: `/auth/v1/admin/users/${userId}`,
+          method: 'PUT',
+          headers: {
+            'Authorization': 'Bearer ' + SUPABASE_SERVICE_ROLE,
+            'apikey': SUPABASE_SERVICE_ROLE,
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(confirmBody)
+          }
+        }
+        const confirmReq = https.request(opts, r => {
+          r.resume()
+          r.on('end', () => { res.writeHead(200, cors); res.end(JSON.stringify({ ok: true })) })
         })
-        req2.on('error', e => cb(e))
-        if (bodyStr) req2.write(bodyStr)
-        req2.end()
+        confirmReq.on('error', () => { res.writeHead(200, cors); res.end(JSON.stringify({ ok: true })) })
+        confirmReq.write(confirmBody)
+        confirmReq.end()
+      } else {
+        res.writeHead(200, cors); res.end(JSON.stringify({ ok: true }))
       }
-
-      // Step 1: confirm email
-      supabaseAdminReq('PUT', `/auth/v1/admin/users/${userId}`, { email_confirm: true }, (err1) => {
-        if (err1 || !userId) { res.writeHead(200, cors); res.end(JSON.stringify({ ok: true })); return }
-
-        // Step 2: generate magic link so client can get a real session
-        const origin = req.headers.origin || req.headers.referer || 'https://genesis360vest.com'
-        const host = origin.replace(/\/$/, '')
-        supabaseAdminReq('POST', '/auth/v1/admin/generate_link', {
-          type: 'magiclink',
-          email: email.toLowerCase(),
-          options: { redirect_to: host + '/setup-pin' }
-        }, (err2, linkData) => {
-          const actionLink = linkData?.action_link || null
-          res.writeHead(200, cors)
-          res.end(JSON.stringify({ ok: true, actionLink }))
-        })
-      })
     })
     return true
   }
