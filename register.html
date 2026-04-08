@@ -375,6 +375,18 @@ async function saveRegPin() {
       body: JSON.stringify({ userId: registeredUserId, pinHash: hash })
     })
     if (!res.ok) throw new Error('Failed to save PIN')
+
+    // Auto sign-in so user lands on dashboard without re-entering credentials
+    if (registeredEmail && registeredPass) {
+      const { data: sd } = await getClient().auth.signInWithPassword({
+        email: registeredEmail, password: registeredPass
+      })
+      if (sd?.session) {
+        window.location.href = '/dashboard'
+        return
+      }
+    }
+    // Fallback if sign-in fails
     showStep(4)
   } catch(e) {
     errEl.textContent = 'Could not save PIN. Please try again.'
