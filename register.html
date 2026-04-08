@@ -484,6 +484,13 @@ async function submitStep1(e) {
     return
   }
 
+  // Detect existing confirmed user — Supabase v2 returns empty identities array
+  if (data.user?.identities?.length === 0) {
+    showErr(err, 'An account with this email already exists. <a href="/login" class="underline font-semibold">Sign in instead →</a>')
+    setBtn(btn, false, 'Create Account <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>')
+    return
+  }
+
   registeredUserId = data.user?.id
   hasSession       = !!data.session   // session exists when email confirm is OFF
 
@@ -625,7 +632,7 @@ function startResendCountdown() {
 }
 
 // ── HELPERS ─────────────────────────────────────────────
-function showErr(el, msg) { el.textContent = msg; el.classList.remove('hidden') }
+function showErr(el, msg) { el.innerHTML = msg; el.classList.remove('hidden') }
 function setBtn(btn, disabled, html) { btn.disabled = disabled; btn.innerHTML = html }
 
 function friendlyError(msg) {
