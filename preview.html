@@ -592,7 +592,7 @@ footer{background:#060f0a;padding:60px 24px 32px}
     <div class="section-center">
       <div class="section-tag">Calculator</div>
       <h2 class="section-h">Investment Calculator</h2>
-      <p class="section-sub">Enter any amount to instantly see your estimated earnings based on our 2% monthly amortization model.</p>
+      <p class="section-sub">Enter any amount to instantly see your estimated earnings based on our 2.5% monthly amortization model.</p>
     </div>
     <div class="calc-card" style="max-width:680px;margin:48px auto 0;background:#F3F3F3;border-radius:24px;padding:40px;border:1px solid #e5e7eb">
 
@@ -616,19 +616,19 @@ footer{background:#060f0a;padding:60px 24px 32px}
       <!-- Results -->
       <div class="calc-results" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px" id="calc-results">
         <div style="background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:20px;text-align:center">
-          <div style="font-size:.68rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Daily Earnings</div>
-          <div id="calc-daily" style="font-size:1.5rem;font-weight:900;color:#1E4A43;line-height:1">$0.35</div>
-          <div style="font-size:.7rem;color:#A9C83A;font-weight:600;margin-top:4px">per day</div>
+          <div style="font-size:.68rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Total Interest</div>
+          <div id="calc-interest" style="font-size:1.5rem;font-weight:900;color:#1E4A43;line-height:1">$233.52</div>
+          <div style="font-size:.7rem;color:#A9C83A;font-weight:600;margin-top:4px">earned over 12 months</div>
         </div>
         <div style="background:#1E4A43;border-radius:16px;padding:20px;text-align:center">
           <div style="font-size:.68rem;font-weight:700;color:rgba(199,255,74,0.6);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Quarterly Payout</div>
-          <div id="calc-quarterly" style="font-size:1.5rem;font-weight:900;color:#C7FF4A;line-height:1">$283.68</div>
+          <div id="calc-quarterly" style="font-size:1.5rem;font-weight:900;color:#C7FF4A;line-height:1">$308.38</div>
           <div style="font-size:.7rem;color:rgba(255,255,255,0.5);font-weight:600;margin-top:4px">every 3 months</div>
         </div>
         <div style="background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:20px;text-align:center">
           <div style="font-size:.68rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Total Return</div>
-          <div id="calc-total" style="font-size:1.5rem;font-weight:900;color:#1E4A43;line-height:1">$1,134.72</div>
-          <div style="font-size:.7rem;color:#A9C83A;font-weight:600;margin-top:4px">over 13 months</div>
+          <div id="calc-total" style="font-size:1.5rem;font-weight:900;color:#1E4A43;line-height:1">$1,233.52</div>
+          <div style="font-size:.7rem;color:#A9C83A;font-weight:600;margin-top:4px">after 12 months</div>
         </div>
       </div>
 
@@ -643,36 +643,110 @@ footer{background:#060f0a;padding:60px 24px 32px}
         <a href="/register" style="padding:12px 24px;background:#A9C83A;color:#fff;font-weight:800;font-size:.875rem;border-radius:10px;text-decoration:none;white-space:nowrap;transition:background .2s" onmouseover="this.style.background='#8db030'" onmouseout="this.style.background='#A9C83A'">Start Investing</a>
       </div>
 
-      <p style="text-align:center;font-size:.72rem;color:#9ca3af;margin-top:16px;line-height:1.6">Based on 2% monthly interest, 13-month cycle, 1-month moratorium, quarterly amortized payouts.</p>
+      <!-- Amortization Table -->
+      <div style="margin-top:24px;overflow-x:auto">
+        <div style="font-size:.75rem;font-weight:700;color:#1E4A43;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Payment Schedule</div>
+        <table id="calc-table" style="width:100%;border-collapse:collapse;font-size:.8rem">
+          <thead>
+            <tr style="background:#1E4A43;color:#fff">
+              <th style="padding:10px 12px;text-align:left;border-radius:8px 0 0 0">Quarter</th>
+              <th style="padding:10px 12px;text-align:right">Payment</th>
+              <th style="padding:10px 12px;text-align:right">Interest</th>
+              <th style="padding:10px 12px;text-align:right">Principal</th>
+              <th style="padding:10px 12px;text-align:right;border-radius:0 8px 0 0">Balance</th>
+            </tr>
+          </thead>
+          <tbody id="calc-table-body"></tbody>
+        </table>
+      </div>
+
+      <p style="text-align:center;font-size:.72rem;color:#9ca3af;margin-top:16px;line-height:1.6">Based on 2.5% monthly interest, 1-month moratorium, 4 quarterly amortized payouts over 12 months.</p>
     </div>
   </div>
 </section>
 
 <script>
-// Calculator logic — runs immediately when defined
+// Amortization Calculator — 2.5% monthly, 1-month moratorium, 4 quarterly payments
+var MONTHLY_RATE    = 0.025
+var MORATORIUM_MONTHS = 1
+var QUARTERS        = 4
+
+function calcAmortization(investmentAmount) {
+  if (!investmentAmount || investmentAmount <= 0) return null
+  // Step 1: Adjust principal for moratorium (interest accrues during moratorium month)
+  var adjustedPrincipal = investmentAmount * Math.pow(1 + MONTHLY_RATE, MORATORIUM_MONTHS)
+  // Step 2: Convert monthly rate to effective quarterly rate
+  var quarterlyRate = Math.pow(1 + MONTHLY_RATE, 3) - 1
+  // Step 3: Standard amortization payment formula
+  var quarterlyPayment = (adjustedPrincipal * quarterlyRate) /
+    (1 - Math.pow(1 + quarterlyRate, -QUARTERS))
+  // Step 4: Generate payment schedule
+  var balance = adjustedPrincipal
+  var schedule = []
+  for (var q = 1; q <= QUARTERS; q++) {
+    var interest  = balance * quarterlyRate
+    var principal = quarterlyPayment - interest
+    balance       = balance - principal
+    schedule.push({
+      quarter:   q,
+      payment:   quarterlyPayment,
+      interest:  interest,
+      principal: principal,
+      balance:   Math.max(0, balance)
+    })
+  }
+  return {
+    investmentAmount: investmentAmount,
+    adjustedPrincipal: adjustedPrincipal,
+    quarterlyRate: quarterlyRate,
+    quarterlyPayment: quarterlyPayment,
+    totalReceived: quarterlyPayment * QUARTERS,
+    totalInterest: (quarterlyPayment * QUARTERS) - investmentAmount,
+    schedule: schedule
+  }
+}
+
+function fmt(n) { return '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',') }
+
 function calcUpdate() {
-  const inp    = document.getElementById('calc-input')
-  const slider = document.getElementById('calc-slider')
-  let P = parseFloat(inp.value) || 0
+  var inp    = document.getElementById('calc-input')
+  var slider = document.getElementById('calc-slider')
+  var P = parseFloat(inp.value) || 0
   if (P < 0) P = 0
   if (P > 2000) { P = 2000; inp.value = 2000 }
   slider.value = P
 
-  const r   = 0.02
-  const n   = 12
-  const pmt = P > 0 ? P * r / (1 - Math.pow(1 + r, -n)) : 0
-  const quarterly = pmt * 3
-  const total     = pmt * 12
-  const interest  = total - P
-  const daily     = P > 0 ? interest / 390 : 0
+  var result = calcAmortization(P)
+  if (!result) {
+    document.getElementById('calc-interest').textContent  = '$0.00'
+    document.getElementById('calc-quarterly').textContent = '$0.00'
+    document.getElementById('calc-total').textContent     = '$0.00'
+    document.getElementById('calc-principal').textContent = '$0'
+    document.getElementById('calc-interest-earned').textContent = '+$0.00 interest'
+    document.getElementById('calc-table-body').innerHTML  = ''
+    return
+  }
 
-  document.getElementById('calc-daily').textContent     = '$' + daily.toFixed(2)
-  document.getElementById('calc-quarterly').textContent = '$' + quarterly.toFixed(2)
-  document.getElementById('calc-total').textContent     = '$' + total.toFixed(2)
+  document.getElementById('calc-interest').textContent  = fmt(result.totalInterest)
+  document.getElementById('calc-quarterly').textContent = fmt(result.quarterlyPayment)
+  document.getElementById('calc-total').textContent     = fmt(result.totalReceived)
   document.getElementById('calc-principal').textContent = '$' + P.toLocaleString()
-  document.getElementById('calc-interest-earned').textContent = '+$' + interest.toFixed(2) + ' interest'
+  document.getElementById('calc-interest-earned').textContent = '+' + fmt(result.totalInterest) + ' interest'
+
+  // Render amortization table
+  var tbody = document.getElementById('calc-table-body')
+  tbody.innerHTML = result.schedule.map(function(row, i) {
+    var bg = i % 2 === 0 ? '#ffffff' : '#f9fafb'
+    return '<tr style="background:' + bg + '">' +
+      '<td style="padding:9px 12px;color:#374151;font-weight:600">Q' + row.quarter + '</td>' +
+      '<td style="padding:9px 12px;text-align:right;color:#1E4A43;font-weight:700">' + fmt(row.payment) + '</td>' +
+      '<td style="padding:9px 12px;text-align:right;color:#A9C83A;font-weight:600">' + fmt(row.interest) + '</td>' +
+      '<td style="padding:9px 12px;text-align:right;color:#6b7280">' + fmt(row.principal) + '</td>' +
+      '<td style="padding:9px 12px;text-align:right;color:#374151">' + fmt(row.balance) + '</td>' +
+    '</tr>'
+  }).join('')
 }
-// Sync slider with typed input
+
 document.getElementById('calc-input').addEventListener('input', function() {
   document.getElementById('calc-slider').value = this.value
 })
