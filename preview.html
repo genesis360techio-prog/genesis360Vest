@@ -37,7 +37,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(15,61,46,0.9
 .btn-ghost:hover{background:rgba(199,255,74,0.08)}
 .btn-primary{padding:9px 22px;background:#C7FF4A;color:#0F3D2E;border-radius:10px;font-size:.875rem;font-weight:700;text-decoration:none;transition:all .2s}
 .btn-primary:hover{background:#d4ff6a;transform:translateY(-1px)}
-.mob-menu-btn{display:none;background:none;border:none;cursor:pointer;color:#fff}
+.mob-menu-btn{display:none;background:none;border:none;cursor:pointer;color:#fff;padding:4px;line-height:0}
+.mob-menu{display:none;position:fixed;top:68px;left:0;right:0;z-index:99;background:rgba(10,34,24,0.98);backdrop-filter:blur(12px);border-bottom:1px solid rgba(199,255,74,0.15);padding:16px 24px 24px;flex-direction:column;gap:4px}
+.mob-menu.open{display:flex}
+.mob-menu a{color:rgba(255,255,255,0.8);font-size:1rem;font-weight:500;text-decoration:none;padding:13px 0;border-bottom:1px solid rgba(255,255,255,0.07);transition:color .15s}
+.mob-menu a:last-of-type{border-bottom:none}
+.mob-menu a:hover,.mob-menu a:active{color:#C7FF4A}
+.mob-menu-btns{display:flex;gap:10px;margin-top:16px}
+.mob-menu-btns a{flex:1;text-align:center}
 
 /* ── HERO ── */
 .hero{min-height:100vh;background:linear-gradient(135deg,#0a2218 0%,#0F3D2E 45%,#1a5c42 100%);display:flex;align-items:center;padding-top:68px;position:relative;overflow:hidden}
@@ -294,11 +301,25 @@ footer{background:#060f0a;padding:60px 24px 32px}
       <a href="/login" class="btn-ghost">Sign In</a>
       <a href="/register" class="btn-primary">Join Cycle</a>
     </div>
-    <button class="mob-menu-btn" onclick="document.querySelector('.nav-links').style.display=document.querySelector('.nav-links').style.display==='flex'?'none':'flex'">
-      <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    <button class="mob-menu-btn" id="mob-toggle" onclick="toggleMobMenu()">
+      <svg id="mob-icon-open" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      <svg id="mob-icon-close" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none"><path d="M18 6L6 18M6 6l12 12"/></svg>
     </button>
   </div>
 </nav>
+
+<!-- ══ MOBILE MENU ══════════════════════════════════════════════ -->
+<div class="mob-menu" id="mob-menu">
+  <a href="#how-it-works" onclick="closeMobMenu()">How It Works</a>
+  <a href="#returns" onclick="closeMobMenu()">Returns</a>
+  <a href="#calculator" onclick="closeMobMenu()">Calculator</a>
+  <a href="#traction" onclick="closeMobMenu()">Traction</a>
+  <a href="#team" onclick="closeMobMenu()">Team</a>
+  <div class="mob-menu-btns">
+    <a href="/login" class="btn-ghost" onclick="closeMobMenu()">Sign In</a>
+    <a href="/register" class="btn-primary" onclick="closeMobMenu()">Join Cycle</a>
+  </div>
+</div>
 
 <!-- ══ HERO ══════════════════════════════════════════════════════ -->
 <section class="hero">
@@ -664,6 +685,25 @@ footer{background:#060f0a;padding:60px 24px 32px}
     </div>
   </div>
 </section>
+
+<script>
+function toggleMobMenu() {
+  var menu = document.getElementById('mob-menu')
+  var isOpen = menu.classList.toggle('open')
+  document.getElementById('mob-icon-open').style.display  = isOpen ? 'none'  : 'block'
+  document.getElementById('mob-icon-close').style.display = isOpen ? 'block' : 'none'
+}
+function closeMobMenu() {
+  document.getElementById('mob-menu').classList.remove('open')
+  document.getElementById('mob-icon-open').style.display  = 'block'
+  document.getElementById('mob-icon-close').style.display = 'none'
+}
+// Close menu on outside click
+document.addEventListener('click', function(e) {
+  if (!document.getElementById('mob-menu').classList.contains('open')) return
+  if (!e.target.closest('#mob-menu') && !e.target.closest('#mob-toggle')) closeMobMenu()
+})
+</script>
 
 <script>
 // Amortization Calculator — 2.5% monthly, 1-month moratorium, 4 quarterly payments
