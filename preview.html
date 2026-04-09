@@ -43,7 +43,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(15,61,46,0.9
 .hero{min-height:100vh;background:linear-gradient(135deg,#0a2218 0%,#0F3D2E 45%,#1a5c42 100%);display:flex;align-items:center;padding-top:68px;position:relative;overflow:hidden}
 .hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(199,255,74,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(199,255,74,0.04) 1px,transparent 1px);background-size:60px 60px;pointer-events:none}
 .hero-glow{position:absolute;top:20%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(199,255,74,0.08) 0%,transparent 70%);pointer-events:none}
-.hero-inner{max-width:1200px;margin:0 auto;padding:80px 24px;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;position:relative;z-index:1}
+.hero-inner{max-width:1200px;margin:0 auto;padding:80px 24px;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;position:relative;z-index:1;width:100%}
 .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(199,255,74,0.12);border:1px solid rgba(199,255,74,0.25);border-radius:100px;padding:6px 14px;margin-bottom:24px}
 .hero-badge span{color:#C7FF4A;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
 .hero-badge .dot{width:7px;height:7px;border-radius:50%;background:#C7FF4A;animation:pulse 2s infinite}
@@ -243,7 +243,7 @@ footer{background:#060f0a;padding:60px 24px 32px}
   .dash-grid{grid-template-columns:1fr 1fr}
 }
 @media(max-width:768px){
-  .hero-inner{grid-template-columns:1fr;gap:40px;padding:60px 24px}
+  .hero-inner{grid-template-columns:1fr;gap:40px;padding:60px 24px;width:100%}
   .hero h1{font-size:2.25rem}
   .nav-links{display:none}
   .mob-menu-btn{display:block}
@@ -261,10 +261,17 @@ footer{background:#060f0a;padding:60px 24px 32px}
   .metrics{grid-template-columns:1fr}
   .dash-grid{grid-template-columns:1fr 1fr}
   .snap-cards{grid-template-columns:1fr}
+  /* Calculator */
   .calc-card{padding:20px !important}
   .calc-results{grid-template-columns:1fr !important;gap:10px !important}
   .calc-summary{flex-direction:column;align-items:stretch !important}
   .calc-summary a{text-align:center}
+  /* Hero */
+  .hero h1{font-size:1.75rem}
+  .hero-inner{padding:40px 16px;width:100%}
+  .hero-card{padding:20px}
+  .hero-metric-strip{grid-template-columns:1fr !important;gap:8px !important}
+  .hero-card-row-val{font-size:.8rem;text-align:right;max-width:55%}
 }
 </style>
 </head>
@@ -325,7 +332,7 @@ footer{background:#060f0a;padding:60px 24px 32px}
       </div>
 
       <!-- 3-metric strip -->
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+      <div class="hero-metric-strip" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
         <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:18px 14px;text-align:center;transition:background .2s" onmouseover="this.style.background='rgba(199,255,74,0.07)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
           <div style="font-size:1.75rem;font-weight:900;color:#C7FF4A;line-height:1;margin-bottom:6px">24%</div>
           <div style="font-size:.65rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:.07em;font-weight:600">Annual ROI</div>
