@@ -879,8 +879,9 @@ function renderAll(){
 // ── SIDEBAR ──
 function renderSidebar(){
   const name=profile?.full_name||currentUser.email;
+  const displayName=profile?.full_name||'Investor';
   const ini=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'?';
-  set('sb-avatar',ini); set('sb-name',name);
+  set('sb-avatar',ini); set('sb-name',displayName);
   const kyc=profile?.kyc_status||'pending';
   setH('sb-kyc',kyc==='approved'?'<span style="color:#9DC43A;font-size:11px">✓ KYC Verified</span>':kyc==='rejected'?'<a onclick="openKycModal()" href="javascript:void(0)" style="color:#ef4444;font-size:11px;text-decoration:none;cursor:pointer">✗ KYC Rejected — Resubmit →</a>':'<a onclick="openKycModal()" href="javascript:void(0)" style="color:#f59e0b;font-size:11px;text-decoration:none;cursor:pointer">⏳ KYC Pending — Complete →</a>');
   const unread=notifs.filter(n=>!n.read).length;
@@ -893,7 +894,8 @@ function renderSidebar(){
 function renderHome(){
   const hr=new Date().getHours();
   const g=hr<12?'Good morning':hr<18?'Good afternoon':'Good evening';
-  const fn=(profile?.full_name||'').split(' ')[0]||'there';
+  const rawName=profile?.full_name||'';
+  const fn=rawName&&!rawName.includes('@')?rawName.split(' ')[0]:'Investor';
   set('home-greeting',`${g}, ${fn}`);
   set('home-date',new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}));
 
@@ -1302,20 +1304,24 @@ function proceedToIntlPaystack(){
   const v=parseFloat(document.getElementById('deposit-amt-intl').value)||0;
   const cur=document.getElementById('intl-currency').value;
   if(!v||v<1){showToast('Enter a valid amount');return;}
-  // Convert to USD (Paystack Nigeria only supports USD for international)
+  // Convert to USD — Paystack Nigeria only supports USD for international cards
   const usdEq=parseFloat((v*(FX[cur]||1)).toFixed(2));
   const fee=parseFloat((usdEq*0.039).toFixed(2)), charged=parseFloat((usdEq+fee).toFixed(2));
-  const handler=PaystackPop.setup({
-    key: PAYSTACK_KEY,
-    email: currentUser.email,
-    amount: Math.round(charged*100),
-    currency: 'USD',
-    ref: 'GEN360_INTL_'+Date.now()+'_'+Math.random().toString(36).slice(2,7).toUpperCase(),
-    metadata:{ user_id:currentUser.id, usd_equiv:usdEq.toFixed(2), original_currency:cur, original_amount:v, custom_fields:[{display_name:'User ID',variable_name:'user_id',value:currentUser.id}] },
-    callback: function(response){ onDepositSuccess(response.reference, v, usdEq, cur, 'paystack'); },
-    onClose: function(){ showToast('Payment cancelled'); }
-  });
-  handler.openIframe();
+  try {
+    const handler=PaystackPop.setup({
+      key: PAYSTACK_KEY,
+      email: currentUser.email,
+      amount: Math.round(charged*100),
+      currency: 'USD',
+      ref: 'GEN360_INTL_'+Date.now()+'_'+Math.random().toString(36).slice(2,7).toUpperCase(),
+      metadata:{ user_id:currentUser.id, usd_equiv:usdEq.toFixed(2), original_currency:cur, original_amount:v, custom_fields:[{display_name:'User ID',variable_name:'user_id',value:currentUser.id}] },
+      callback: function(response){ onDepositSuccess(response.reference, v, usdEq, cur, 'paystack'); },
+      onClose: function(){ showToast('Payment window closed'); }
+    });
+    handler.openIframe();
+  } catch(e) {
+    showToast('⚠️ International payments not yet active. Please contact support or use the NGN tab.');
+  }
 }
 
 // ─── SHARED SUCCESS HANDLER ───────────────────────────────
