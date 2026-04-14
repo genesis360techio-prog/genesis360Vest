@@ -569,14 +569,6 @@ body{font-family:'Inter',sans-serif;background:#F0F4F8;color:#1e293b;min-height:
       <div class="page-sub">Monitor your active participations and payout timelines</div>
       <div id="tracking-list"></div>
 
-      <!-- Investor Intelligence -->
-      <div style="margin-top:32px;">
-        <div style="font-size:1.1rem;font-weight:700;color:#A6D64A;margin-bottom:6px;">Loan Ecosystem Intelligence</div>
-        <div style="font-size:0.85rem;color:#aaa;margin-bottom:16px;">Live metrics from the Genesis360Finance loan portfolio powering your returns</div>
-        <div style="background:#111;border:1px solid rgba(166,214,74,0.15);border-radius:12px;overflow:hidden;">
-          <iframe id="tracking_intel_iframe" style="width:100%;height:700px;border:none;display:block;" loading="lazy"></iframe>
-        </div>
-      </div>
     </div>
 
     <!-- ═══════════════ REWARDS PAGE ═══════════════ -->
@@ -1569,10 +1561,6 @@ function showPage(name){
   const mn=document.getElementById('mnav-'+name);
   if(mn)mn.classList.add('active');
   window.scrollTo(0,0);
-  if(name==='tracking'){
-    const fr=document.getElementById('tracking_intel_iframe');
-    if(fr&&!fr.src)fr.src='/investor-intelligence';
-  }
 }
 function showMoreSheet(){document.getElementById('more-sheet').classList.add('open');}
 function hideMoreSheet(){document.getElementById('more-sheet').classList.remove('open');}
